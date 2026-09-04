@@ -7,21 +7,26 @@ const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_G
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
   script.onload = function () {
-    window.troothSupabase = window.supabase.createClient(
-      TROOTH_SUPABASE_URL,
-      TROOTH_SUPABASE_PUBLISHABLE_KEY
-    );
+    window.troothSupabase = window.supabase.createClient(TROOTH_SUPABASE_URL,TROOTH_SUPABASE_PUBLISHABLE_KEY);
     const enhancement = document.createElement('script');
     enhancement.src = 'feed-enhancements.js';
     enhancement.onload = function () {
       const liveSync = document.createElement('script');
       liveSync.src = 'trooth-live-sync.js';
       liveSync.onload = function () {
-        window.dispatchEvent(new Event('trooth-supabase-ready'));
+        const hub = document.createElement('script');
+        hub.src = 'trooth-content-hub.js';
+        hub.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+        hub.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+        document.body.appendChild(hub);
       };
       liveSync.onerror = function () {
         console.error('Trooth: live sync could not be loaded.');
-        window.dispatchEvent(new Event('trooth-supabase-ready'));
+        const hub = document.createElement('script');
+        hub.src = 'trooth-content-hub.js';
+        hub.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+        hub.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+        document.body.appendChild(hub);
       };
       document.body.appendChild(liveSync);
     };
@@ -35,8 +40,6 @@ const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_G
     };
     document.body.appendChild(enhancement);
   };
-  script.onerror = function () {
-    console.error('Trooth: Supabase client could not be loaded.');
-  };
+  script.onerror = function () { console.error('Trooth: Supabase client could not be loaded.'); };
   document.head.appendChild(script);
 })();
