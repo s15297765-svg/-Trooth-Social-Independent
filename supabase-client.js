@@ -16,7 +16,13 @@ const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_G
       liveSync.onload = function () {
         const hub = document.createElement('script');
         hub.src = 'trooth-content-hub.js';
-        hub.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+        hub.onload = function () {
+          const groups = document.createElement('script');
+          groups.src = 'trooth-groups-home.js';
+          groups.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+          groups.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+          document.body.appendChild(groups);
+        };
         hub.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
         document.body.appendChild(hub);
       };
@@ -24,7 +30,13 @@ const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_G
         console.error('Trooth: live sync could not be loaded.');
         const hub = document.createElement('script');
         hub.src = 'trooth-content-hub.js';
-        hub.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+        hub.onload = function () {
+          const groups = document.createElement('script');
+          groups.src = 'trooth-groups-home.js';
+          groups.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+          groups.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+          document.body.appendChild(groups);
+        };
         hub.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
         document.body.appendChild(hub);
       };
