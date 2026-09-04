@@ -6,6 +6,20 @@
     window.addEventListener('trooth-supabase-ready', () => resolve(window.troothSupabase), { once: true });
   });
 
+  async function notifyPostOwner(s, postId, actorId, kind, body) {
+    try {
+      const { data: post } = await s.from('posts').select('user_id').eq('id', postId).maybeSingle();
+      if (!post?.user_id || post.user_id === actorId) return;
+      await s.from('notifications').insert({
+        user_id: post.user_id,
+        actor_id: actorId,
+        kind,
+        body,
+        is_read: false
+      });
+    } catch (_) {}
+  }
+
   async function hydrateFeed() {
     const s = await wait();
     const posts = [...document.querySelectorAll('.post')];
@@ -54,6 +68,7 @@
     } else {
       const r = await s.from('post_likes').insert({ post_id: id, user_id: me.id });
       if (r.error) { alert(r.error.message); return; }
+      await notifyPostOwner(s, id, me.id, 'Like', 'liked your post on Trooth.');
     }
     await hydrateFeed();
   };
@@ -66,14 +81,19 @@
     if (!v || !v.trim()) return;
     const r = await s.from('comments').insert({ post_id: id, user_id: me.id, body: v.trim() });
     if (r.error) { alert(r.error.message); return; }
+    await notifyPostOwner(s, id, me.id, 'Comment', 'commented on your post on Trooth.');
     await hydrateFeed();
   };
 
   window.sharePost = async function (id) {
+    const s = await wait();
+    const me = (await s.auth.getUser()).data.user;
+    if (!me) { alert('Please login first.'); location.href = 'auth.html'; return; }
     const url = location.origin + location.pathname + '#post-' + id;
     try {
       if (navigator.share) await navigator.share({ title: 'Trooth Social Independent', text: 'Check this post on Trooth', url });
       else { await navigator.clipboard.writeText(url); alert('Post link copied!'); }
+      await notifyPostOwner(s, id, me.id, 'Share', 'shared your post on Trooth.');
     } catch (_) {}
   };
 
