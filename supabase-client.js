@@ -19,7 +19,13 @@ const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_G
         hub.onload = function () {
           const groups = document.createElement('script');
           groups.src = 'trooth-groups-home.js';
-          groups.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+          groups.onload = function () {
+            const groupEnhancement = document.createElement('script');
+            groupEnhancement.src = 'trooth-groups-enhancement.js';
+            groupEnhancement.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+            groupEnhancement.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+            document.body.appendChild(groupEnhancement);
+          };
           groups.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
           document.body.appendChild(groups);
         };
@@ -33,7 +39,13 @@ const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_G
         hub.onload = function () {
           const groups = document.createElement('script');
           groups.src = 'trooth-groups-home.js';
-          groups.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+          groups.onload = function () {
+            const groupEnhancement = document.createElement('script');
+            groupEnhancement.src = 'trooth-groups-enhancement.js';
+            groupEnhancement.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+            groupEnhancement.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+            document.body.appendChild(groupEnhancement);
+          };
           groups.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
           document.body.appendChild(groups);
         };
