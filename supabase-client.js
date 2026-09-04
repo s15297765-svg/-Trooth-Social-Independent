@@ -4,6 +4,13 @@ const TROOTH_SUPABASE_URL = 'https://tmshuyvtmbumtrlbhdjq.supabase.co';
 const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_GTSnhpkz';
 
 (function () {
+  // Apply the stronger green visual theme as early as possible.
+  const theme = document.createElement('script');
+  theme.src = 'trooth-green-theme.js';
+  theme.onload = function () {};
+  theme.onerror = function () { console.warn('Trooth: green theme could not be loaded.'); };
+  document.head.appendChild(theme);
+
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
   script.onload = function () {
