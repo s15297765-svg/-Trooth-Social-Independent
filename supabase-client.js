@@ -14,11 +14,24 @@ const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_G
     const enhancement = document.createElement('script');
     enhancement.src = 'feed-enhancements.js';
     enhancement.onload = function () {
-      window.dispatchEvent(new Event('trooth-supabase-ready'));
+      const liveSync = document.createElement('script');
+      liveSync.src = 'trooth-live-sync.js';
+      liveSync.onload = function () {
+        window.dispatchEvent(new Event('trooth-supabase-ready'));
+      };
+      liveSync.onerror = function () {
+        console.error('Trooth: live sync could not be loaded.');
+        window.dispatchEvent(new Event('trooth-supabase-ready'));
+      };
+      document.body.appendChild(liveSync);
     };
     enhancement.onerror = function () {
       console.error('Trooth: feed enhancements could not be loaded.');
-      window.dispatchEvent(new Event('trooth-supabase-ready'));
+      const liveSync = document.createElement('script');
+      liveSync.src = 'trooth-live-sync.js';
+      liveSync.onload = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+      liveSync.onerror = function () { window.dispatchEvent(new Event('trooth-supabase-ready')); };
+      document.body.appendChild(liveSync);
     };
     document.body.appendChild(enhancement);
   };
