@@ -1,4 +1,4 @@
-/* Trooth Social Independent — live notification/message sync */
+/* Trooth Social Independent — live notification/message/news/sports sync */
 (function(){
   function boot(){
     const sb=window.troothSupabase;
@@ -16,7 +16,18 @@
           window.dispatchEvent(new CustomEvent('trooth-message',{detail:payload.new}));
           if(typeof window.refreshTroothMessages==='function') window.refreshTroothMessages();
         })
-        .subscribe();
+        .on('postgres_changes',{event:'*',schema:'public',table:'news_stories'},payload=>{
+          window.dispatchEvent(new CustomEvent('trooth-news-update',{detail:payload}));
+          if(location.pathname.toLowerCase().includes('news.html')) location.reload();
+        })
+        .on('postgres_changes',{event:'*',schema:'public',table:'sports_stories'},payload=>{
+          window.dispatchEvent(new CustomEvent('trooth-sports-update',{detail:payload}));
+          if(location.pathname.toLowerCase().includes('sports.html')) location.reload();
+        })
+        .subscribe((status)=>{
+          window.troothLiveStatus=status;
+          window.dispatchEvent(new CustomEvent('trooth-live-status',{detail:status}));
+        });
       window.troothLiveChannel=channel;
     });
   }
