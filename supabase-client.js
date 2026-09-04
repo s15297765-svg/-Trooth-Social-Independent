@@ -11,7 +11,16 @@ const TROOTH_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_G
       TROOTH_SUPABASE_URL,
       TROOTH_SUPABASE_PUBLISHABLE_KEY
     );
-    window.dispatchEvent(new Event('trooth-supabase-ready'));
+    const enhancement = document.createElement('script');
+    enhancement.src = 'feed-enhancements.js';
+    enhancement.onload = function () {
+      window.dispatchEvent(new Event('trooth-supabase-ready'));
+    };
+    enhancement.onerror = function () {
+      console.error('Trooth: feed enhancements could not be loaded.');
+      window.dispatchEvent(new Event('trooth-supabase-ready'));
+    };
+    document.body.appendChild(enhancement);
   };
   script.onerror = function () {
     console.error('Trooth: Supabase client could not be loaded.');
