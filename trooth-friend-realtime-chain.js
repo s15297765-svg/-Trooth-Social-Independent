@@ -1,9 +1,9 @@
-// Trooth — optimized realtime Friends / Follow / Request chain v2
+// Trooth — optimized realtime Friends / Follow / Request chain v3
 (function(){
   function boot(){
     var sb=window.troothSupabase;if(!sb||window.troothFriendRealtimeBooted)return;
     window.troothFriendRealtimeBooted=true;
-    var uid=null,channel=null,timer=null,subTimer=null,started=true,lastSignal=0;
+    var uid=null,channel=null,timer=null,subTimer=null,started=true,lastSignal=0,subscribing=false;
     function clearChannel(){
       if(channel){try{sb.removeChannel(channel)}catch(e){}channel=null;}
       window.troothFriendRealtimeChannel=null;
@@ -22,20 +22,26 @@
       },160);
     }
     async function subscribe(){
-      clearTimeout(subTimer);if(!started)return;
-      var id=await getUid();
-      if(!started)return;
-      clearChannel();
-      if(!id){uid=null;return}
-      uid=id;
-      var name='trooth-friend-realtime-chain-'+id;
-      channel=sb.channel(name)
-        .on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'receiver_id=eq.'+id},refresh)
-        .on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'sender_id=eq.'+id},refresh)
-        .on('postgres_changes',{event:'*',schema:'public',table:'connections',filter:'follower_id=eq.'+id},refresh)
-        .on('postgres_changes',{event:'*',schema:'public',table:'connections',filter:'following_id=eq.'+id},refresh)
-        .subscribe(function(status){if(status==='SUBSCRIBED')refresh();else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')scheduleSubscribe(900)});
-      window.troothFriendRealtimeChannel=channel;
+      clearTimeout(subTimer);if(!started||subscribing)return;
+      subscribing=true;
+      try{
+        var id=await getUid();
+        if(!started)return;
+        clearChannel();
+        if(!id){uid=null;return}
+        uid=id;
+        var name='trooth-friend-realtime-chain-'+id;
+        channel=sb.channel(name)
+          .on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'receiver_id=eq.'+id},refresh)
+          .on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'sender_id=eq.'+id},refresh)
+          .on('postgres_changes',{event:'*',schema:'public',table:'connections',filter:'follower_id=eq.'+id},refresh)
+          .on('postgres_changes',{event:'*',schema:'public',table:'connections',filter:'following_id=eq.'+id},refresh)
+          .subscribe(function(status){
+            if(status==='SUBSCRIBED')refresh();
+            else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')scheduleSubscribe(900);
+          });
+        window.troothFriendRealtimeChannel=channel;
+      }finally{subscribing=false}
     }
     function scheduleSubscribe(delay){clearTimeout(subTimer);if(started)subTimer=setTimeout(subscribe,delay==null?80:delay)}
     subscribe();
@@ -44,6 +50,7 @@
       if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED')scheduleSubscribe(80);
     });
     window.addEventListener('online',function(){scheduleSubscribe(120)});
+    window.addEventListener('visibilitychange',function(){if(!document.hidden)scheduleSubscribe(180)});
     window.addEventListener('beforeunload',function(){started=false;clearTimeout(timer);clearTimeout(subTimer);clearChannel()},{once:true});
   }
   if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
