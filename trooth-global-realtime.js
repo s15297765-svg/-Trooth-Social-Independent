@@ -1,23 +1,20 @@
-// Trooth Social Independent — global realtime refresh bridge
+// Trooth Social Independent — global realtime event bridge
 (function(){
   function boot(){
     if(window.__troothGlobalRealtime)return;window.__troothGlobalRealtime=true;
     var sb=window.troothSupabase;if(!sb)return;
-    function pulse(type,payload){
-      window.dispatchEvent(new CustomEvent('trooth-'+type+'-incoming',{detail:payload}));
-      window.dispatchEvent(new CustomEvent('trooth-feed-refresh'));
-    }
+    function signal(name,detail){window.dispatchEvent(new CustomEvent(name,{detail:detail||{}}))}
     sb.auth.getUser().then(function(r){
       var u=r.data&&r.data.user;if(!u)return;
-      if(window.__troothGlobalChannel){try{sb.removeChannel(window.__troothGlobalChannel)}catch(e){}}
-      var c=sb.channel('trooth-global-realtime-'+u.id);
-      c.on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'user_id=eq.'+u.id},function(p){pulse('notification',p)});
-      c.on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'receiver_id=eq.'+u.id},function(p){pulse('message',p)});
-      c.on('postgres_changes',{event:'*',schema:'public',table:'posts'},function(p){pulse('post',p)});
-      c.subscribe();window.__troothGlobalChannel=c;
+      try{if(window.__troothGlobalChannel)sb.removeChannel(window.__troothGlobalChannel)}catch(e){}
+      var c=sb.channel('trooth-global-'+u.id)
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'user_id=eq.'+u.id},function(p){signal('trooth-notification-incoming',p.new);signal('trooth-notifications-refresh',p.new)})
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'receiver_id=eq.'+u.id},function(p){signal('trooth-message-incoming',p.new);signal('trooth-messages-refresh',p.new)})
+        .on('postgres_changes',{event:'*',schema:'public',table:'posts'},function(p){signal('trooth-feed-refresh',p)})
+        .subscribe(function(status){if(status==='SUBSCRIBED')signal('trooth-realtime-connected')});
+      window.__troothGlobalChannel=c;
     });
-    window.addEventListener('online',function(){setTimeout(boot,900)});
   }
-  function start(){setTimeout(boot,2600)}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,2200)},{once:true});else setTimeout(boot,2200);
+  window.addEventListener('online',function(){setTimeout(boot,700)});
 })();
