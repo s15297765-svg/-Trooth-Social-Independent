@@ -19,6 +19,7 @@
     connect();
     window.addEventListener('online',function(){setTimeout(connect,700)});
     document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(connect,500)});
+    window.addEventListener('trooth-realtime-reconnect',function(){connect()});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,2200)},{once:true});else setTimeout(boot,2200);
 })();
