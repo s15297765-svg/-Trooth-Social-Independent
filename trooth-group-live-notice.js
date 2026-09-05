@@ -19,7 +19,7 @@
     }
     function esc(s){return String(s??'').replace(/[&<>\"]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])})}
     sb.channel('trooth-group-live-notice-'+groupId)
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'group_announcements',filter:'group_id=eq.'+groupId},function(e){show(e.new||{});window.dispatchEvent(new CustomEvent('trooth-group-announcement-live',{detail:e.new||{}});})
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'group_announcements',filter:'group_id=eq.'+groupId},function(e){show(e.new||{});window.dispatchEvent(new CustomEvent('trooth-group-announcement-live',{detail:e.new||{}}));})
       .subscribe();
   }
   if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
