@@ -1,14 +1,14 @@
-// Trooth Social Independent — Home Network Live Upgrade v5
+// Trooth Social Independent — Home Network Live Upgrade v6
 (function(){
   function start(){
     var s=window.troothSupabase;if(!s||window.__troothHomeNetworkUpgrade)return;window.__troothHomeNetworkUpgrade=true;
-    var tables=[['news_stories','newsHub'],['sports_stories','sportsHub'],['store_listings','storesHub'],['properties','propertyHub'],['film_fashion_stories','filmFashionHub']],refreshTimers={},lastEvent={},channel=null,retryTimer=null,starting=false,onlineHandler,offlineHandler,focusHandler;
+    var tables=[['news_stories','newsHub'],['sports_stories','sportsHub'],['store_listings','storesHub'],['properties','propertyHub'],['film_fashion_stories','filmFashionHub']],refreshTimers={},lastEvent={},channel=null,retryTimer=null,starting=false,handlersBound=false,onlineHandler,offlineHandler,focusHandler,beforeUnloadHandler;
     function refreshHub(table,id){if(!navigator.onLine)return;if(typeof window.loadHub==='function')return window.loadHub(table,id)}
     function schedule(key,fn,delay){clearTimeout(refreshTimers[key]);refreshTimers[key]=setTimeout(fn,delay||700)}
     function shouldHandle(key){var now=Date.now();if(lastEvent[key]&&now-lastEvent[key]<900)return false;lastEvent[key]=now;return true}
-    function toast(msg){var el=document.getElementById('troothLiveToast');if(!el){el=document.createElement('div');el.id='troothLiveToast';el.style.cssText='position:fixed;right:16px;bottom:16px;background:#2d6a4f;color:#fff;padding:11px 15px;border-radius:12px;box-shadow:0 5px 18px #0002;z-index:9999;font-weight:800;opacity:0;transition:.25s';document.body.appendChild(el)}el.textContent=msg;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(function(){el.style.opacity='0'},2200)}
+    function toast(msg){var el=document.getElementById('troothHomeNetworkToast');if(!el){el=document.createElement('div');el.id='troothHomeNetworkToast';el.style.cssText='position:fixed;right:16px;bottom:16px;background:#2d6a4f;color:#fff;padding:11px 15px;border-radius:12px;box-shadow:0 5px 18px #0002;z-index:9999;font-weight:800;opacity:0;transition:.25s';document.body.appendChild(el)}el.textContent=msg;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(function(){el.style.opacity='0'},2200)}
     function status(type,detail){try{window.dispatchEvent(new CustomEvent('trooth-home-network-status',{detail:{status:type,message:detail||''}}))}catch(e){}}
-    function cleanup(){clearTimeout(retryTimer);retryTimer=null;Object.keys(refreshTimers).forEach(function(k){clearTimeout(refreshTimers[k])});if(channel){try{s.removeChannel(channel)}catch(e){}channel=null}}
+    function cleanup(){clearTimeout(retryTimer);retryTimer=null;Object.keys(refreshTimers).forEach(function(k){clearTimeout(refreshTimers[k]);delete refreshTimers[k]});if(channel){try{s.removeChannel(channel)}catch(e){}channel=null}}
     function subscribe(){
       if(starting||!navigator.onLine)return;starting=true;cleanup();
       channel=s.channel('trooth-home-network-live-'+Date.now())
@@ -23,8 +23,8 @@
     }
     var hero=document.querySelector('.hero');if(hero&&!document.getElementById('troothLiveBadge')){var b=document.createElement('span');b.id='troothLiveBadge';b.className='tag';b.textContent='● LIVE NETWORK';b.style.marginLeft='6px';var tag=hero.querySelector('.tag');if(tag&&tag.parentNode)tag.after(b);else hero.appendChild(b)}
     onlineHandler=function(){subscribe()};offlineHandler=function(){status('OFFLINE','Network offline');cleanup();starting=false};focusHandler=function(){if(!navigator.onLine)return;if(typeof window.loadPosts==='function')window.loadPosts();tables.forEach(function(x){schedule(x[0],function(){refreshHub(x[0],x[1])},250)})};
-    subscribe();window.addEventListener('online',onlineHandler);window.addEventListener('offline',offlineHandler);window.addEventListener('focus',focusHandler);
-    window.addEventListener('beforeunload',function(){window.removeEventListener('online',onlineHandler);window.removeEventListener('offline',offlineHandler);window.removeEventListener('focus',focusHandler);cleanup()},{once:true});
+    if(!handlersBound){handlersBound=true;window.addEventListener('online',onlineHandler);window.addEventListener('offline',offlineHandler);window.addEventListener('focus',focusHandler);beforeUnloadHandler=function(){window.removeEventListener('online',onlineHandler);window.removeEventListener('offline',offlineHandler);window.removeEventListener('focus',focusHandler);cleanup()};window.addEventListener('beforeunload',beforeUnloadHandler,{once:true})}
+    subscribe();
   }
   if(window.troothSupabase)start();else window.addEventListener('trooth-supabase-ready',start,{once:true});
 })();
