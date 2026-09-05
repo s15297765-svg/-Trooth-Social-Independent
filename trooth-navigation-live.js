@@ -7,8 +7,10 @@
     let el=document.getElementById(id);if(!el)return;el.textContent=count>99?'99+':count;el.style.display=count?'inline-flex':'none';el.style.alignItems='center';el.style.justifyContent='center';
   }
   async function run(){
+    if(window.troothNavigationRealtimeReady)return;
     const sb=await ready();
     let u=(await sb.auth.getUser()).data.user;if(!u)return;
+    window.troothNavigationRealtimeReady=true;
     let refreshTimer=null;
     async function refresh(){
       clearTimeout(refreshTimer);refreshTimer=setTimeout(async function(){
@@ -27,12 +29,15 @@
     inject();refresh();
     window.addEventListener('trooth-navigation-refresh',refresh);
     window.addEventListener('trooth-content-hubs-refresh',function(){inject()});
-    const ch=sb.channel('trooth-global-nav-live-v2')
+    const ch=sb.channel('trooth-global-nav-live-v3-'+u.id)
       .on('postgres_changes',{event:'*',schema:'public',table:'notifications',filter:`user_id=eq.${u.id}`},refresh)
       .on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:`receiver_id=eq.${u.id}`},refresh)
       .subscribe();
     window.troothNavigationRealtime=ch;
-    sb.auth.onAuthStateChange(function(){setTimeout(function(){location.reload()},0)});
+    window.addEventListener('beforeunload',function(){clearTimeout(refreshTimer);try{sb.removeChannel(ch)}catch(e){}});
+    sb.auth.onAuthStateChange(function(event){
+      if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_DELETED')setTimeout(function(){location.reload()},0);
+    });
   }
   ready().then(run).catch(()=>{});
 })();
