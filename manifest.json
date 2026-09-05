@@ -1,0 +1,13 @@
+{
+  "name": "Trooth Social Independent",
+  "short_name": "Trooth",
+  "description": "Independent social network for people, news, sports, business, stores, property, film and fashion.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef8f1",
+  "theme_color": "#74c69d",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "categories": ["social", "news", "business"]
+}
