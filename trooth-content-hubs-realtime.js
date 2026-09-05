@@ -8,19 +8,27 @@
     var timer=null;
     function refresh(table,event){
       clearTimeout(timer);timer=setTimeout(function(){
+        var detail={table:table,event:event,source:'content-hubs-realtime'};
         var name=names[table];
-        if(name)window.dispatchEvent(new CustomEvent(name,{detail:{table:table,event:event,source:'content-hubs-realtime'}}));
-        window.dispatchEvent(new CustomEvent('trooth-content-hubs-refresh',{detail:{table:table,event:event,source:'content-hubs-realtime'}}));
+        if(name)window.dispatchEvent(new CustomEvent(name,{detail:detail}));
+        window.dispatchEvent(new CustomEvent('trooth-content-hubs-refresh',{detail:detail}));
+        window.dispatchEvent(new CustomEvent('trooth-navigation-refresh',{detail:detail}));
       },120);
     }
-    var ch=sb.channel('trooth-content-hubs-realtime');
-    tables.forEach(function(table){ch.on('postgres_changes',{event:'*',schema:'public',table:table},function(e){refresh(table,e.eventType)})});
-    ch.subscribe(function(status){
-      if(status==='SUBSCRIBED')window.dispatchEvent(new CustomEvent('trooth-content-hubs-ready'));
-    });
-    window.troothContentHubsRealtime=ch;
+    function subscribe(){
+      var ch=sb.channel('trooth-content-hubs-realtime-'+Date.now());
+      tables.forEach(function(table){ch.on('postgres_changes',{event:'*',schema:'public',table:table},function(e){refresh(table,e.eventType)})});
+      ch.subscribe(function(status){
+        if(status==='SUBSCRIBED'){
+          window.troothContentHubsRealtime=ch;
+          window.dispatchEvent(new CustomEvent('trooth-content-hubs-ready'));
+        }
+      });
+      return ch;
+    }
+    var ch=subscribe();
     sb.auth.onAuthStateChange(function(){
-      if(window.troothContentHubsRealtime===ch){try{sb.removeChannel(ch)}catch(e){}window.troothContentHubsRealtime=null;setTimeout(boot,0)}
+      if(window.troothContentHubsRealtime===ch){try{sb.removeChannel(ch)}catch(e){}window.troothContentHubsRealtime=null;setTimeout(boot,50)}
     });
   }
   if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
