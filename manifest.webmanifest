@@ -1,0 +1,11 @@
+{
+  "name": "Trooth Social Independent",
+  "short_name": "Trooth",
+  "start_url": "/-Trooth-Social-Independent/index.html",
+  "scope": "/-Trooth-Social-Independent/",
+  "display": "standalone",
+  "background_color": "#eef8f1",
+  "theme_color": "#40916c",
+  "description": "Trooth Social Independent — social, business, news, sports, stores and community network.",
+  "icons": []
+}
