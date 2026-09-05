@@ -1,5 +1,5 @@
-const CACHE='trooth-shell-v3';
-const CORE=['./','./index.html','./auth.html','./friends.html','./chat.html','./notifications.html','./business.html','./news.html','./sports.html','./stores.html','./property.html','./film-fashion.html','./manifest.webmanifest','./trooth-icon.svg'];
+const CACHE='trooth-shell-v4';
+const CORE=['./','./index.html','./auth.html','./friends.html','./chat.html','./notifications.html','./business.html','./news.html','./sports.html','./stores.html','./property.html','./film-fashion.html','./groups.html','./group.html','./activity.html','./saved.html','./settings.html','./profile.html','./search.html','./reels.html','./manifest.webmanifest','./trooth-icon.svg'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('trooth-shell-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('message',e=>{if(e.data&&e.data.type==='SKIP_WAITING')self.skipWaiting()});
