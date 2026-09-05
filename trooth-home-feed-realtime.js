@@ -7,10 +7,16 @@
     window.troothHomeFeedRealtimeReady=true;
 
     var feed=document.getElementById('feed');
-    var pending=0,channel=null,authSub=null,subscribing=false;
+    var pending=0,channel=null,authSub=null,subscribing=false,lastRefresh=0;
     function emit(detail){window.dispatchEvent(new CustomEvent('trooth-home-feed-refresh',{detail:detail||{}}))}
     function hideBanner(){var el=document.getElementById('trooth-new-posts-banner');if(el)el.remove();pending=0}
-    function refreshNow(){hideBanner();if(typeof window.loadPosts==='function')window.loadPosts();emit({source:'smart-refresh'})}
+    function refreshNow(){
+      var now=Date.now();
+      if(now-lastRefresh<900)return;
+      lastRefresh=now;hideBanner();
+      if(typeof window.loadPosts==='function')window.loadPosts();
+      emit({source:'smart-refresh'});
+    }
     function showNewPostsBanner(){
       pending++;if(!feed)return;
       var el=document.getElementById('trooth-new-posts-banner');
@@ -45,6 +51,8 @@
       if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED')subscribe();
     });
     authSub=auth&&auth.data&&auth.data.subscription?auth.data.subscription:null;
+    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&pending)refreshNow()});
+    window.addEventListener('focus',function(){if(pending)refreshNow()});
     window.addEventListener('beforeunload',function(){
       cleanup();
       if(authSub){try{authSub.unsubscribe()}catch(e){}}
