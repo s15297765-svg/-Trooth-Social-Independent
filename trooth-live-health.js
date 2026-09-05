@@ -1,7 +1,7 @@
-// Trooth Social Independent — resilient realtime health indicator v10
+// Trooth Social Independent — resilient realtime health indicator v11
 (function(){
   function boot(){
-    if(window.__troothLiveHealthV10)return;window.__troothLiveHealthV10=true;
+    if(window.__troothLiveHealthV11)return;window.__troothLiveHealthV11=true;
     var el=document.createElement('div');el.id='trooth-live-health';el.textContent='● LIVE';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.setAttribute('aria-atomic','true');
     el.style='position:fixed;top:68px;right:12px;z-index:99998;background:#fff;padding:6px 10px;border-radius:999px;box-shadow:0 4px 16px #0002;font:700 11px system-ui;color:#718276;transition:.2s;cursor:default;max-width:calc(100vw - 24px);padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-top,0px))';
     document.body.appendChild(el);
