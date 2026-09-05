@@ -12,14 +12,13 @@
     refreshTimer=setTimeout(()=>{
       refreshTimer=null;
       window.dispatchEvent(new CustomEvent('trooth-market-interaction-update'));
-      if(typeof window.refreshTroothFeed==='function')window.refreshTroothFeed();
     },180);
   }
 
   function onMarketUpdate(event){
     if(stopped)return;
     const detail=event&&event.detail;
-    if(!detail||!tables[detail.table])return;
+    if(!detail||!tables[detail.type])return;
     refresh();
   }
 
