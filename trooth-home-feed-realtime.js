@@ -7,7 +7,7 @@
     window.troothHomeFeedRealtimeReady=true;
 
     var feed=document.getElementById('feed');
-    var pending=0,channel=null;
+    var pending=0,channel=null,authSub=null,subscribing=false;
     function emit(detail){window.dispatchEvent(new CustomEvent('trooth-home-feed-refresh',{detail:detail||{}}))}
     function hideBanner(){var el=document.getElementById('trooth-new-posts-banner');if(el)el.remove();pending=0}
     function refreshNow(){hideBanner();if(typeof window.loadPosts==='function')window.loadPosts();emit({source:'smart-refresh'})}
@@ -28,20 +28,27 @@
     `;document.head.appendChild(style);
     function cleanup(){hideBanner();if(channel){try{sb.removeChannel(channel)}catch(e){}channel=null}window.troothHomeFeedRealtimeChannel=null}
     function subscribe(){
-      cleanup();
-      channel=sb.channel('trooth-home-feed-realtime')
+      if(subscribing)return;
+      subscribing=true;cleanup();
+      channel=sb.channel('trooth-home-feed-realtime-'+Date.now())
         .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},function(e){showNewPostsBanner();emit({source:'new-post',post:e&&e.new||null})})
         .on('postgres_changes',{event:'UPDATE',schema:'public',table:'posts'},function(e){emit({source:'post-update',post:e&&e.new||null})})
         .on('postgres_changes',{event:'DELETE',schema:'public',table:'posts'},function(e){emit({source:'post-delete',post:e&&e.old||null})})
-        .subscribe();
-      window.troothHomeFeedRealtimeChannel=channel;
+        .subscribe(function(status){
+          subscribing=false;
+          if(status==='SUBSCRIBED')window.troothHomeFeedRealtimeChannel=channel;
+        });
     }
     subscribe();
-    sb.auth.onAuthStateChange(function(event,session){
+    var auth=sb.auth.onAuthStateChange(function(event,session){
       if(event==='SIGNED_OUT'||!session){cleanup();return}
       if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED')subscribe();
     });
-    window.addEventListener('beforeunload',cleanup);
+    authSub=auth&&auth.data&&auth.data.subscription?auth.data.subscription:null;
+    window.addEventListener('beforeunload',function(){
+      cleanup();
+      if(authSub){try{authSub.unsubscribe()}catch(e){}}
+    },{once:true});
     window.troothHomeFeedRefresh=refreshNow;
   }
   if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
