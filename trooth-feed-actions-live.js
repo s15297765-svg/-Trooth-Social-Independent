@@ -1,29 +1,41 @@
-// Trooth — polished live Home Feed actions v3
+// Trooth — polished live Home Feed actions v4
 (function(){
   function boot(){
     var sb=window.troothSupabase;if(!sb)return;
-    if(window.troothFeedActionsLiveV3)return;window.troothFeedActionsLiveV3=true;
+    if(window.troothFeedActionsLiveV4)return;window.troothFeedActionsLiveV4=true;
+    var refreshTimer=null,refreshing={};
     async function uid(){var r=await sb.auth.getUser();return r.data&&r.data.user?r.data.user.id:null}
     function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
     async function refreshPost(postId){
-      var cards=document.querySelectorAll('.post[data-post-id="'+postId+'"]');
-      if(!cards.length)return;
-      var userId=await uid();
-      var [l,c,sh]=await Promise.all([
-        sb.from('post_likes').select('user_id').eq('post_id',postId),
-        sb.from('comments').select('id,user_id,body,created_at').eq('post_id',postId).order('created_at',{ascending:false}).limit(5),
-        sb.from('post_shares').select('user_id').eq('post_id',postId)
-      ]);
-      var liked=userId&&(l.data||[]).some(x=>x.user_id===userId);
-      cards.forEach(card=>{
-        var a=card.querySelector('[data-feed-actions]'),meta=card.querySelector('[data-feed-meta]');
-        if(a){var like=a.querySelector('[data-action="like"]');if(like){like.textContent='👍 '+(liked?'Liked':'Like')+' ('+(l.data||[]).length+')';like.dataset.liked=liked?'1':'0';like.setAttribute('aria-pressed',liked?'true':'false')}}
-        if(meta)meta.textContent=(l.data||[]).length+' Likes • '+(c.data||[]).length+' Comments • '+(sh.data||[]).length+' Shares';
-        var box=card.querySelector('[data-feed-comments]');
-        if(box)box.innerHTML=(c.data||[]).map(x=>'<div class="feed-comment"><b>💬</b> '+esc(x.body)+'</div>').join('');
-      });
+      if(!postId||refreshing[postId])return;refreshing[postId]=true;
+      try{
+        var cards=document.querySelectorAll('.post[data-post-id="'+postId+'"]');if(!cards.length)return;
+        var userId=await uid();
+        var [l,c,sh]=await Promise.all([
+          sb.from('post_likes').select('user_id').eq('post_id',postId),
+          sb.from('comments').select('id,user_id,body,created_at').eq('post_id',postId).order('created_at',{ascending:false}).limit(5),
+          sb.from('post_shares').select('user_id').eq('post_id',postId)
+        ]);
+        if(l.error||c.error||sh.error)return;
+        var liked=userId&&(l.data||[]).some(x=>x.user_id===userId);
+        cards.forEach(card=>{
+          var a=card.querySelector('[data-feed-actions]'),meta=card.querySelector('[data-feed-meta]');
+          if(a){var like=a.querySelector('[data-action="like"]');if(like){like.textContent='👍 '+(liked?'Liked':'Like')+' ('+(l.data||[]).length+')';like.dataset.liked=liked?'1':'0';like.setAttribute('aria-pressed',liked?'true':'false')}}
+          if(meta)meta.textContent=(l.data||[]).length+' Likes • '+(c.data||[]).length+' Comments • '+(sh.data||[]).length+' Shares';
+          var box=card.querySelector('[data-feed-comments]');
+          if(box)box.innerHTML=(c.data||[]).map(x=>'<div class="feed-comment"><b>💬</b> '+esc(x.body)+'</div>').join('');
+        });
+      }finally{delete refreshing[postId]}
     }
-    function refreshAll(){document.querySelectorAll('.post[data-post-id]').forEach(x=>refreshPost(x.dataset.postId))}
+    function refreshAll(){
+      clearTimeout(refreshTimer);refreshTimer=setTimeout(function(){
+        document.querySelectorAll('.post[data-post-id]').forEach(x=>refreshPost(x.dataset.postId));
+      },140);
+    }
+    function refreshFromRealtime(payload){
+      var id=payload&&((payload.new&&payload.new.post_id)||(payload.old&&payload.old.post_id));
+      if(id)refreshPost(id);else refreshAll();
+    }
     window.likePost=async function(postId){
       var userId=await uid();if(!userId){location.href='auth.html';return}
       var q=await sb.from('post_likes').select('post_id').eq('post_id',postId).eq('user_id',userId).maybeSingle();
@@ -47,7 +59,7 @@
       try{if(navigator.share)await navigator.share({title:'Trooth Social Independent',text:'Check this post on Trooth',url:url});else if(navigator.clipboard){await navigator.clipboard.writeText(url);alert('Post link copied!')}else prompt('Post link:',url)}catch(e){}
       await refreshPost(postId);window.dispatchEvent(new CustomEvent('trooth-post-shared',{detail:{postId:postId}}));
     };
-    if(sb.channel)sb.channel('trooth-feed-actions-live-v3').on('postgres_changes',{event:'*',schema:'public',table:'post_likes'},function(){refreshAll()}).on('postgres_changes',{event:'*',schema:'public',table:'comments'},function(){refreshAll()}).on('postgres_changes',{event:'*',schema:'public',table:'post_shares'},function(){refreshAll()}).subscribe();
+    if(sb.channel)sb.channel('trooth-feed-actions-live-v4').on('postgres_changes',{event:'*',schema:'public',table:'post_likes'},refreshFromRealtime).on('postgres_changes',{event:'*',schema:'public',table:'comments'},refreshFromRealtime).on('postgres_changes',{event:'*',schema:'public',table:'post_shares'},refreshFromRealtime).subscribe();
     window.addEventListener('trooth-feed-refreshed',refreshAll);window.addEventListener('trooth-home-hub-refresh',refreshAll);
     setTimeout(refreshAll,700);
   }
