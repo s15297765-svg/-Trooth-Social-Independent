@@ -1,14 +1,20 @@
-// Trooth Social Independent — mobile bottom navigation
+// Trooth Social Independent — mobile bottom navigation + live badges
 (function(){
   function boot(){
     if(document.getElementById('trooth-mobile-nav')) return;
     var style=document.createElement('style');
-    style.textContent='.trooth-mobile-nav{display:none}@media(max-width:650px){.trooth-mobile-nav{position:fixed;left:8px;right:8px;bottom:8px;z-index:9998;background:#fff;border:1px solid #d8e9de;border-radius:18px;box-shadow:0 8px 28px #245c3a2b;padding:7px;grid-template-columns:repeat(5,1fr);gap:4px}.trooth-mobile-nav a{color:#2d6a4f;text-decoration:none;text-align:center;font-size:11px;font-weight:800;padding:7px 3px;border-radius:12px}.trooth-mobile-nav a:hover,.trooth-mobile-nav a.active{background:#d8f3dc}.trooth-mobile-nav .ico{display:block;font-size:19px;line-height:20px;margin-bottom:2px}body{padding-bottom:78px}}';
+    style.textContent='.trooth-mobile-nav{display:none}@media(max-width:650px){.trooth-mobile-nav{position:fixed;left:8px;right:8px;bottom:8px;z-index:9998;background:#fff;border:1px solid #d8e9de;border-radius:18px;box-shadow:0 8px 28px #245c3a2b;padding:7px;grid-template-columns:repeat(5,1fr);gap:4px}.trooth-mobile-nav a{position:relative;color:#2d6a4f;text-decoration:none;text-align:center;font-size:11px;font-weight:800;padding:7px 3px;border-radius:12px}.trooth-mobile-nav a:hover,.trooth-mobile-nav a.active{background:#d8f3dc}.trooth-mobile-nav .ico{display:block;font-size:19px;line-height:20px;margin-bottom:2px}.trooth-mobile-nav .badge{position:absolute;top:2px;right:7px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#d90429;color:#fff;font:800 9px/16px system-ui;text-align:center;box-shadow:0 2px 7px #0003}body{padding-bottom:78px}}';
     document.head.appendChild(style);
     var n=document.createElement('nav');n.id='trooth-mobile-nav';n.className='trooth-mobile-nav';n.setAttribute('aria-label','Mobile navigation');
-    n.innerHTML='<a href="index.html" data-page="index.html"><span class="ico">🏠</span>Home</a><a href="friends.html" data-page="friends.html"><span class="ico">👥</span>Friends</a><a href="chat.html" data-page="chat.html"><span class="ico">💬</span>Messages</a><a href="notifications.html" data-page="notifications.html"><span class="ico">🔔</span>Alerts</a><a href="auth.html" data-page="auth.html"><span class="ico">👤</span>Profile</a>';
+    n.innerHTML='<a href="index.html" data-page="index.html"><span class="ico">🏠</span>Home</a><a href="friends.html" data-page="friends.html"><span class="ico">👥</span>Friends</a><a href="chat.html" data-page="chat.html"><span class="ico">💬</span>Messages<span class="badge" id="trooth-mobile-msg-badge" hidden></span></a><a href="notifications.html" data-page="notifications.html"><span class="ico">🔔</span>Alerts<span class="badge" id="trooth-mobile-notif-badge" hidden></span></a><a href="auth.html" data-page="auth.html"><span class="ico">👤</span>Profile</a>';
     document.body.appendChild(n);
     var page=location.pathname.split('/').pop()||'index.html';n.querySelectorAll('a').forEach(function(a){if(a.dataset.page===page)a.classList.add('active')});
+    function paint(id,count){var b=document.getElementById(id);if(!b)return;var x=Number(count)||0;b.hidden=x<1;b.textContent=x>99?'99+':String(x)}
+    function refresh(){var sb=window.troothSupabase;if(!sb||!navigator.onLine)return;sb.auth.getUser().then(function(r){var u=r.data&&r.data.user;if(!u)return;return Promise.all([sb.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',u.id).eq('is_read',false),sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).eq('is_read',false)]).then(function(a){paint('trooth-mobile-msg-badge',a[0]&&a[0].count);paint('trooth-mobile-notif-badge',a[1]&&a[1].count)})}).catch(function(){});
+    }
+    ['trooth-messages-refresh','trooth-notifications-refresh','trooth-unread-updated','trooth-header-badges-updated'].forEach(function(ev){window.addEventListener(ev,refresh)});
+    window.addEventListener('online',refresh);document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh()});
+    setTimeout(refresh,1400);setInterval(refresh,60000);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
