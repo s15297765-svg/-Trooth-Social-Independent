@@ -12,7 +12,8 @@
     var likeR=await sb.from('post_likes').select('user_id').eq('post_id',id);
     var commentR=await sb.from('comments').select('body,created_at,user_id').eq('post_id',id).order('created_at',{ascending:true});
     var shareR=await sb.from('post_shares').select('user_id').eq('post_id',id);
-    var likes=likeR.data||[],comments=commentR.data||[],shares=shareR.data||[],liked=!!user&&likes.some(function(x){return x.user_id===user.id};
+    var likes=likeR.data||[],comments=commentR.data||[],shares=shareR.data||[];
+    var liked=!!user&&likes.some(function(x){return x.user_id===user.id});
     actions.innerHTML='<button class="action" data-like> '+(liked?'❤️ Liked':'🤍 Like')+' <span data-like-count>('+likes.length+')</span></button><button class="action" data-comment-focus>💬 Comment <span data-comment-count>('+comments.length+')</span></button><button class="action" data-share>↗ Share <span data-share-count>('+shares.length+')</span></button>';
     var panel=document.createElement('div');panel.style.cssText='margin-top:10px';panel.innerHTML='<div style="display:flex;gap:7px"><input data-comment-input aria-label="Write a comment" maxlength="1000" placeholder="Write a comment..." style="flex:1;min-width:0;border:1px solid #d8e9de;border-radius:999px;padding:10px 13px"><button data-send type="button" style="border:0;border-radius:999px;padding:9px 13px;background:#40916c;color:#fff;font-weight:800;cursor:pointer">💬 Send</button></div><div data-comments style="margin-top:8px"></div>';
     post.appendChild(panel);
@@ -35,7 +36,7 @@
       render();
     }
     function activityRefresh(){window.dispatchEvent(new CustomEvent('trooth-post-activity-refresh',{detail:{postId:id}}));}
-    actions.querySelector('[data-like]').onclick=async function(){if(!user){location.href='auth.html';return}this.disabled=true;try{var r=liked?await sb.from('post_likes').delete().eq('post_id',id).eq('user_id',user.id):await sb.from('post_likes').insert({post_id:id,user_id:user.id});if(r.error)throw r.error;await sync();activityRefresh();toast(liked?'Like removed':'❤️ Liked')}catch(e){toast(e.message||'Like failed')}finally{this.disabled=false}};
+    actions.querySelector('[data-like]').onclick=async function(){if(!user){location.href='auth.html';return}this.disabled=true;try{var r=liked?await sb.from('post_likes').delete().eq('post_id',id).eq('user_id',user.id):await sb.from('post_likes').insert({post_id:id,user_id:user.id});if(r.error)throw r.error;var wasLiked=liked;await sync();activityRefresh();toast(wasLiked?'Like removed':'❤️ Liked')}catch(e){toast(e.message||'Like failed')}finally{this.disabled=false}};
     actions.querySelector('[data-comment-focus]').onclick=function(){panel.querySelector('[data-comment-input]').focus()};
     panel.querySelector('[data-send]').onclick=send;
     panel.querySelector('[data-comment-input]').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
