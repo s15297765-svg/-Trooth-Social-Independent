@@ -1,4 +1,4 @@
-// Trooth Social Independent — unified live event bridge v3
+// Trooth Social Independent — unified live event bridge v4
 (function(){
   if(window.__troothUnifiedLiveBridge)return;
   window.__troothUnifiedLiveBridge=true;
@@ -10,7 +10,10 @@
   window.addEventListener('trooth-message-incoming',function(e){var d=e.detail||{};relay('trooth-notifications-refresh',{source:'message',message:d});relay('trooth-chat-live-refresh',{source:'message',message:d});unified('message',d)})
   window.addEventListener('trooth-notification-incoming',function(e){var d=e.detail||{};relay('trooth-notifications-refresh',{source:'notification',notification:d});unified('notification',d)})
   window.addEventListener('trooth-unread-updated',function(e){var d=e.detail||{};relay('trooth-header-badges-refresh',{source:'unread',detail:d});unified('unread',d)})
-  window.addEventListener('trooth-post-shared',function(e){var d=e.detail||{};relay('trooth-home-live-refresh',{source:'share',detail:d},180);unified('share',d)})
+  // Social interactions refresh Home Activity/Badges, but never force a feed "new posts" cycle.
+  window.addEventListener('trooth-post-liked',function(e){var d=e.detail||{};unified('like',d)})
+  window.addEventListener('trooth-comment-added',function(e){var d=e.detail||{};unified('comment',d)})
+  window.addEventListener('trooth-post-shared',function(e){var d=e.detail||{};unified('share',d)})
   window.addEventListener('trooth-feed-refreshed',function(e){var d=e.detail||{};relay('trooth-home-live-refresh',{source:'feed',detail:d},180);unified('feed',d)})
   window.addEventListener('trooth-home-hub-refresh',function(e){var d=e.detail||{};relay('trooth-home-live-refresh',{source:'hub',detail:d},220);unified('hub',d)})
   window.addEventListener('trooth-realtime-connected',function(){clearTimeout(timers.connected);timers.connected=setTimeout(function(){unified('connected')},80)})
