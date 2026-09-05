@@ -57,7 +57,7 @@
     Object.keys(tables).forEach(mount);
     Object.keys(tables).forEach(table=>{
       const eventName={news_stories:'trooth-news-refresh',sports_stories:'trooth-sports-refresh',store_listings:'trooth-stores-refresh',properties:'trooth-property-refresh',film_fashion_stories:'trooth-film-fashion-refresh'}[table];
-      if(eventName)window.addEventListener(eventName',()=>refresh(table));
+      if(eventName)window.addEventListener(eventName,()=>refresh(table));
     });
     window.addEventListener('trooth-content-hubs-refresh',e=>{if(e.detail?.table)refresh(e.detail.table);});
     window.addEventListener('trooth-content-hub-interaction-refresh',e=>{if(e.detail?.table)refresh(e.detail.table);});
