@@ -1,9 +1,9 @@
-// Trooth Social Independent — unified realtime connection panel v9
+// Trooth Social Independent — unified realtime connection panel v10
 (function(){
   function boot(){
-    if(window.__troothLiveConnectionPanelV9)return;window.__troothLiveConnectionPanelV9=true;
-    var el=document.createElement('div');el.id='trooth-connection-panel';el.setAttribute('role','status');el.setAttribute('aria-live','polite');
-    el.style='position:fixed;left:12px;bottom:14px;z-index:99999;background:#fff;color:#173b29;padding:7px 11px;border-radius:999px;box-shadow:0 4px 18px #0002;font:700 11px system-ui;transition:.25s;cursor:default;max-width:calc(100vw - 24px)';
+    if(window.__troothLiveConnectionPanelV10)return;window.__troothLiveConnectionPanelV10=true;
+    var el=document.createElement('div');el.id='trooth-connection-panel';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.setAttribute('aria-atomic','true');
+    el.style='position:fixed;left:12px;bottom:14px;z-index:99999;background:#fff;color:#173b29;padding:7px 11px;border-radius:999px;box-shadow:0 4px 18px #0002;font:700 11px system-ui;transition:.25s;cursor:default;max-width:calc(100vw - 24px);padding-bottom:calc(7px + env(safe-area-inset-bottom))';
     document.body.appendChild(el);
     var last='',state='connecting',timer=null,watchdog=null,moduleErrors=0,lastConnectedAt=0,lastSignal=0;
     function set(next,detail){
