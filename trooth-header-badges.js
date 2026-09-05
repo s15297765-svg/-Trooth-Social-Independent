@@ -1,4 +1,4 @@
-// Trooth Social Independent — live header notification/message badges v4
+// Trooth Social Independent — live header notification/message badges v5
 (function(){
   if(window.__troothHeaderBadges)return;window.__troothHeaderBadges=true;
   function boot(){
@@ -7,11 +7,18 @@
     var timer=null,lastMsg=-1,lastNote=-1,busy=false,lastRun=0;
     function addBadge(el,n,label){if(!el)return;var b=el.querySelector(':scope > .trooth-live-badge');if(!n){if(b)b.remove();el.removeAttribute('data-trooth-unread');return}if(!b){b=document.createElement('span');b.className='trooth-live-badge trooth-unread-pulse';b.setAttribute('aria-hidden','true');el.classList.add('trooth-badge-wrap');el.appendChild(b)}b.textContent=n>99?'99+':n;b.title=(n===1?'1 unread ':'')+(label||'unread')+(n===1?'':'s');el.setAttribute('data-trooth-unread',String(n))}
     function targets(kind){var all=[].slice.call(document.querySelectorAll('a,button,[role="button"]'));return all.filter(function(el){var s=((el.textContent||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.getAttribute('title')||'')).toLowerCase();return kind==='msg'?(s.indexOf('message')>-1||s.indexOf('💬')>-1):(s.indexOf('notification')>-1||s.indexOf('نوتیف')>-1||s.indexOf('🔔')>-1)})}
-    async function refresh(){if(busy||!navigator.onLine)return;var now=Date.now();if(now-lastRun<350)return;lastRun=now;var sb=window.troothSupabase;if(!sb)return;busy=true;try{var x=await sb.auth.getUser(),u=x.data&&x.data.user;if(!u){targets('msg').forEach(function(e){addBadge(e,0,'message')});targets('note').forEach(function(e){addBadge(e,0,'notification')});return}var r=await Promise.all([sb.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',u.id).eq('is_read',false),sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).eq('is_read',false)]);var m=(r[0]&&r[0].count)||0,n=(r[1]&&r[1].count)||0;targets('msg').forEach(function(e){addBadge(e,m,'message')});targets('note').forEach(function(e){addBadge(e,n,'notification')});if(m!==lastMsg||n!==lastNote)window.dispatchEvent(new CustomEvent('trooth-header-badges-updated',{detail:{messages:m,notifications:n}}));lastMsg=m;lastNote=n}catch(e){}finally{busy=false}}
-    function schedule(ms){clearTimeout(timer);timer=setTimeout(refresh,ms||250)}
-    window.refreshTroothHeaderBadges=refresh;
-    window.addEventListener('trooth-messages-refresh',function(){schedule(100)});window.addEventListener('trooth-notifications-refresh',function(){schedule(100)});window.addEventListener('trooth-unread-updated',function(){schedule(100)});window.addEventListener('trooth-live-refresh-complete',function(){schedule(180)});window.addEventListener('trooth-auth-changed',function(){lastMsg=-1;lastNote=-1;schedule(200)});window.addEventListener('online',function(){schedule(300)});window.addEventListener('visibilitychange',function(){if(!document.hidden)schedule(300);else clearTimeout(timer)});window.addEventListener('pageshow',function(){schedule(350)});
-    new MutationObserver(function(){schedule(700)}).observe(document.body,{childList:true,subtree:true});setTimeout(refresh,2200);setInterval(function(){if(!document.hidden&&navigator.onLine)refresh()},60000);
+    function paintMessages(n){n=Math.max(0,Number(n)||0);targets('msg').forEach(function(e){addBadge(e,n,'message')});if(n!==lastMsg)window.dispatchEvent(new CustomEvent('trooth-header-badges-updated',{detail:{messages:n,notifications:lastNote}}));lastMsg=n}
+    async function refreshNotifications(){if(busy||!navigator.onLine)return;var sb=window.troothSupabase;if(!sb)return;var now=Date.now();if(now-lastRun<500)return;lastRun=now;busy=true;try{var x=await sb.auth.getUser(),u=x.data&&x.data.user;if(!u){paintMessages(0);targets('note').forEach(function(e){addBadge(e,0,'notification')});return}var r=await sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).eq('is_read',false);var n=(r&&r.count)||0;targets('note').forEach(function(e){addBadge(e,n,'notification')});if(n!==lastNote)window.dispatchEvent(new CustomEvent('trooth-header-badges-updated',{detail:{messages:lastMsg,notifications:n}}));lastNote=n}catch(e){}finally{busy=false}}
+    function schedule(ms){clearTimeout(timer);timer=setTimeout(refreshNotifications,ms||250)}
+    window.refreshTroothHeaderBadges=refreshNotifications;
+    window.addEventListener('trooth-unread-updated',function(e){var n=e.detail&&e.detail.count;if(n!==undefined)paintMessages(n)});
+    window.addEventListener('trooth-messages-refresh',function(){schedule(160)});
+    window.addEventListener('trooth-notifications-refresh',function(){schedule(100)});
+    window.addEventListener('trooth-unread-refresh',function(){schedule(120)});
+    window.addEventListener('trooth-live-refresh-complete',function(){schedule(180)});
+    window.addEventListener('trooth-auth-changed',function(){lastMsg=-1;lastNote=-1;paintMessages(0);schedule(220)});
+    window.addEventListener('online',function(){schedule(300)});window.addEventListener('visibilitychange',function(){if(!document.hidden)schedule(300);else clearTimeout(timer)});window.addEventListener('pageshow',function(){schedule(350)});
+    new MutationObserver(function(){schedule(700)}).observe(document.body,{childList:true,subtree:true});setTimeout(refreshNotifications,2200);setInterval(function(){if(!document.hidden&&navigator.onLine)refreshNotifications()},60000);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
