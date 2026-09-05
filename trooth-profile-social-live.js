@@ -1,34 +1,16 @@
-// Trooth Social Independent — live profile social tabs
+// Trooth Social Independent — live profile social tabs + realtime actions
 (function(){
   function boot(){
     var sb=window.troothSupabase;if(!sb)return setTimeout(boot,300);
     if(!document.getElementById('app'))return;
-    function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]) )}
-    function profileCard(p,buttons){
-      var initial=esc((p.display_name||'T')[0].toUpperCase());
-      var avatar=p.avatar_url?'<img src="'+esc(p.avatar_url)+'" alt="">':initial;
-      return '<div class="trooth-social-person"><div class="trooth-social-avatar">'+avatar+'</div><div class="trooth-social-info"><b>'+esc(p.display_name||'Trooth Member')+'</b><small>'+esc(p.bio||'Trooth Community Member')+'</small></div>'+buttons+'</div>';
-    }
-    async function loadPeople(){
-      if(!window.user)return;
-      var uid=window.user.id;
-      var cr=await sb.from('connections').select('follower_id,following_id,created_at').or('follower_id.eq.'+uid+',following_id.eq.'+uid);
-      var rows=cr.data||[], ids=[...new Set(rows.flatMap(x=>[x.follower_id,x.following_id]).filter(x=>x&&x!==uid))];
-      var pr=ids.length?await sb.from('profiles').select('id,display_name,bio,avatar_url,is_public').in('id',ids):{data:[]};
-      var map=new Map((pr.data||[]).map(p=>[p.id,p]));
-      var followers=rows.filter(x=>x.following_id===uid).map(x=>map.get(x.follower_id)).filter(Boolean);
-      var following=rows.filter(x=>x.follower_id===uid).map(x=>map.get(x.following_id)).filter(Boolean);
-      var friendRows=(window.cache&&window.cache.followers&&window.cache.following)?[]:[];
-      var friendsIds=[];
-      if(window.user){var fr=await sb.from('friend_requests').select('sender_id,receiver_id,status').or('sender_id.eq.'+uid+',receiver_id.eq.'+uid).eq('status','accepted');friendsIds=[...new Set((fr.data||[]).map(x=>x.sender_id===uid?x.receiver_id:x.sender_id))]}
-      var friendProfiles=[];if(friendsIds.length){var fp=await sb.from('profiles').select('id,display_name,bio,avatar_url').in('id',friendsIds);friendProfiles=fp.data||[]}
-      render('followers',followers);render('following',following);render('friends',friendProfiles);
-    }
+    var uid=null,channels=[];
+    function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function profileCard(p,buttons){var initial=esc((p.display_name||'T')[0].toUpperCase()),avatar=p.avatar_url?'<img src="'+esc(p.avatar_url)+'" alt="">':initial;return '<div class="trooth-social-person"><div class="trooth-social-avatar">'+avatar+'</div><div class="trooth-social-info"><b>'+esc(p.display_name||'Trooth Member')+'</b><small>'+esc(p.bio||'Trooth Community Member')+'</small></div>'+buttons+'</div>'}
+    async function loadPeople(){if(!uid)return;var cr=await sb.from('connections').select('follower_id,following_id,created_at').or('follower_id.eq.'+uid+',following_id.eq.'+uid);var rows=cr.data||[],ids=[...new Set(rows.flatMap(x=>[x.follower_id,x.following_id]).filter(x=>x&&x!==uid))];var pr=ids.length?await sb.from('profiles').select('id,display_name,bio,avatar_url,is_public').in('id',ids):{data:[]};var map=new Map((pr.data||[]).map(p=>[p.id,p]));var followers=rows.filter(x=>x.following_id===uid).map(x=>map.get(x.follower_id)).filter(Boolean),following=rows.filter(x=>x.follower_id===uid).map(x=>map.get(x.following_id)).filter(Boolean);var fr=await sb.from('friend_requests').select('sender_id,receiver_id,status').or('sender_id.eq.'+uid+',receiver_id.eq.'+uid).eq('status','accepted');var fids=[...new Set((fr.data||[]).map(x=>x.sender_id===uid?x.receiver_id:x.sender_id))];var fp=fids.length?await sb.from('profiles').select('id,display_name,bio,avatar_url').in('id',fids):{data:[]};render('followers',followers);render('following',following);render('friends',fp.data||[])}
     function render(id,list){var el=document.getElementById(id);if(!el)return;var title=id==='friends'?'Friends':id[0].toUpperCase()+id.slice(1);el.innerHTML='<h3>👥 '+title+'</h3>'+(list.length?list.map(function(p){return profileCard(p,'<button class="trooth-social-btn" onclick="location.href=\'friends.html\'">View</button><button class="trooth-social-btn" onclick="location.href=\'chat.html\'">Message</button>')}).join(''):'<p class="muted">No '+title.toLowerCase()+' yet.</p>')}
-    function decorate(){
-      var style=document.getElementById('trooth-profile-social-style');if(!style){style=document.createElement('style');style.id='trooth-profile-social-style';style.textContent='.trooth-social-person{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #e0eee5;border-radius:13px;margin:9px 0;background:#fff}.trooth-social-avatar{width:48px;height:48px;border-radius:50%;background:#40916c;color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px;overflow:hidden;flex:none}.trooth-social-avatar img{width:100%;height:100%;object-fit:cover}.trooth-social-info{flex:1;min-width:0}.trooth-social-info b,.trooth-social-info small{display:block}.trooth-social-info small{color:#718276;margin-top:3px}.trooth-social-btn{border:0;border-radius:9px;padding:8px 10px;background:#d8f3dc;color:#2d6a4f;font-weight:700;cursor:pointer}@media(max-width:600px){.trooth-social-person{flex-wrap:wrap}.trooth-social-btn{flex:1}}';document.head.appendChild(style)}
-    decorate();loadPeople();
-    window.addEventListener('trooth-profile-updated',loadPeople);
+    function decorate(){var style=document.getElementById('trooth-profile-social-style');if(!style){style=document.createElement('style');style.id='trooth-profile-social-style';style.textContent='.trooth-social-person{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #e0eee5;border-radius:13px;margin:9px 0;background:#fff}.trooth-social-avatar{width:48px;height:48px;border-radius:50%;background:#40916c;color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px;overflow:hidden;flex:none}.trooth-social-avatar img{width:100%;height:100%;object-fit:cover}.trooth-social-info{flex:1;min-width:0}.trooth-social-info b,.trooth-social-info small{display:block}.trooth-social-info small{color:#718276;margin-top:3px}.trooth-social-btn{border:0;border-radius:9px;padding:8px 10px;background:#d8f3dc;color:#2d6a4f;font-weight:700;cursor:pointer}@media(max-width:600px){.trooth-social-person{flex-wrap:wrap}.trooth-social-btn{flex:1}}';document.head.appendChild(style)}}
+    async function subscribe(){channels.forEach(c=>sb.removeChannel(c));channels=[];var a=sb.channel('trooth-profile-friend-requests').on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'receiver_id=eq.'+uid},function(){loadPeople()}).on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'sender_id=eq.'+uid},function(){loadPeople()}).subscribe();var b=sb.channel('trooth-profile-follows').on('postgres_changes',{event:'*',schema:'public',table:'connections',filter:'following_id=eq.'+uid},function(){loadPeople()}).on('postgres_changes',{event:'*',schema:'public',table:'connections',filter:'follower_id=eq.'+uid},function(){loadPeople()}).subscribe();channels=[a,b]}
+    decorate();sb.auth.getUser().then(function(r){uid=r.data&&r.data.user&&r.data.user.id;if(uid){loadPeople();subscribe()}});window.addEventListener('trooth-profile-updated',loadPeople);
   }
   if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
 })();
