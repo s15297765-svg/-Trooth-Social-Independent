@@ -10,12 +10,12 @@
     if(window.troothNavigationRealtimeReady)return;
     const sb=await ready();
     if(!sb||!sb.auth)return;
-    let u=(await sb.auth.getUser()).data.user;if(!u)return;
     window.troothNavigationRealtimeReady=true;
-    let refreshTimer=null,reconnectTimer=null,channel=null,authSub=null,stopped=false,refreshing=false,pending=false;
-    function cleanup(){clearTimeout(refreshTimer);clearTimeout(reconnectTimer);refreshTimer=null;reconnectTimer=null;if(channel){try{sb.removeChannel(channel)}catch(e){}channel=null}if(authSub){try{authSub.data.subscription.unsubscribe()}catch(e){}authSub=null}window.troothNavigationRealtime=null;}
+    let u=null,refreshTimer=null,reconnectTimer=null,channel=null,authSub=null,stopped=false,refreshing=false,pending=false;
+    function removeChannel(){clearTimeout(refreshTimer);clearTimeout(reconnectTimer);refreshTimer=null;reconnectTimer=null;if(channel){try{sb.removeChannel(channel)}catch(e){}channel=null}window.troothNavigationRealtime=null}
+    function cleanup(full){removeChannel();if(full&&authSub){try{authSub.unsubscribe()}catch(e){}authSub=null}window.troothNavigationRealtime=null}
     async function doRefresh(){
-      if(stopped)return;
+      if(stopped||!u)return;
       if(refreshing){pending=true;return;}
       refreshing=true;pending=false;
       try{
@@ -27,35 +27,30 @@
         if(n.error||m.error)return;
         badgeLink('notifications.html','🔔','troothNavNotifBadge',n.count||0);
         badgeLink('chat.html','💬','troothNavMsgBadge',m.count||0);
-      }finally{
-        refreshing=false;
-        if(pending)refresh();
-      }
+      }finally{refreshing=false;if(pending)refresh()}
     }
-    function refresh(){clearTimeout(refreshTimer);if(stopped)return;refreshTimer=setTimeout(doRefresh,80)}
+    function refresh(){clearTimeout(refreshTimer);if(stopped||!u)return;refreshTimer=setTimeout(doRefresh,80)}
     function inject(){document.querySelectorAll('.circle').forEach((b,i)=>{if(i===1&&!b.querySelector('#troothNavNotifBadge')){const s=document.createElement('span');s.id='troothNavNotifBadge';s.className='badge';s.style.cssText='position:absolute;top:-5px;right:-4px;min-width:18px;height:18px;border-radius:99px;background:#d62828;color:#fff;font-size:10px;font-weight:900;padding:0 5px';b.style.position='relative';b.appendChild(s)}if(i===2&&!b.querySelector('#troothNavMsgBadge')){const s=document.createElement('span');s.id='troothNavMsgBadge';s.className='badge';s.style.cssText='position:absolute;top:-5px;right:-4px;min-width:18px;height:18px;border-radius:99px;background:#d62828;color:#fff;font-size:10px;font-weight:900;padding:0 5px';b.style.position='relative';b.appendChild(s)}})}
     function subscribe(){
-      if(stopped||channel)return;
-      const ch=sb.channel('trooth-global-nav-live-v4-'+u.id);
-      channel=ch;
+      if(stopped||!u||channel)return;
+      const ch=sb.channel('trooth-global-nav-live-v4-'+u.id+'-'+Date.now());channel=ch;
       ch.on('postgres_changes',{event:'*',schema:'public',table:'notifications',filter:`user_id=eq.${u.id}`},refresh).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:`receiver_id=eq.${u.id}`},refresh).subscribe(function(status){
         if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
           if(channel===ch){try{sb.removeChannel(ch)}catch(e){}channel=null;window.troothNavigationRealtime=null}
           clearTimeout(reconnectTimer);reconnectTimer=setTimeout(subscribe,700);
         }
-      });
-      window.troothNavigationRealtime=ch;
+      });window.troothNavigationRealtime=ch;
     }
-    inject();refresh();subscribe();
+    async function connect(){const next=(await sb.auth.getUser()).data.user;removeChannel();u=next;if(!u){stopped=true;return}stopped=false;inject();refresh();subscribe()}
+    inject();
+    authSub=sb.auth.onAuthStateChange(function(event,session){
+      if(event==='SIGNED_OUT'||event==='USER_DELETED'){stopped=true;u=null;removeChannel();return}
+      if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){stopped=false;u=session?.user||null;setTimeout(()=>{if(!stopped)connect()},50)}
+    }).data?.subscription||null;
+    connect();
     window.addEventListener('trooth-navigation-refresh',refresh);
     window.addEventListener('trooth-content-hubs-refresh',inject);
-    authSub=sb.auth.onAuthStateChange(function(event){
-      if(event==='SIGNED_OUT'||event==='USER_DELETED'){stopped=true;cleanup();return}
-      if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
-        stopped=false;cleanup();setTimeout(function(){if(!stopped){subscribe();refresh()}},50);
-      }
-    });
-    window.addEventListener('beforeunload',cleanup,{once:true});
+    window.addEventListener('beforeunload',()=>cleanup(true),{once:true});
   }
   ready().then(run).catch(()=>{});
 })();
