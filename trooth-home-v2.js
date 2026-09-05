@@ -15,7 +15,7 @@
     const wrap=document.createElement('div');wrap.id='troothV2';
     wrap.innerHTML=`<div class="t2-banner"><div><div class="t2-live"><span class="t2-dot"></span> TROOTH NETWORK LIVE</div><h2>Your independent social space</h2><p>Share your voice, discover news, connect with people and grow your business.</p></div><div class="t2-badge">💚 Independent</div></div>
     <div class="t2-chips"><button class="t2-chip" data-go="index.html">🏠 Feed</button><button class="t2-chip" data-go="news.html">📰 News</button><button class="t2-chip" data-go="sports.html">🏆 Sports</button><button class="t2-chip" data-go="stores.html">🛍️ Stores</button><button class="t2-chip" data-go="property.html">🏠 Property</button><button class="t2-chip" data-go="film-fashion.html">🎬 Film & Fashion</button></div>
-    <div class="t2-actions"><button class="t2-action" data-go="friends.html">👥<br>Friends</button><button class="t2-action" data-go="business.html">💼<br>Business</button><button class="t2-action" data-go="groups.html">👨‍👩‍👧<br>Groups</button><button class="t2-action" data-go="notifications-messages.html">💬<br>Messages</button></div>`;
+    <div class="t2-actions"><button class="t2-action" data-go="friends.html">👥<br>Friends</button><button class="t2-action" data-go="business.html">💼<br>Business</button><button class="t2-action" data-go="groups.html">👨‍👩‍👧<br>Groups</button><button class="t2-action" data-go="chat.html">💬<br>Messages</button></div>`;
     hero.insertAdjacentElement('afterend',wrap);
     wrap.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>location.href=b.dataset.go));
   }
