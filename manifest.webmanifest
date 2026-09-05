@@ -6,9 +6,10 @@
   "display": "standalone",
   "background_color": "#eef8f1",
   "theme_color": "#40916c",
-  "description": "Trooth Social Independent — social, business, news, sports, stores and community network.",
+  "description": "Trooth Social Independent — social, business, news, sports, stores, property, film, fashion and community network.",
   "orientation": "portrait-primary",
-  "categories": ["social", "business", "news"],
+  "categories": ["social", "business", "news", "sports"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "trooth-icon.svg",
