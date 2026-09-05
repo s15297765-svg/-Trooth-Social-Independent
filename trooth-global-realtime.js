@@ -3,7 +3,7 @@
   function boot(){
     if(window.__troothGlobalRealtimeBooted)return;window.__troothGlobalRealtimeBooted=true;
     var sb=window.troothSupabase;if(!sb)return;
-    var retry=null,connecting=false,online=navigator.onLine!==false,attempt=0;
+    var retry=null,connecting=false,online=navigator.onLine!==false,attempt=0,sessionTimer=null;
     function signal(name,detail){window.dispatchEvent(new CustomEvent(name,{detail:detail||{}}))}
     function clear(){if(retry){clearTimeout(retry);retry=null}if(window.__troothGlobalChannel){try{sb.removeChannel(window.__troothGlobalChannel)}catch(e){}window.__troothGlobalChannel=null}}
     function schedule(){if(!online||retry)return;attempt=Math.min(attempt+1,6);var ms=Math.min(30000,1500*Math.pow(2,attempt-1));signal('trooth-realtime-status',{status:'RETRYING',delay:ms,attempt:attempt});retry=setTimeout(function(){retry=null;connect()},ms)}
@@ -30,12 +30,15 @@
         }catch(e){connecting=false;schedule()}
       }).catch(function(){connecting=false;schedule()});
     }
+    function refreshSession(){if(!online||!sb.auth)return;sb.auth.getSession().then(function(r){var s=r.data&&r.data.session;if(s&&!window.__troothGlobalChannel&&!connecting)connect()}).catch(function(){})}
     connect();
     window.addEventListener('online',function(){online=true;attempt=0;signal('trooth-realtime-status',{status:'RECONNECTING'});clear();setTimeout(connect,400)});
     window.addEventListener('offline',function(){online=false;clear();signal('trooth-realtime-status',{status:'OFFLINE'})});
-    document.addEventListener('visibilitychange',function(){if(!document.hidden&&online){clear();setTimeout(connect,500)}});
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&online){refreshSession();clear();setTimeout(connect,500)}});
     window.addEventListener('trooth-realtime-reconnect',function(){attempt=0;clear();connect()});
     window.addEventListener('trooth-auth-changed',function(){attempt=0;clear();setTimeout(connect,300)});
+    if(sb.auth.onAuthStateChange)sb.auth.onAuthStateChange(function(event){if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'){clear();setTimeout(connect,250)}else if(event==='SIGNED_OUT'){clear();signal('trooth-realtime-status',{status:'SIGNED_OUT'})}});
+    sessionTimer=setInterval(refreshSession,120000);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,2200)},{once:true});else setTimeout(boot,2200);
 })();
