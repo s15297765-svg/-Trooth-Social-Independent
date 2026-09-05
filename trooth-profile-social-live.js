@@ -1,7 +1,7 @@
-// Trooth Social Independent — optimized live profile social tabs + realtime actions
+// Trooth Social Independent — live profile social tabs + realtime presence/actions
 (function(){
   function boot(){
-    var sb=window.troothSupabase;if(!sb)return setTimeout(boot,300);
+    var sb=window.troothSupabase;if(!sb)return setTimeout(boot,500);
     if(!document.getElementById('app')||window.troothProfileSocialLiveReady)return;
     window.troothProfileSocialLiveReady=true;
     var uid=null,channels=[],loadTimer=null,loading=false,pending=false;
@@ -23,11 +23,12 @@
     }
     function scheduleLoad(delay){clearTimeout(loadTimer);loadTimer=setTimeout(loadPeople,delay==null?180:delay)}
     function render(id,list){var el=document.getElementById(id);if(!el)return;var title=id==='friends'?'Friends':id[0].toUpperCase()+id.slice(1);el.innerHTML='<h3>👥 '+title+'</h3>'+(list.length?list.map(function(p){return profileCard(p,'<button class="trooth-social-btn" onclick="location.href=\'profile.html?id='+encodeURIComponent(p.id)+'\'">View</button><button class="trooth-social-btn" onclick="location.href=\'chat.html?user='+encodeURIComponent(p.id)+'\'">Message</button>')}).join(''):'<p class="muted">No '+title.toLowerCase()+' yet.</p>')}
-    function decorate(){var style=document.getElementById('trooth-profile-social-style');if(!style){style=document.createElement('style');style.id='trooth-profile-social-style';style.textContent='.trooth-social-person{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #e0eee5;border-radius:13px;margin:9px 0;background:#fff}.trooth-social-avatar{width:48px;height:48px;border-radius:50%;background:#40916c;color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px;overflow:hidden;flex:none}.trooth-social-avatar img{width:100%;height:100%;object-fit:cover}.trooth-social-info{flex:1;min-width:0}.trooth-social-info b,.trooth-social-info small{display:block}.trooth-social-info small{color:#718276;margin-top:3px}.trooth-social-btn{border:0;border-radius:9px;padding:8px 10px;background:#d8f3dc;color:#2d6a4f;font-weight:700;cursor:pointer}@media(max-width:600px){.trooth-social-person{flex-wrap:wrap}.trooth-social-btn{flex:1}}';document.head.appendChild(style)}}
+    function decorate(){var style=document.getElementById('trooth-profile-social-style');if(!style){style=document.createElement('style');style.id='trooth-profile-social-style';style.textContent='.trooth-social-person{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #e0eee5;border-radius:13px;margin:9px 0;background:#fff}.trooth-social-avatar{width:48px;height:48px;border-radius:50%;background:#40916c;color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px;overflow:hidden;flex:none;position:relative}.trooth-social-avatar img{width:100%;height:100%;object-fit:cover}.trooth-social-info{flex:1;min-width:0}.trooth-social-info b,.trooth-social-info small{display:block}.trooth-social-info small{color:#718276;margin-top:3px}.trooth-social-btn{border:0;border-radius:9px;padding:8px 10px;background:#d8f3dc;color:#2d6a4f;font-weight:700;cursor:pointer}@media(max-width:600px){.trooth-social-person{flex-wrap:wrap}.trooth-social-btn{flex:1}}';document.head.appendChild(style)}}
     function clearChannels(){channels.forEach(function(c){try{sb.removeChannel(c)}catch(e){}});channels=[]}
     function subscribe(){clearChannels();if(!uid)return;var ch=sb.channel('trooth-profile-social-'+uid).on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'receiver_id=eq.'+uid},function(){scheduleLoad()}).on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'sender_id=eq.'+uid},function(){scheduleLoad()}).on('postgres_changes',{event:'*',schema:'public',table:'connections',filter:'following_id=eq.'+uid},function(){scheduleLoad()}).on('postgres_changes',{event:'*',schema:'public',table:'connections',filter:'follower_id=eq.'+uid},function(){scheduleLoad()}).subscribe();channels=[ch]}
     decorate();sb.auth.getUser().then(function(r){uid=r.data&&r.data.user&&r.data.user.id;if(uid){loadPeople();subscribe()}});
     window.addEventListener('trooth-profile-updated',function(){scheduleLoad(60)});
+    window.addEventListener('trooth-presence-sync',function(e){window.__troothOnlineUsers=e.detail&&e.detail.state||{};document.dispatchEvent(new CustomEvent('trooth-social-online-refresh'))});
     sb.auth.onAuthStateChange(function(event,session){if(event==='SIGNED_OUT'||!session){uid=null;clearChannels();clearTimeout(loadTimer);return}if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'){uid=session.user.id;subscribe();scheduleLoad(60)}});
     window.addEventListener('beforeunload',function(){clearTimeout(loadTimer);clearChannels()});
   }
