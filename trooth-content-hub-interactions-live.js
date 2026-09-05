@@ -1,4 +1,4 @@
-// Trooth — live interaction bridge for News / Sports / Stores / Property / Film-Fashion hubs
+// Trooth — live interaction bridge for News / Sports / Stores / Property / Film-Fashion
 (function(){
   function boot(){
     if(window.troothContentHubInteractionsLive)return;
@@ -12,24 +12,29 @@
       properties:'trooth-property-refresh',
       film_fashion_stories:'trooth-film-fashion-refresh'
     };
+    var pending={};
 
     function refresh(table,source){
-      window.dispatchEvent(new CustomEvent('trooth-content-hub-interaction-refresh',{
-        detail:{table:table,source:source||'interaction-bridge'}
-      }));
+      if(!table||!events[table])return;
+      // The unified bridge emits both a table event and a unified event.
+      // Coalesce them so one database change causes one UI refresh.
+      clearTimeout(pending[table]);
+      pending[table]=setTimeout(function(){
+        pending[table]=null;
+        window.dispatchEvent(new CustomEvent('trooth-content-hub-interaction-refresh',{
+          detail:{table:table,source:source||'interaction-bridge'}
+        }));
+      },80);
     }
 
-    // Use the unified realtime bridge instead of opening duplicate
-    // Postgres Changes channels for every content table.
     tables.forEach(function(table){
       var eventName=events[table];
       if(!eventName)return;
-      window.addEventListener(eventName,function(e){
+      window.addEventListener(eventName,function(){
         refresh(table,'content-hubs-realtime');
       });
     });
 
-    // Also accept the unified refresh event as a safety net/manual bridge.
     window.addEventListener('trooth-content-hubs-refresh',function(e){
       var table=e&&e.detail&&e.detail.table;
       if(table&&events[table])refresh(table,'content-hubs-unified');
@@ -39,6 +44,10 @@
       if(table&&events[table])refresh(table,'manual');
       else tables.forEach(function(t){refresh(t,'manual');});
     };
+
+    window.addEventListener('beforeunload',function(){
+      tables.forEach(function(t){clearTimeout(pending[t]);pending[t]=null;});
+    },{once:true});
 
     window.dispatchEvent(new CustomEvent('trooth-content-hub-interactions-ready'));
   }
