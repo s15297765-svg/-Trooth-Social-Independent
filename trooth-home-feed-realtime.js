@@ -1,4 +1,4 @@
-// Trooth Social Independent — Home Feed Realtime / Smart Refresh v2
+// Trooth Social Independent — Home Feed Realtime / Smart Refresh v3
 (function(){
   function boot(){
     var sb=window.troothSupabase;
@@ -29,8 +29,7 @@
         el=document.createElement('button');el.id='trooth-new-posts-banner';el.type='button';el.setAttribute('aria-live','polite');el.setAttribute('aria-label','Show new posts');el.onclick=refreshNow;
         (feed.parentNode||feed).insertBefore(el,feed);
       }
-      el.textContent='🌿 '+pending+' new post'+(pending===1?'':'s')+' available · Refreshing…';
-      scheduleRefresh();
+      el.textContent='🌿 '+pending+' new post'+(pending===1?'':'s')+' available · Tap to refresh';
     }
     var style=document.createElement('style');style.textContent=`
       #trooth-new-posts-banner{display:block;width:100%;margin:8px 0;padding:11px 14px;border:1px solid #b7dfc7;border-radius:13px;background:#e8f5ed;color:#245c3a;font-weight:800;cursor:pointer;box-shadow:0 3px 12px #245c3a18;transition:transform .18s ease,box-shadow .18s ease}
