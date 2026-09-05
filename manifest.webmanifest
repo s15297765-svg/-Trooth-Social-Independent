@@ -7,5 +7,12 @@
   "background_color": "#eef8f1",
   "theme_color": "#40916c",
   "description": "Trooth Social Independent — social, business, news, sports, stores and community network.",
-  "icons": []
+  "icons": [
+    {
+      "src": "trooth-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
