@@ -1,4 +1,4 @@
-// Trooth Social Independent — mobile bottom navigation + live badges + resilient UI
+// Trooth Social Independent — mobile bottom navigation + live badges + resilient UI v3
 (function(){
   function boot(){
     if(document.getElementById('trooth-mobile-nav')) return;
@@ -9,12 +9,12 @@
     n.innerHTML='<a href="index.html" data-page="index.html"><span class="ico">🏠</span>Home</a><a href="friends.html" data-page="friends.html"><span class="ico">👥</span>Friends</a><a href="chat.html" data-page="chat.html"><span class="ico">💬</span>Messages<span class="badge" id="trooth-mobile-msg-badge" hidden></span></a><a href="notifications.html" data-page="notifications.html"><span class="ico">🔔</span>Alerts<span class="badge" id="trooth-mobile-notif-badge" hidden></span></a><a href="auth.html" data-page="auth.html"><span class="ico">👤</span>Profile</a>';
     document.body.appendChild(n);
     function markActive(){var page=location.pathname.split('/').pop()||'index.html';n.querySelectorAll('a').forEach(function(a){a.classList.toggle('active',a.dataset.page===page)})}
-    markActive();window.addEventListener('popstate',markActive);window.addEventListener('pageshow',markActive);
     function paint(id,count){var b=document.getElementById(id);if(!b)return;var x=Math.max(0,Number(count)||0),old=Number(b.dataset.count)||0;b.hidden=x<1;b.textContent=x>99?'99+':String(x);b.dataset.count=String(x);if(x>old){b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse');setTimeout(function(){b.classList.remove('pulse')},750)}}
-    function refresh(){var sb=window.troothSupabase;if(!sb||!navigator.onLine)return;sb.auth.getUser().then(function(r){var u=r.data&&r.data.user;if(!u){paint('trooth-mobile-msg-badge',0);paint('trooth-mobile-notif-badge',0);return}return Promise.all([sb.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',u.id).eq('is_read',false),sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).eq('is_read',false)]).then(function(a){paint('trooth-mobile-msg-badge',a[0]&&a[0].count);paint('trooth-mobile-notif-badge',a[1]&&a[1].count)})}).catch(function(){});}
-    ['trooth-messages-refresh','trooth-notifications-refresh','trooth-unread-updated','trooth-header-badges-updated','trooth-auth-state-change'].forEach(function(ev){window.addEventListener(ev,refresh)});
-    window.addEventListener('online',refresh);document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh()});window.addEventListener('pageshow',refresh);
-    setTimeout(refresh,1400);setInterval(refresh,60000);
+    var refreshing=false,last=0;
+    function refresh(force){var now=Date.now();if(refreshing||(!force&&now-last<2500))return;last=now;var sb=window.troothSupabase;if(!sb||!navigator.onLine)return;refreshing=true;sb.auth.getUser().then(function(r){var u=r.data&&r.data.user;if(!u){paint('trooth-mobile-msg-badge',0);paint('trooth-mobile-notif-badge',0);return null}return Promise.all([sb.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',u.id).eq('is_read',false),sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).eq('is_read',false)]).then(function(a){paint('trooth-mobile-msg-badge',a[0]&&a[0].count);paint('trooth-mobile-notif-badge',a[1]&&a[1].count)})}).catch(function(){}).finally(function(){refreshing=false})}
+    markActive();refresh(true);window.addEventListener('popstate',markActive);window.addEventListener('pageshow',function(){markActive();refresh(true)});window.addEventListener('online',function(){refresh(true)});document.addEventListener('visibilitychange',function(){if(!document.hidden){markActive();refresh(true)}});
+    ['trooth-messages-refresh','trooth-notifications-refresh','trooth-unread-updated','trooth-header-badges-updated','trooth-auth-state-change'].forEach(function(ev){window.addEventListener(ev,function(){refresh(true)})});
+    setInterval(function(){if(!document.hidden)refresh(false)},60000);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
