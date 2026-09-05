@@ -1,27 +1,26 @@
-// Trooth Social Independent — Home Feed Realtime / Smart Refresh
+// Trooth Social Independent — Home Feed Realtime / Smart Refresh v2
 (function(){
   function boot(){
     var sb=window.troothSupabase;
-    if(!sb) return setTimeout(boot,300);
-    if(window.troothHomeFeedRealtimeReady) return;
+    if(!sb)return setTimeout(boot,300);
+    if(window.troothHomeFeedRealtimeReady)return;
     window.troothHomeFeedRealtimeReady=true;
-
     var feed=document.getElementById('feed');
     var pending=0,channel=null,authSub=null,subscribing=false,lastRefresh=0,refreshTimer=null;
     function emit(detail){window.dispatchEvent(new CustomEvent('trooth-home-feed-refresh',{detail:detail||{}}))}
     function hideBanner(){var el=document.getElementById('trooth-new-posts-banner');if(el)el.remove();pending=0}
     function refreshNow(){
-      var now=Date.now();
-      if(now-lastRefresh<900)return;
+      if(navigator.onLine===false)return;
+      var now=Date.now();if(now-lastRefresh<900)return;
       lastRefresh=now;hideBanner();
       if(typeof window.loadPosts==='function')window.loadPosts();
       emit({source:'smart-refresh'});
     }
-    function scheduleRefresh(){
+    function scheduleRefresh(delay){
       clearTimeout(refreshTimer);
       refreshTimer=setTimeout(function(){
-        if(document.visibilityState==='visible')refreshNow();
-      },1200);
+        if(document.visibilityState==='visible'&&navigator.onLine!==false)refreshNow();
+      },delay||1200);
     }
     function showNewPostsBanner(){
       pending++;if(!feed)return;
@@ -45,11 +44,12 @@
       subscribing=true;cleanup();
       channel=sb.channel('trooth-home-feed-realtime-'+Date.now())
         .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},function(e){showNewPostsBanner();emit({source:'new-post',post:e&&e.new||null})})
-        .on('postgres_changes',{event:'UPDATE',schema:'public',table:'posts'},function(e){emit({source:'post-update',post:e&&e.new||null});scheduleRefresh()})
-        .on('postgres_changes',{event:'DELETE',schema:'public',table:'posts'},function(e){emit({source:'post-delete',post:e&&e.old||null});scheduleRefresh()})
+        .on('postgres_changes',{event:'UPDATE',schema:'public',table:'posts'},function(e){emit({source:'post-update',post:e&&e.new||null});scheduleRefresh(900)})
+        .on('postgres_changes',{event:'DELETE',schema:'public',table:'posts'},function(e){emit({source:'post-delete',post:e&&e.old||null});scheduleRefresh(900)})
         .subscribe(function(status){
           subscribing=false;
-          if(status==='SUBSCRIBED')window.troothHomeFeedRealtimeChannel=channel;
+          if(status==='SUBSCRIBED'){window.troothHomeFeedRealtimeChannel=channel;window.dispatchEvent(new CustomEvent('trooth-realtime-connected',{detail:{source:'home-feed'}}))}
+          else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')window.dispatchEvent(new CustomEvent('trooth-realtime-status',{detail:{status:status,source:'home-feed'}}));
         });
     }
     subscribe();
@@ -60,10 +60,9 @@
     authSub=auth&&auth.data&&auth.data.subscription?auth.data.subscription:null;
     document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&pending)refreshNow()});
     window.addEventListener('focus',function(){if(pending)refreshNow()});
-    window.addEventListener('beforeunload',function(){
-      cleanup();
-      if(authSub){try{authSub.unsubscribe()}catch(e){}}
-    },{once:true});
+    window.addEventListener('online',function(){if(pending)scheduleRefresh(250)});
+    window.addEventListener('offline',function(){clearTimeout(refreshTimer)});
+    window.addEventListener('beforeunload',function(){cleanup();if(authSub){try{authSub.unsubscribe()}catch(e){} }},{once:true});
     window.troothHomeFeedRefresh=refreshNow;
   }
   if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
