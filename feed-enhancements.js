@@ -54,6 +54,16 @@
       }
       const mineComments = comments.filter(c => c.post_id === id);
       box.innerHTML = mineComments.map(c => `<div class="comment" style="margin-top:8px;padding:8px;border-radius:9px;background:#f4f8f5"><b>Trooth Member:</b> ${esc(c.body)} <small>• ${new Date(c.created_at).toLocaleString()}</small></div>`).join('');
+
+      if (!post.dataset.troothDblLike) {
+        post.dataset.troothDblLike = '1';
+        post.addEventListener('dblclick', event => {
+          if (event.target.closest('button,input,textarea,a,video')) return;
+          const likeButton = post.querySelector('.like-action');
+          if (likeButton && /Liked/i.test(likeButton.textContent)) return;
+          window.toggleLike(id);
+        });
+      }
     });
   }
 
