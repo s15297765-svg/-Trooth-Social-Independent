@@ -2,6 +2,8 @@
 (function(){
   function boot(){
     var sb=window.troothSupabase;if(!sb||!sb.channel)return;
+    var path=(location.pathname||'').split('/').pop();
+    if(path!=='group.html'&&path!=='group-admin.html')return;
     var groupId=new URLSearchParams(location.search).get('id');
     if(!groupId||window.troothGroupLiveNoticeReady)return;
     window.troothGroupLiveNoticeReady=true;
