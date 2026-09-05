@@ -1,4 +1,4 @@
-// Trooth Social Independent — offline/online app status v2
+// Trooth Social Independent — offline/online app status v3
 (function(){
   function boot(){
     if(window.__troothOfflineStatus)return;window.__troothOfflineStatus=true;
@@ -10,10 +10,14 @@
       if(!offline)timer=setTimeout(function(){if(el)el.style.opacity='0'},2200);
     }
     function refresh(){window.dispatchEvent(new CustomEvent('trooth-feed-refresh'));window.dispatchEvent(new CustomEvent('trooth-messages-refresh'));window.dispatchEvent(new CustomEvent('trooth-notifications-refresh'));window.dispatchEvent(new CustomEvent('trooth-auth-changed'))}
+    var reconnectTimer=null,reconnecting=false;
+    function reconnect(){if(reconnecting||!navigator.onLine)return;reconnecting=true;clearTimeout(reconnectTimer);reconnectTimer=setTimeout(function(){reconnecting=false;if(navigator.onLine)refresh()},500)}
     window.addEventListener('offline',function(){show(true);window.dispatchEvent(new CustomEvent('trooth-realtime-status',{detail:{status:'OFFLINE'}}))});
-    window.addEventListener('online',function(){show(false);window.dispatchEvent(new CustomEvent('trooth-realtime-status',{detail:{status:'CONNECTING'}}));setTimeout(refresh,350)});
-    window.addEventListener('trooth-pwa-online',function(){if(navigator.onLine)refresh()});
+    window.addEventListener('online',function(){show(false);window.dispatchEvent(new CustomEvent('trooth-realtime-status',{detail:{status:'CONNECTING'}}));reconnect()});
+    window.addEventListener('trooth-pwa-online',function(){if(navigator.onLine)reconnect()});
     window.addEventListener('trooth-pwa-offline',function(){show(true)});
+    window.addEventListener('pageshow',function(){if(navigator.onLine)reconnect()});
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&navigator.onLine)reconnect()});
     if(!navigator.onLine)show(true);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
