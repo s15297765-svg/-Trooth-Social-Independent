@@ -6,18 +6,15 @@
     var channel=null;
     function fire(name,detail){window.dispatchEvent(new CustomEvent(name,{detail:detail||{}}))}
     function refreshAll(){
-      fire('trooth-activity-refresh');
-      fire('trooth-notifications-refresh');
-      fire('trooth-unread-refresh');
-      fire('trooth-friends-refresh');
-      fire('trooth-messages-refresh');
-      fire('trooth-profile-social-refresh');
+      fire('trooth-activity-refresh');fire('trooth-notifications-refresh');fire('trooth-unread-refresh');
+      fire('trooth-friends-refresh');fire('trooth-messages-refresh');fire('trooth-profile-social-refresh');
     }
     function emit(table,payload){
+      var row=payload.new||payload.old||{};
       fire('trooth-activity-live',{table:table,event:payload.eventType,payload:payload});
-      if(table==='notifications')fire('trooth-notification-live',{detail:payload.new||{}});
-      if(table==='messages')fire('trooth-message-live',{detail:payload.new||{}});
-      if(table==='friend_requests'||table==='connections')fire('trooth-friend-live',{detail:payload.new||payload.old||{}});
+      if(table==='notifications')fire('trooth-notification-live',row);
+      if(table==='messages')fire('trooth-message-live',row);
+      if(table==='friend_requests'||table==='connections')fire('trooth-friend-live',row);
       refreshAll();
     }
     function connect(){
