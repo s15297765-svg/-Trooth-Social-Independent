@@ -1,8 +1,9 @@
-// Trooth — post deep-link resolver, highlight and focus (v4)
+// Trooth — post deep-link resolver, highlight and focus (v5)
 (function(){
-  if(window.__troothPostDeepLinkV4)return;window.__troothPostDeepLinkV4=true;
+  if(window.__troothPostDeepLinkV5)return;window.__troothPostDeepLinkV5=true;
   function getId(card){
-    if(card.getAttribute('data-post-id'))return card.getAttribute('data-post-id');
+    var existing=card.getAttribute('data-post-id');
+    if(existing)return existing;
     var btn=card.querySelector('[onclick*="likePost"],[onclick*="commentPost"],[onclick*="sharePost"]');
     if(!btn)return '';
     var raw=btn.getAttribute('onclick')||'';
@@ -10,11 +11,16 @@
     if(m&&m[1]){card.setAttribute('data-post-id',m[1]);return m[1];}
     return '';
   }
-  function hydrate(root){
-    (root||document).querySelectorAll('.post').forEach(function(card){getId(card);});
+  function hydrate(root){(root||document).querySelectorAll('.post').forEach(function(card){getId(card);});}
+  function readPostId(){
+    var q=new URLSearchParams(location.search).get('post');
+    if(q)return q;
+    var h=location.hash||'';
+    var m=h.match(/^#post-(.+)$/);
+    return m?decodeURIComponent(m[1]):'';
   }
   function boot(){
-    var postId=new URLSearchParams(location.search).get('post');
+    var postId=readPostId();
     hydrate(document);
     if(!postId)return;
     var highlighted=null;
@@ -28,6 +34,7 @@
           if(highlighted===card)return true;
           highlighted=card;
           card.setAttribute('tabindex','-1');
+          card.setAttribute('aria-label','Trooth post '+postId);
           card.style.transition='box-shadow .25s,transform .25s';
           card.style.boxShadow='0 0 0 4px #74c69d,0 8px 30px #16653433';
           card.scrollIntoView({behavior:'smooth',block:'center'});
@@ -44,6 +51,7 @@
     obs.observe(root,{childList:true,subtree:true});
     timer=setInterval(function(){if(find()||++tries>40){clearInterval(timer);obs.disconnect()}},500);
     window.addEventListener('trooth-feed-refreshed',find);
+    window.addEventListener('hashchange',function(){postId=readPostId();highlighted=null;find();});
     window.addEventListener('beforeunload',function(){clearInterval(timer);obs.disconnect();},{once:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
