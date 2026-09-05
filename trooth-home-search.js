@@ -1,16 +1,16 @@
-// Trooth Social Independent — home search enhancement v7
+// Trooth Social Independent — home search enhancement v8
 (()=>{
-  if(window.__troothHomeSearchV7)return;window.__troothHomeSearchV7=true;
+  if(window.__troothHomeSearchV8)return;window.__troothHomeSearchV8=true;
   const getInput=()=>document.getElementById('search');
   let timer=null;
   const ensureStatus=()=>{
     const input=getInput();if(!input)return null;
-    input.setAttribute('aria-label',input.getAttribute('aria-label')||'Search Trooth');input.setAttribute('autocomplete','off');input.setAttribute('enterkeyhint','search');input.setAttribute('aria-controls','feed');
+    input.setAttribute('aria-label',input.getAttribute('aria-label')||'Search Trooth');input.setAttribute('autocomplete','off');input.setAttribute('enterkeyhint','search');input.setAttribute('inputmode','search');input.setAttribute('role','searchbox');input.setAttribute('spellcheck','false');input.setAttribute('aria-controls','feed');
     let wrap=input.parentElement;
     let status=document.getElementById('troothSearchStatus');
     if(!status&&wrap){status=document.createElement('small');status.id='troothSearchStatus';status.className='muted';status.style.display='none';status.style.marginTop='5px';status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');wrap.appendChild(status)}
     let clear=document.getElementById('troothSearchClear');
-    if(!clear&&wrap){clear=document.createElement('button');clear.id='troothSearchClear';clear.type='button';clear.textContent='✕';clear.title='Clear search';clear.setAttribute('aria-label','Clear search');clear.className='action';clear.style.display='none';clear.style.marginLeft='6px';clear.addEventListener('click',()=>{input.value='';run();input.focus()});wrap.appendChild(clear)}
+    if(!clear&&wrap){clear=document.createElement('button');clear.id='troothSearchClear';clear.type='button';clear.textContent='✕';clear.title='Clear search';clear.setAttribute('aria-label','Clear search');clear.className='action';clear.style.display='none';clear.style.flex='0 0 auto';clear.style.width='38px';clear.style.minWidth='38px';clear.style.marginLeft='6px';clear.addEventListener('click',()=>{input.value='';run();input.focus()});wrap.appendChild(clear)}
     return status;
   };
   const ensureMobileSearch=()=>{
