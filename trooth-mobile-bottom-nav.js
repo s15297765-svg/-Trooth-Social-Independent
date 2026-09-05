@@ -1,4 +1,4 @@
-// Trooth Social Independent — mobile bottom navigation + live badges + resilient UI v3
+// Trooth Social Independent — mobile bottom navigation + live badges + resilient UI v4
 (function(){
   function boot(){
     if(document.getElementById('trooth-mobile-nav')) return;
@@ -13,7 +13,8 @@
     var refreshing=false,last=0;
     function refresh(force){var now=Date.now();if(refreshing||(!force&&now-last<2500))return;last=now;var sb=window.troothSupabase;if(!sb||!navigator.onLine)return;refreshing=true;sb.auth.getUser().then(function(r){var u=r.data&&r.data.user;if(!u){paint('trooth-mobile-msg-badge',0);paint('trooth-mobile-notif-badge',0);return null}return Promise.all([sb.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',u.id).eq('is_read',false),sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).eq('is_read',false)]).then(function(a){paint('trooth-mobile-msg-badge',a[0]&&a[0].count);paint('trooth-mobile-notif-badge',a[1]&&a[1].count)})}).catch(function(){}).finally(function(){refreshing=false})}
     markActive();refresh(true);window.addEventListener('popstate',markActive);window.addEventListener('pageshow',function(){markActive();refresh(true)});window.addEventListener('online',function(){refresh(true)});document.addEventListener('visibilitychange',function(){if(!document.hidden){markActive();refresh(true)}});
-    ['trooth-messages-refresh','trooth-notifications-refresh','trooth-unread-updated','trooth-header-badges-updated','trooth-auth-state-change'].forEach(function(ev){window.addEventListener(ev,function(){refresh(true)})});
+    ['trooth-messages-refresh','trooth-notifications-refresh','trooth-unread-updated','trooth-header-badges-updated','trooth-auth-state-change','trooth-auth-changed'].forEach(function(ev){window.addEventListener(ev,function(){refresh(true)})});
+    window.addEventListener('trooth-live-interaction-refresh',function(){refresh(false)});
     setInterval(function(){if(!document.hidden)refresh(false)},60000);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
