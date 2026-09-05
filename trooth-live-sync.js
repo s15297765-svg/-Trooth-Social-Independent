@@ -42,6 +42,7 @@
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'receiver_id=eq.'+uid},payload=>{
         window.dispatchEvent(new CustomEvent('trooth-message',{detail:payload.new}));
         if(typeof window.refreshTroothMessages==='function')window.refreshTroothMessages();
+        indicator('social','🟢 نیا Message — نیا پیغام','chat.html?user='+encodeURIComponent(payload.new.sender_id));
       })
       .on('postgres_changes',{event:'*',schema:'public',table:'news_stories'},payload=>{
         window.dispatchEvent(new CustomEvent('trooth-news-update',{detail:payload}));
@@ -55,7 +56,7 @@
       })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},payload=>{
         window.dispatchEvent(new CustomEvent('trooth-post-update',{detail:payload}));
-        if(!page().includes('group.html'))indicator('social','🟢 Live Feed — نئی پوسٹ','index.html');
+        if(payload.new?.user_id!==uid&&!page().includes('group.html'))indicator('social','🟢 Live Feed — نئی پوسٹ','index.html');
         window.dispatchEvent(new CustomEvent('trooth-live-feed-update',{detail:payload}));
       })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'friend_requests',filter:'receiver_id=eq.'+uid},payload=>{
