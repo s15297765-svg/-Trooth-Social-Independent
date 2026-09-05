@@ -15,7 +15,7 @@
     };
     const cleanup=(full)=>{
       stopped=true;clearChannel();
-      if(full&&authSub&&authSub.unsubscribe){try{authSub.unsubscribe()}catch(e){}authSub=null;}
+      if(full&&authSub){try{authSub.unsubscribe?.();authSub.subscription?.unsubscribe?.()}catch(e){}authSub=null;}
     };
     const scheduleRefresh=()=>{
       clearTimeout(refreshTimer);
