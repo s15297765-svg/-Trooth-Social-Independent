@@ -1,13 +1,28 @@
-// Trooth Social Independent — Supabase client configuration
-// Safe for frontend use: this is the public/publishable key. Never put a service_role/secret key here.
-const TROOTH_SUPABASE_URL='https://tmshuyvtmbumtrlbhdjq.supabase.co';
-const TROOTH_SUPABASE_PUBLISHABLE_KEY='sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_GTSnhpkz';
+// Trooth Social Independent — Supabase bootstrap + live modules
 (function(){
- const theme=document.createElement('script');theme.src='trooth-green-theme.js';document.head.appendChild(theme);
- const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
- script.onload=function(){
-  window.troothSupabase=window.supabase.createClient(TROOTH_SUPABASE_URL,TROOTH_SUPABASE_PUBLISHABLE_KEY);
-  const files=['feed-enhancements.js','trooth-live-sync.js','trooth-stories-live.js','trooth-notifications-messages.js','trooth-content-hub.js','trooth-groups-home.js','trooth-groups-enhancement.js','trooth-friends-live.js','trooth-social-connect.js','trooth-content-live.js','trooth-market-live.js','trooth-market-interactions-live.js','trooth-home-unified.js','trooth-home-content.js','trooth-home-notifications.js','trooth-home-v2.js','trooth-auth-social-v2.js','trooth-auth-profile-v2.js','trooth-messaging-notifications-v2.js'];let i=0;
-  function next(){if(i>=files.length){window.dispatchEvent(new Event('trooth-supabase-ready'));return}const s=document.createElement('script');s.src=files[i++];s.onload=next;s.onerror=next;document.body.appendChild(s)}next();
- };script.onerror=function(){console.error('Trooth: Supabase client could not be loaded.')};document.head.appendChild(script);
+  var scripts=[
+    'trooth-green-theme.js',
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    'feed-enhancements.js','trooth-live-sync.js','trooth-stories-live.js',
+    'trooth-notifications-messages.js','trooth-content-hub.js','trooth-groups-home.js',
+    'trooth-groups-enhancement.js','trooth-friends-live.js','trooth-social-connect.js',
+    'trooth-content-live.js','trooth-market-live.js','trooth-market-interactions-live.js',
+    'trooth-home-unified.js','trooth-home-content.js','trooth-home-notifications.js',
+    'trooth-home-v2.js','trooth-auth-social-v2.js','trooth-auth-profile-v2.js',
+    'trooth-messaging-notifications-v2.js'
+  ];
+  var i=0;
+  function load(){
+    if(i>=scripts.length){
+      window.dispatchEvent(new CustomEvent('trooth-supabase-ready'));
+      return;
+    }
+    var s=document.createElement('script');
+    s.src=scripts[i++];
+    s.async=false;
+    s.onload=load;
+    s.onerror=load;
+    document.head.appendChild(s);
+  }
+  load();
 })();
