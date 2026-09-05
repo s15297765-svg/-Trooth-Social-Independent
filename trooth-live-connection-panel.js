@@ -1,4 +1,4 @@
-// Trooth Social Independent — unified realtime connection panel v3
+// Trooth Social Independent — unified realtime connection panel v4
 (function(){
   function boot(){
     if(window.__troothLiveConnectionPanel)return;window.__troothLiveConnectionPanel=true;
@@ -16,11 +16,19 @@
       if(last===text)return;last=text;el.textContent=text;el.style.color=color;el.title=title;el.setAttribute('aria-label',title);
     }
     function online(){return navigator.onLine!==false}
-    function temporaryConnecting(){clearTimeout(timer);if(!online()){set('offline');return}set('connecting');timer=setTimeout(function(){if(online()&&last==='🟡 Connecting…')set('connected')},1800)}
+    function temporaryConnecting(){
+      clearTimeout(timer);
+      if(!online()){set('offline');return}
+      set('connecting');
+      // Never claim LIVE on a timer: only a real realtime SUBSCRIBED/connected event may do that.
+      timer=setTimeout(function(){
+        if(online()&&last==='🟡 Connecting…')set('retrying',{attempt:1});
+      },5000);
+    }
     window.addEventListener('trooth-realtime-status',function(e){var s=e.detail&&e.detail.status;if(s==='SUBSCRIBED')set('connected');else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'||s==='RETRYING')set('retrying',e.detail);else if(s==='CLOSED'||s==='RECONNECTING')set('reconnecting');else if(s==='OFFLINE')set('offline');else if(s==='SIGNED_OUT')set('offline');else set('connecting')});
     window.addEventListener('trooth-realtime-connected',function(){clearTimeout(timer);set('connected')});
-    window.addEventListener('trooth-realtime-reconnect',function(e){set('reconnecting',e.detail)});
-    window.addEventListener('trooth-realtime-reconnecting',function(e){set('retrying',e.detail)});
+    window.addEventListener('trooth-realtime-reconnect',function(e){clearTimeout(timer);set('reconnecting',e.detail)});
+    window.addEventListener('trooth-realtime-reconnecting',function(e){clearTimeout(timer);set('retrying',e.detail)});
     window.addEventListener('trooth-message-incoming',function(){clearTimeout(timer);set('connected')});
     window.addEventListener('trooth-notification-incoming',function(){clearTimeout(timer);set('connected')});
     window.addEventListener('online',temporaryConnecting);
