@@ -1,8 +1,8 @@
-// Trooth Social Independent — Home Network Live Upgrade v4
+// Trooth Social Independent — Home Network Live Upgrade v5
 (function(){
   function start(){
     var s=window.troothSupabase;if(!s||window.__troothHomeNetworkUpgrade)return;window.__troothHomeNetworkUpgrade=true;
-    var tables=[['news_stories','newsHub'],['sports_stories','sportsHub'],['store_listings','storesHub'],['properties','propertyHub'],['film_fashion_stories','filmFashionHub']],refreshTimers={},lastEvent={},channel=null,retryTimer=null;
+    var tables=[['news_stories','newsHub'],['sports_stories','sportsHub'],['store_listings','storesHub'],['properties','propertyHub'],['film_fashion_stories','filmFashionHub']],refreshTimers={},lastEvent={},channel=null,retryTimer=null,starting=false,onlineHandler,offlineHandler,focusHandler;
     function refreshHub(table,id){if(!navigator.onLine)return;if(typeof window.loadHub==='function')return window.loadHub(table,id)}
     function schedule(key,fn,delay){clearTimeout(refreshTimers[key]);refreshTimers[key]=setTimeout(fn,delay||700)}
     function shouldHandle(key){var now=Date.now();if(lastEvent[key]&&now-lastEvent[key]<900)return false;lastEvent[key]=now;return true}
@@ -10,7 +10,7 @@
     function status(type,detail){try{window.dispatchEvent(new CustomEvent('trooth-home-network-status',{detail:{status:type,message:detail||''}}))}catch(e){}}
     function cleanup(){clearTimeout(retryTimer);retryTimer=null;Object.keys(refreshTimers).forEach(function(k){clearTimeout(refreshTimers[k])});if(channel){try{s.removeChannel(channel)}catch(e){}channel=null}}
     function subscribe(){
-      cleanup();if(!navigator.onLine)return;
+      if(starting||!navigator.onLine)return;starting=true;cleanup();
       channel=s.channel('trooth-home-network-live-'+Date.now())
         .on('postgres_changes',{event:'*',schema:'public',table:'posts'},function(){if(!shouldHandle('posts'))return;schedule('posts',function(){if(typeof window.loadPosts==='function'&&navigator.onLine)window.loadPosts();toast('Live feed updated ✓');status('FEED_REFRESH','posts')},450)})
         .on('postgres_changes',{event:'*',schema:'public',table:'stories_reels'},function(){if(!shouldHandle('stories'))return;schedule('stories',function(){if(typeof window.loadStories==='function'&&navigator.onLine)window.loadStories();status('STORIES_REFRESH','stories_reels')},600)})
@@ -19,12 +19,12 @@
         .on('postgres_changes',{event:'*',schema:'public',table:'store_listings'},function(){if(shouldHandle('store_listings'))schedule('store_listings',function(){refreshHub('store_listings','storesHub');status('HUB_REFRESH','store_listings')},600)})
         .on('postgres_changes',{event:'*',schema:'public',table:'properties'},function(){if(shouldHandle('properties'))schedule('properties',function(){refreshHub('properties','propertyHub');status('HUB_REFRESH','properties')},600)})
         .on('postgres_changes',{event:'*',schema:'public',table:'film_fashion_stories'},function(){if(shouldHandle('film_fashion_stories'))schedule('film_fashion_stories',function(){refreshHub('film_fashion_stories','filmFashionHub');status('HUB_REFRESH','film_fashion_stories')},600)})
-        .subscribe(function(subStatus){if(subStatus==='SUBSCRIBED'){toast('Trooth Live Network connected ✓');status('CONNECTED','Live network connected');window.dispatchEvent(new CustomEvent('trooth-realtime-connected',{detail:{source:'home-network'}}))}else if(subStatus==='CHANNEL_ERROR'||subStatus==='TIMED_OUT'){status('RETRYING',subStatus);window.dispatchEvent(new CustomEvent('trooth-realtime-status',{detail:{status:'RETRYING',source:'home-network'}}));cleanup();retryTimer=setTimeout(subscribe,1500)}});
+        .subscribe(function(subStatus){starting=false;if(subStatus==='SUBSCRIBED'){toast('Trooth Live Network connected ✓');status('CONNECTED','Live network connected');window.dispatchEvent(new CustomEvent('trooth-realtime-connected',{detail:{source:'home-network'}}))}else if(subStatus==='CHANNEL_ERROR'||subStatus==='TIMED_OUT'){status('RETRYING',subStatus);window.dispatchEvent(new CustomEvent('trooth-realtime-status',{detail:{status:'RETRYING',source:'home-network'}}));cleanup();retryTimer=setTimeout(function(){starting=false;subscribe()},1500)}});
     }
     var hero=document.querySelector('.hero');if(hero&&!document.getElementById('troothLiveBadge')){var b=document.createElement('span');b.id='troothLiveBadge';b.className='tag';b.textContent='● LIVE NETWORK';b.style.marginLeft='6px';var tag=hero.querySelector('.tag');if(tag&&tag.parentNode)tag.after(b);else hero.appendChild(b)}
-    subscribe();window.addEventListener('online',subscribe);window.addEventListener('offline',function(){status('OFFLINE','Network offline');cleanup()});
-    window.addEventListener('focus',function(){if(!navigator.onLine)return;if(typeof window.loadPosts==='function')window.loadPosts();tables.forEach(function(x){schedule(x[0],function(){refreshHub(x[0],x[1])},250)})});
-    window.addEventListener('beforeunload',cleanup,{once:true});
+    onlineHandler=function(){subscribe()};offlineHandler=function(){status('OFFLINE','Network offline');cleanup();starting=false};focusHandler=function(){if(!navigator.onLine)return;if(typeof window.loadPosts==='function')window.loadPosts();tables.forEach(function(x){schedule(x[0],function(){refreshHub(x[0],x[1])},250)})};
+    subscribe();window.addEventListener('online',onlineHandler);window.addEventListener('offline',offlineHandler);window.addEventListener('focus',focusHandler);
+    window.addEventListener('beforeunload',function(){window.removeEventListener('online',onlineHandler);window.removeEventListener('offline',offlineHandler);window.removeEventListener('focus',focusHandler);cleanup()},{once:true});
   }
   if(window.troothSupabase)start();else window.addEventListener('trooth-supabase-ready',start,{once:true});
 })();
