@@ -12,16 +12,20 @@
   let pending={};
   let mounted=false;
   let stopped=false;
+  let requestToken=0;
+  const loading={};
 
   function mount(table){
-    if(stopped)return;
+    if(stopped||loading[table])return;
     const sb=window.troothSupabase,cfg=tables[table];
     if(!sb||!cfg)return;
     let host=document.querySelector(`[data-trooth-content="${table}"]`);
     if(!host){const candidates=selectors[table];host=candidates&&document.querySelector(candidates);}
     if(!host)return;
+    const token=++requestToken;
+    loading[table]=true;
     sb.from(table).select('*').order('created_at',{ascending:false}).limit(12).then(({data,error})=>{
-      if(stopped)return;
+      if(stopped||token!==requestToken||!document.contains(host))return;
       if(error){console.warn('Trooth '+table,error);return;}
       if(!data?.length){host.innerHTML='<div class="trooth-empty">'+cfg.icon+' ابھی کوئی مواد موجود نہیں۔</div>';return;}
       host.innerHTML='<div class="trooth-hub-grid">'+data.map(x=>{
@@ -31,7 +35,7 @@
         const link=x.url?'<a href="'+esc(x.url)+'" target="_blank" rel="noopener">View / Visit ↗</a>':'';
         return '<article class="trooth-hub-card"><div class="trooth-hub-icon">'+cfg.icon+'</div><h3>'+esc(heading)+'</h3>'+(meta?'<small>'+esc(meta)+'</small>':'')+(text?'<p>'+esc(text)+'</p>':'')+link+'</article>';
       }).join('')+'</div>';
-    });
+    }).catch(error=>console.warn('Trooth '+table,error)).finally(()=>{loading[table]=false;});
   }
   function refresh(table){
     if(stopped||!tables[table])return;
@@ -40,6 +44,7 @@
   }
   function stop(){
     stopped=true;
+    requestToken++;
     Object.keys(pending).forEach(k=>{clearTimeout(pending[k]);pending[k]=null;});
   }
   function boot(){
