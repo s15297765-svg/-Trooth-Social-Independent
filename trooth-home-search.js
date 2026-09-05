@@ -1,17 +1,16 @@
-// Trooth Social Independent — home search enhancement v5
+// Trooth Social Independent — home search enhancement v6
 (()=>{
-  if(window.__troothHomeSearchV5)return;window.__troothHomeSearchV5=true;
+  if(window.__troothHomeSearchV6)return;window.__troothHomeSearchV6=true;
   const getInput=()=>document.getElementById('search');
   let timer=null;
   const ensureStatus=()=>{
     const input=getInput();if(!input)return null;
-    input.setAttribute('aria-label',input.getAttribute('aria-label')||'Search Trooth');
-    input.setAttribute('autocomplete','off');input.setAttribute('enterkeyhint','search');
+    input.setAttribute('aria-label',input.getAttribute('aria-label')||'Search Trooth');input.setAttribute('autocomplete','off');input.setAttribute('enterkeyhint','search');input.setAttribute('aria-controls','feed');
     let wrap=input.parentElement;
     let status=document.getElementById('troothSearchStatus');
     if(!status&&wrap){status=document.createElement('small');status.id='troothSearchStatus';status.className='muted';status.style.display='none';status.style.marginTop='5px';status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');wrap.appendChild(status)}
     let clear=document.getElementById('troothSearchClear');
-    if(!clear&&wrap){clear=document.createElement('button');clear.id='troothSearchClear';clear.type='button';clear.textContent='✕';clear.title='Clear search';clear.setAttribute('aria-label','Clear search');clear.className='action';clear.style.display='none';clear.style.marginLeft='6px';wrap.appendChild(clear);clear.addEventListener('click',()=>{input.value='';run();input.focus()})}
+    if(!clear&&wrap){clear=document.createElement('button');clear.id='troothSearchClear';clear.type='button';clear.textContent='✕';clear.title='Clear search';clear.setAttribute('aria-label','Clear search');clear.className='action';clear.style.display='none';clear.style.marginLeft='6px';clear.addEventListener('click',()=>{input.value='';run();input.focus()});wrap.appendChild(clear)}
     return status;
   };
   const run=()=>{
@@ -25,10 +24,7 @@
       return;
     }
     let shown=0;
-    document.querySelectorAll('#feed .post').forEach(card=>{
-      const text=String(card.getAttribute('data-text')||card.textContent||'').toLowerCase();
-      const ok=!q||text.includes(q);card.style.display=ok?'':'none';if(ok)shown++;
-    });
+    document.querySelectorAll('#feed .post').forEach(card=>{const text=String(card.getAttribute('data-text')||card.textContent||'').toLowerCase();const ok=!q||text.includes(q);card.style.display=ok?'':'none';if(ok)shown++});
     if(status){status.textContent=q?shown+' result'+(shown===1?'':'s')+' found':'';status.style.display=q?'block':'none'}
   };
   const schedule=()=>{clearTimeout(timer);timer=setTimeout(run,120)};
@@ -38,7 +34,8 @@
   document.addEventListener('input',e=>{if(e.target&&e.target.id==='search')schedule()});
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'&&document.activeElement&&document.activeElement.id==='search'){clearSearch();return}
-    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();focusSearch()}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();focusSearch();return}
+    if(e.key==='/'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&document.activeElement!==getInput()&&['INPUT','TEXTAREA','SELECT'].indexOf(document.activeElement?.tagName)<0){e.preventDefault();focusSearch()}
   });
   window.addEventListener('trooth-feed-refreshed',schedule);window.addEventListener('trooth-home-hub-refresh',schedule);
   window.addEventListener('beforeunload',()=>clearTimeout(timer),{once:true});
