@@ -13,14 +13,16 @@
       film_fashion_stories:'trooth-film-fashion-refresh'
     };
     var pending={};
+    var last={};
 
     function refresh(table,source){
       if(!table||!events[table])return;
-      // The unified bridge emits both a table event and a unified event.
-      // Coalesce them so one database change causes one UI refresh.
       clearTimeout(pending[table]);
       pending[table]=setTimeout(function(){
         pending[table]=null;
+        var now=Date.now();
+        if(last[table]&&now-last[table]<120)return;
+        last[table]=now;
         window.dispatchEvent(new CustomEvent('trooth-content-hub-interaction-refresh',{
           detail:{table:table,source:source||'interaction-bridge'}
         }));
@@ -29,15 +31,15 @@
 
     tables.forEach(function(table){
       var eventName=events[table];
-      if(!eventName)return;
-      window.addEventListener(eventName,function(){
-        refresh(table,'content-hubs-realtime');
+      window.addEventListener(eventName,function(e){
+        refresh(table,(e&&e.detail&&e.detail.source)||'content-hubs-realtime');
       });
     });
 
     window.addEventListener('trooth-content-hubs-refresh',function(e){
-      var table=e&&e.detail&&e.detail.table;
-      if(table&&events[table])refresh(table,'content-hubs-unified');
+      var detail=e&&e.detail||{};
+      var table=detail.table||detail.type;
+      if(table&&events[table])refresh(table,detail.source||'content-hubs-unified');
     });
 
     window.troothHubRefresh=function(table){
