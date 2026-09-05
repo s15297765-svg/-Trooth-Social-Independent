@@ -6,17 +6,28 @@
     badge.style.cssText='position:fixed;right:12px;top:104px;z-index:9996;display:none;padding:6px 10px;border-radius:999px;background:#40916c;color:#fff;font:800 11px system-ui;box-shadow:0 5px 16px #0002';
     document.body.appendChild(badge);
     function pulse(msg){badge.textContent='● '+msg;badge.style.display='block';clearTimeout(pulse.t);pulse.t=setTimeout(function(){badge.style.display='none'},2200)}
+    var channel=null,connecting=false;
     function connect(){
-      if(!window.troothSupabase||!navigator.onLine)return;
+      if(!window.troothSupabase||!navigator.onLine||connecting)return;
+      if(channel)return;
+      connecting=true;
       try{
-        var c=window.troothSupabase.channel('trooth-realtime-alerts');
-        c.on('broadcast',{event:'trooth-alert'},function(p){pulse((p&&p.payload&&p.payload.text)||'New activity')});
-        c.subscribe(function(status){
-          if(status==='SUBSCRIBED') window.troothRealtimeAlertChannel=c;
+        channel=window.troothSupabase.channel('trooth-realtime-alerts');
+        channel.on('broadcast',{event:'trooth-alert'},function(p){pulse((p&&p.payload&&p.payload.text)||'New activity')});
+        channel.subscribe(function(status){
+          connecting=false;
+          if(status==='SUBSCRIBED'){window.troothRealtimeAlertChannel=channel;window.dispatchEvent(new CustomEvent('trooth-alerts-connected'));}
+          if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){channel=null;window.troothRealtimeAlertChannel=null;setTimeout(connect,2500)}
         });
-      }catch(e){}
+      }catch(e){connecting=false;channel=null;setTimeout(connect,2500)}
     }
-    window.addEventListener('online',connect);document.addEventListener('visibilitychange',function(){if(!document.hidden)connect()});
+    function reconnect(){if(channel&&window.troothSupabase){try{window.troothSupabase.removeChannel(channel)}catch(e){}channel=null;window.troothRealtimeAlertChannel=null}connect()}
+    window.addEventListener('online',function(){pulse('Connection restored');reconnect()});
+    window.addEventListener('offline',function(){if(channel&&window.troothSupabase){try{window.troothSupabase.removeChannel(channel)}catch(e){}}channel=null;window.troothRealtimeAlertChannel=null});
+    window.addEventListener('trooth-realtime-reconnect',reconnect);
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)connect()});
+    window.addEventListener('trooth-message-incoming',function(){pulse('New message')});
+    window.addEventListener('trooth-notification-incoming',function(){pulse('New notification')});
     setTimeout(connect,1200);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
