@@ -3,8 +3,12 @@
   function boot(){
     if(window.__troothGlobalRealtimeBooted)return;window.__troothGlobalRealtimeBooted=true;
     var sb=window.troothSupabase;if(!sb)return;
-    var retry=null,connecting=false,online=navigator.onLine!==false,attempt=0,sessionTimer=null;
-    function signal(name,detail){window.dispatchEvent(new CustomEvent(name,{detail:detail||{}}))}
+    var retry=null,connecting=false,online=navigator.onLine!==false,attempt=0,sessionTimer=null,lastRefresh={};
+    function signal(name,detail){
+      var refreshEvent=/^(trooth-(notifications|messages|feed|friends|profile-social)-refresh)$/.test(name);
+      if(refreshEvent){var now=Date.now();if(lastRefresh[name]&&now-lastRefresh[name]<180)return;lastRefresh[name]=now}
+      window.dispatchEvent(new CustomEvent(name,{detail:detail||{}}));
+    }
     function clear(){if(retry){clearTimeout(retry);retry=null}if(window.__troothGlobalChannel){try{sb.removeChannel(window.__troothGlobalChannel)}catch(e){}window.__troothGlobalChannel=null}}
     function schedule(){if(!online||retry)return;attempt=Math.min(attempt+1,6);var ms=Math.min(30000,1500*Math.pow(2,attempt-1));signal('trooth-realtime-status',{status:'RETRYING',delay:ms,attempt:attempt});retry=setTimeout(function(){retry=null;connect()},ms)}
     function connect(){
