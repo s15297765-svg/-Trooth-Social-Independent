@@ -1,4 +1,4 @@
-// Trooth Social Independent — resilient realtime health indicator v5
+// Trooth Social Independent — resilient realtime health indicator v6
 (function(){
   function boot(){
     if(window.__troothLiveHealth)return;window.__troothLiveHealth=true;
@@ -8,11 +8,11 @@
     var last='',attempt=0,timer=null,lastSignal=0;
     function set(state,detail){var map={live:['● LIVE','#40916c','Trooth realtime is connected'],connecting:['● CONNECTING…','#9a7b19','Trooth realtime is connecting'],offline:['○ OFFLINE','#718276','You are offline'],error:['○ RETRYING…','#9a7b19','Trooth realtime is retrying'],reconnecting:['○ RECONNECTING…','#9a7b19','Trooth realtime is reconnecting']};var x=map[state]||map.connecting;if(last===state)return;last=state;el.textContent=x[0];el.style.color=x[1];el.title=x[2];el.setAttribute('aria-label',x[2]);if(detail&&detail.attempt)el.title+=' — attempt '+detail.attempt}
     function online(){return navigator.onLine!==false}
-    function recover(){clearTimeout(timer);if(!online()){set('offline');return}set('connecting');timer=setTimeout(function(){if(online()&&last==='connecting'){attempt++;set('error',{attempt:attempt})}},5000)}
+    function recover(){clearTimeout(timer);if(!online()){set('offline');return}if(last==='live')return;set('connecting');timer=setTimeout(function(){if(online()&&last==='connecting'){attempt++;set('error',{attempt:attempt})}},5000)}
     function signalLive(){var now=Date.now();if(now-lastSignal<250)return;lastSignal=now;attempt=0;clearTimeout(timer);timer=null;set('live')}
     set(online()?'connecting':'offline');
     window.addEventListener('trooth-realtime-connected',signalLive);
-    window.addEventListener('trooth-realtime-status',function(e){var s=e.detail&&e.detail.status;if(s==='SUBSCRIBED')signalLive();else if(s==='CONNECTING')set('connecting');else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){attempt++;set('error',{attempt:attempt})}else if(s==='CLOSED'){attempt++;set('reconnecting',{attempt:attempt})}else if(s==='RECONNECTING'){attempt++;set('reconnecting',{attempt:attempt})}else if(s==='RETRYING'){attempt++;set('error',{attempt:attempt})}else if(s==='OFFLINE')set('offline')});
+    window.addEventListener('trooth-realtime-status',function(e){var s=e.detail&&e.detail.status;if(s==='SUBSCRIBED')signalLive();else if(s==='CONNECTING')recover();else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){attempt++;set('error',{attempt:attempt})}else if(s==='CLOSED'){attempt++;set('reconnecting',{attempt:attempt})}else if(s==='RECONNECTING'){attempt++;set('reconnecting',{attempt:attempt})}else if(s==='RETRYING'){attempt++;set('error',{attempt:attempt})}else if(s==='OFFLINE')set('offline')});
     window.addEventListener('trooth-realtime-reconnect',function(){attempt++;set('reconnecting',{attempt:attempt})});
     window.addEventListener('trooth-realtime-reconnecting',function(){attempt++;set('reconnecting',{attempt:attempt})});
     window.addEventListener('trooth-message-incoming',signalLive);
