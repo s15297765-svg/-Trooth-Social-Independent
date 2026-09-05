@@ -18,16 +18,20 @@
     clearTimeout(el._timer);el._timer=setTimeout(()=>el.style.display='none',8000);
   }
 
-  function cleanup(){
-    stopped=true;
+  function clearChannel(){
     clearTimeout(reconnectTimer);reconnectTimer=null;
     clearTimeout(reloadTimer);reloadTimer=null;
     if(channel){try{window.troothSupabase&&window.troothSupabase.removeChannel(channel)}catch(e){}channel=null;}
-    if(authSub&&authSub.unsubscribe){try{authSub.unsubscribe()}catch(e){}authSub=null;}
     window.troothMarketLiveChannel=null;
   }
 
+  function cleanup(full){
+    stopped=true;clearChannel();
+    if(full&&authSub&&authSub.unsubscribe){try{authSub.unsubscribe()}catch(e){}authSub=null;}
+  }
+
   function scheduleBoot(){
+    if(stopped)return;
     clearTimeout(reconnectTimer);
     reconnectTimer=setTimeout(()=>{reconnectTimer=null;if(!stopped)boot(true)},700);
   }
@@ -35,10 +39,7 @@
   function boot(reconnect){
     const sb=window.troothSupabase;if(!sb||booting||stopped)return;
     booting=true;
-    if(reconnect){
-      if(channel){try{sb.removeChannel(channel)}catch(e){}channel=null;}
-      window.troothMarketLiveChannel=null;
-    }
+    if(reconnect)clearChannel();
     const name='trooth-market-live-'+Date.now();
     channel=sb.channel(name)
       .on('postgres_changes',{event:'*',schema:'public',table:'businesses'},p=>update('businesses',p))
@@ -68,17 +69,21 @@
     const sb=window.troothSupabase;if(!sb||!sb.auth)return;
     if(authSub&&authSub.unsubscribe)try{authSub.unsubscribe()}catch(e){}
     const result=sb.auth.onAuthStateChange((event)=>{
-      if(event==='SIGNED_OUT'||event==='USER_DELETED')cleanup();
-      else if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
-        stopped=false;boot(true);
+      if(event==='SIGNED_OUT'||event==='USER_DELETED'){
+        stopped=true;clearChannel();
+        window.troothMarketLiveStatus='SIGNED_OUT';
+        return;
+      }
+      if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
+        stopped=false;clearChannel();setTimeout(()=>boot(false),60);
       }
     });
     authSub=result&&result.data&&result.data.subscription?result.data.subscription:null;
   }
 
   function start(){
-    stopped=false;boot(false);wireAuth();
-    window.addEventListener('beforeunload',cleanup,{once:true});
+    stopped=false;wireAuth();boot(false);
+    window.addEventListener('beforeunload',()=>cleanup(true),{once:true});
   }
 
   if(window.troothSupabase)start();else window.addEventListener('trooth-supabase-ready',start,{once:true});
