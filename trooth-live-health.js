@@ -9,6 +9,13 @@
     function live(){set(true,'LIVE')}
     set(navigator.onLine,navigator.onLine?'ONLINE':'OFFLINE');
     window.addEventListener('trooth-realtime-connected',live);
+    window.addEventListener('trooth-realtime-status',function(e){
+      var s=e.detail&&e.detail.status;
+      if(s==='SUBSCRIBED')set(true,'LIVE');
+      else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')set(false,'RETRYING');
+      else if(s==='CLOSED')set(false,'RECONNECTING');
+      else if(s)el.textContent='● '+String(s).toUpperCase();
+    });
     window.addEventListener('trooth-message-incoming',live);
     window.addEventListener('trooth-notification-incoming',live);
     window.addEventListener('online',function(){set(true,'ONLINE')});
