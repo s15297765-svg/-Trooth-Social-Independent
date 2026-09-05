@@ -1,25 +1,74 @@
-// Trooth Social Independent — Home Feed Realtime
+// Trooth Social Independent — Home Feed Realtime / Smart Refresh
 (function(){
   function boot(){
     var sb=window.troothSupabase;
     if(!sb) return setTimeout(boot,300);
     if(window.troothHomeFeedRealtimeReady) return;
     window.troothHomeFeedRealtimeReady=true;
-    function refresh(){
-      if(typeof window.loadPosts==='function') window.loadPosts();
-      window.dispatchEvent(new CustomEvent('trooth-home-feed-refresh'));
+
+    var feed=document.getElementById('feed');
+    var pending=0;
+
+    function emit(detail){
+      window.dispatchEvent(new CustomEvent('trooth-home-feed-refresh',{detail:detail||{}}));
     }
+
+    function hideBanner(){
+      var el=document.getElementById('trooth-new-posts-banner');
+      if(el)el.remove();
+      pending=0;
+    }
+
+    function refreshNow(){
+      hideBanner();
+      if(typeof window.loadPosts==='function') window.loadPosts();
+      emit({source:'smart-refresh'});
+    }
+
+    function showNewPostsBanner(){
+      pending++;
+      if(!feed)return;
+      var el=document.getElementById('trooth-new-posts-banner');
+      if(!el){
+        el=document.createElement('button');
+        el.id='trooth-new-posts-banner';
+        el.type='button';
+        el.setAttribute('aria-live','polite');
+        el.setAttribute('aria-label','Show new posts');
+        el.onclick=refreshNow;
+        var host=feed.parentNode||feed;
+        host.insertBefore(el,feed);
+      }
+      el.textContent='🌿 '+pending+' new post'+(pending===1?'':'s')+' available · Tap to refresh';
+    }
+
+    var style=document.createElement('style');
+    style.textContent=`
+      #trooth-new-posts-banner{display:block;width:100%;margin:8px 0;padding:11px 14px;border:1px solid #b7dfc7;border-radius:13px;background:#e8f5ed;color:#245c3a;font-weight:800;cursor:pointer;box-shadow:0 3px 12px #245c3a18;transition:transform .18s ease,box-shadow .18s ease}
+      #trooth-new-posts-banner:hover{transform:translateY(-1px);box-shadow:0 5px 16px #245c3a22}
+      @media(max-width:650px){#trooth-new-posts-banner{position:sticky;top:62px;z-index:20;font-size:12px;padding:10px 12px}}
+      @media(prefers-reduced-motion:reduce){#trooth-new-posts-banner{transition:none}}
+    `;
+    document.head.appendChild(style);
+
     var channel=sb.channel('trooth-home-feed-realtime')
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},refresh)
-      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'posts'},refresh)
-      .on('postgres_changes',{event:'DELETE',schema:'public',table:'posts'},refresh)
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'post_likes'},refresh)
-      .on('postgres_changes',{event:'DELETE',schema:'public',table:'post_likes'},refresh)
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'comments'},refresh)
-      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'comments'},refresh)
-      .on('postgres_changes',{event:'DELETE',schema:'public',table:'comments'},refresh)
+      // New posts wait for the user to refresh so scrolling is never interrupted.
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},function(e){
+        showNewPostsBanner();
+        emit({source:'new-post',post:e&&e.new||null});
+      })
+      // Updates/deletes are announced without forcing a full feed reload.
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'posts'},function(e){
+        emit({source:'post-update',post:e&&e.new||null});
+      })
+      .on('postgres_changes',{event:'DELETE',schema:'public',table:'posts'},function(e){
+        emit({source:'post-delete',post:e&&e.old||null});
+      })
+      // Like/comment realtime is handled by the dedicated interaction modules.
       .subscribe();
+
     window.troothHomeFeedRealtimeChannel=channel;
+    window.troothHomeFeedRefresh=refreshNow;
   }
   if(window.troothSupabase) boot();
   else window.addEventListener('trooth-supabase-ready',boot,{once:true});
