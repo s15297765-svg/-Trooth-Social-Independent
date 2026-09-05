@@ -12,20 +12,21 @@
   let pending={};
   let mounted=false;
   let stopped=false;
-  let requestToken=0;
+  const requestSeq={};
   const loading={};
+  const queued={};
 
   function mount(table){
-    if(stopped||loading[table])return;
+    if(stopped||loading[table]){queued[table]=true;return;}
     const sb=window.troothSupabase,cfg=tables[table];
     if(!sb||!cfg)return;
     let host=document.querySelector(`[data-trooth-content="${table}"]`);
     if(!host){const candidates=selectors[table];host=candidates&&document.querySelector(candidates);}
     if(!host)return;
-    const token=++requestToken;
-    loading[table]=true;
+    const seq=(requestSeq[table]||0)+1;requestSeq[table]=seq;
+    loading[table]=true;queued[table]=false;
     sb.from(table).select('*').order('created_at',{ascending:false}).limit(12).then(({data,error})=>{
-      if(stopped||token!==requestToken||!document.contains(host))return;
+      if(stopped||seq!==requestSeq[table]||!document.contains(host))return;
       if(error){console.warn('Trooth '+table,error);return;}
       if(!data?.length){host.innerHTML='<div class="trooth-empty">'+cfg.icon+' ابھی کوئی مواد موجود نہیں۔</div>';return;}
       host.innerHTML='<div class="trooth-hub-grid">'+data.map(x=>{
@@ -35,7 +36,10 @@
         const link=x.url?'<a href="'+esc(x.url)+'" target="_blank" rel="noopener">View / Visit ↗</a>':'';
         return '<article class="trooth-hub-card"><div class="trooth-hub-icon">'+cfg.icon+'</div><h3>'+esc(heading)+'</h3>'+(meta?'<small>'+esc(meta)+'</small>':'')+(text?'<p>'+esc(text)+'</p>':'')+link+'</article>';
       }).join('')+'</div>';
-    }).catch(error=>console.warn('Trooth '+table,error)).finally(()=>{loading[table]=false;});
+    }).catch(error=>console.warn('Trooth '+table,error)).finally(()=>{
+      loading[table]=false;
+      if(!stopped&&queued[table])refresh(table);
+    });
   }
   function refresh(table){
     if(stopped||!tables[table])return;
@@ -44,7 +48,7 @@
   }
   function stop(){
     stopped=true;
-    requestToken++;
+    Object.keys(tables).forEach(k=>{requestSeq[k]=(requestSeq[k]||0)+1;queued[k]=false;});
     Object.keys(pending).forEach(k=>{clearTimeout(pending[k]);pending[k]=null;});
   }
   function boot(){
@@ -53,7 +57,7 @@
     Object.keys(tables).forEach(mount);
     Object.keys(tables).forEach(table=>{
       const eventName={news_stories:'trooth-news-refresh',sports_stories:'trooth-sports-refresh',store_listings:'trooth-stores-refresh',properties:'trooth-property-refresh',film_fashion_stories:'trooth-film-fashion-refresh'}[table];
-      if(eventName)window.addEventListener(eventName,()=>refresh(table));
+      if(eventName)window.addEventListener(eventName',()=>refresh(table));
     });
     window.addEventListener('trooth-content-hubs-refresh',e=>{if(e.detail?.table)refresh(e.detail.table);});
     window.addEventListener('trooth-content-hub-interaction-refresh',e=>{if(e.detail?.table)refresh(e.detail.table);});
