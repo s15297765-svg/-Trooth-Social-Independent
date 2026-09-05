@@ -11,33 +11,14 @@
     const sb=await ready();
     let u=(await sb.auth.getUser()).data.user;if(!u)return;
     window.troothNavigationRealtimeReady=true;
-    let refreshTimer=null;
-    async function refresh(){
-      clearTimeout(refreshTimer);refreshTimer=setTimeout(async function(){
-        const n=await sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).eq('is_read',false);
-        const m=await sb.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',u.id).eq('is_read',false);
-        badgeLink('notifications.html','🔔','troothNavNotifBadge',n.count||0);
-        badgeLink('chat.html','💬','troothNavMsgBadge',m.count||0);
-      },80);
-    }
-    function inject(){
-      document.querySelectorAll('.circle').forEach((b,i)=>{
-        if(i===1&&!b.querySelector('#troothNavNotifBadge')){const s=document.createElement('span');s.id='troothNavNotifBadge';s.className='badge';s.style.cssText='position:absolute;top:-5px;right:-4px;min-width:18px;height:18px;border-radius:99px;background:#d62828;color:#fff;font-size:10px;font-weight:900;padding:0 5px';b.style.position='relative';b.appendChild(s)}
-        if(i===2&&!b.querySelector('#troothNavMsgBadge')){const s=document.createElement('span');s.id='troothNavMsgBadge';s.className='badge';s.style.cssText='position:absolute;top:-5px;right:-4px;min-width:18px;height:18px;border-radius:99px;background:#d62828;color:#fff;font-size:10px;font-weight:900;padding:0 5px';b.style.position='relative';b.appendChild(s)}
-      });
-    }
-    inject();refresh();
-    window.addEventListener('trooth-navigation-refresh',refresh);
-    window.addEventListener('trooth-content-hubs-refresh',function(){inject()});
-    const ch=sb.channel('trooth-global-nav-live-v3-'+u.id)
-      .on('postgres_changes',{event:'*',schema:'public',table:'notifications',filter:`user_id=eq.${u.id}`},refresh)
-      .on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:`receiver_id=eq.${u.id}`},refresh)
-      .subscribe();
-    window.troothNavigationRealtime=ch;
-    window.addEventListener('beforeunload',function(){clearTimeout(refreshTimer);try{sb.removeChannel(ch)}catch(e){}});
-    sb.auth.onAuthStateChange(function(event){
-      if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_DELETED')setTimeout(function(){location.reload()},0);
-    });
+    let refreshTimer=null,channel=null,authSub=null,stopped=false;
+    function cleanup(){clearTimeout(refreshTimer);refreshTimer=null;if(channel){try{sb.removeChannel(channel)}catch(e){}channel=null}if(authSub){try{authSub.data.subscription.unsubscribe()}catch(e){}authSub=null}window.troothNavigationRealtime=null;}
+    async function refresh(){clearTimeout(refreshTimer);refreshTimer=setTimeout(async function(){if(stopped)return;const n=await sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',u.id).eq('is_read',false);const m=await sb.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',u.id).eq('is_read',false);badgeLink('notifications.html','🔔','troothNavNotifBadge',n.count||0);badgeLink('chat.html','💬','troothNavMsgBadge',m.count||0)},80)}
+    function inject(){document.querySelectorAll('.circle').forEach((b,i)=>{if(i===1&&!b.querySelector('#troothNavNotifBadge')){const s=document.createElement('span');s.id='troothNavNotifBadge';s.className='badge';s.style.cssText='position:absolute;top:-5px;right:-4px;min-width:18px;height:18px;border-radius:99px;background:#d62828;color:#fff;font-size:10px;font-weight:900;padding:0 5px';b.style.position='relative';b.appendChild(s)}if(i===2&&!b.querySelector('#troothNavMsgBadge')){const s=document.createElement('span');s.id='troothNavMsgBadge';s.className='badge';s.style.cssText='position:absolute;top:-5px;right:-4px;min-width:18px;height:18px;border-radius:99px;background:#d62828;color:#fff;font-size:10px;font-weight:900;padding:0 5px';b.style.position='relative';b.appendChild(s)}})}
+    function subscribe(){if(stopped||channel)return;channel=sb.channel('trooth-global-nav-live-v3-'+u.id).on('postgres_changes',{event:'*',schema:'public',table:'notifications',filter:`user_id=eq.${u.id}`},refresh).on('postgres_changes',{event:'*',schema:'public',table:'messages',filter:`receiver_id=eq.${u.id}`},refresh).subscribe();window.troothNavigationRealtime=channel;}
+    inject();refresh();subscribe();window.addEventListener('trooth-navigation-refresh',refresh);window.addEventListener('trooth-content-hubs-refresh',inject);
+    authSub=sb.auth.onAuthStateChange(function(event){if(event==='SIGNED_OUT'||event==='USER_DELETED'){stopped=true;cleanup();return}if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){stopped=false;subscribe();refresh()}});
+    window.addEventListener('beforeunload',cleanup,{once:true});
   }
   ready().then(run).catch(()=>{});
 })();
