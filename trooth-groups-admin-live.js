@@ -3,10 +3,10 @@
   function boot(){
     var sb=window.troothSupabase;
     if(!sb||!sb.channel)return;
-    if(window.troothGroupsAdminLiveReady)return;
-    window.troothGroupsAdminLiveReady=true;
     var path=(location.pathname||'').split('/').pop();
     if(path!=='group-admin.html')return;
+    if(window.troothGroupsAdminLiveReady)return;
+    window.troothGroupsAdminLiveReady=true;
     var id=new URLSearchParams(location.search).get('id');
     if(!id)return;
     var timer=null;
@@ -14,7 +14,8 @@
       clearTimeout(timer);
       timer=setTimeout(function(){
         window.dispatchEvent(new CustomEvent('trooth-group-admin-refresh'));
-        location.reload();
+        if(typeof window.loadGroupAdmin==='function') window.loadGroupAdmin();
+        else if(typeof window.load==='function') window.load();
       },250);
     }
     var ch=sb.channel('trooth-group-admin-live-'+id)
