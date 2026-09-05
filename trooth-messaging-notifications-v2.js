@@ -1,20 +1,23 @@
-// Trooth Social Independent — Messaging + Notifications V3
+// Trooth Social Independent — Messaging + Notifications V4
 // Data/API bridge only. Realtime ownership stays with the dedicated live bridges.
 (function(){
-  if(window.troothMessagingNotificationsV3)return;
-  window.troothMessagingNotificationsV3=true;
+  if(window.troothMessagingNotificationsV4)return;
+  window.troothMessagingNotificationsV4=true;
   function boot(){
     const sb=window.troothSupabase;
     if(!sb)return setTimeout(boot,300);
     let refreshTimer=null,starting=false,stopped=false,pending=false;
     async function state(){try{const r=await sb.auth.getUser();return r.data&&r.data.user?r.data.user:null}catch(e){return null}}
     function schedule(){if(stopped)return;clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>{refreshTimer=null;start()},220)}
+    function eventData(list,source){
+      var a=Array.isArray(list)?list:[];a.source=source;return a;
+    }
     async function refreshMessages(emit=true){
       const u=await state();if(!u||stopped)return window.troothMessages||[];
       const r=await sb.from('messages').select('*').or('sender_id.eq.'+u.id+',receiver_id.eq.'+u.id).order('created_at',{ascending:true}).limit(500);
       if(r.error)return window.troothMessages||[];
       window.troothMessages=r.data||[];
-      if(emit)window.dispatchEvent(new CustomEvent('trooth-messages-refresh',{detail:window.troothMessages,source:'messaging-v3'}));
+      if(emit)window.dispatchEvent(new CustomEvent('trooth-messages-refresh',{detail:eventData(window.troothMessages,'messaging-v4')}));
       return window.troothMessages;
     }
     async function refreshNotifications(emit=true){
@@ -22,7 +25,7 @@
       const r=await sb.from('notifications').select('*').eq('user_id',u.id).order('created_at',{ascending:false}).limit(200);
       if(r.error)return window.troothNotifications||[];
       window.troothNotifications=r.data||[];
-      if(emit)window.dispatchEvent(new CustomEvent('trooth-notifications-refresh',{detail:window.troothNotifications,source:'messaging-v3'}));
+      if(emit)window.dispatchEvent(new CustomEvent('trooth-notifications-refresh',{detail:eventData(window.troothNotifications,'messaging-v4')}));
       return window.troothNotifications;
     }
     window.troothSendMessage=async function(receiverId,body){
@@ -47,10 +50,11 @@
       try{await Promise.all([refreshMessages(false),refreshNotifications(false)])}
       finally{starting=false;if(pending)schedule()}
     }
+    function own(e){return e&&e.detail&&e.detail.source==='messaging-v4'}
     window.addEventListener('trooth-message-incoming',schedule);
     window.addEventListener('trooth-notification-incoming',schedule);
-    window.addEventListener('trooth-messages-refresh',e=>{if(!e.detail||e.detail.source!=='messaging-v3')schedule()});
-    window.addEventListener('trooth-notifications-refresh',e=>{if(!e.detail||e.detail.source!=='messaging-v3')schedule()});
+    window.addEventListener('trooth-messages-refresh',e=>{if(!own(e))schedule()});
+    window.addEventListener('trooth-notifications-refresh',e=>{if(!own(e))schedule()});
     window.addEventListener('trooth-auth-changed',()=>{stopped=false;start()});
     window.addEventListener('online',()=>{stopped=false;schedule()});
     window.addEventListener('beforeunload',()=>{stopped=true;clearTimeout(refreshTimer)},{once:true});
