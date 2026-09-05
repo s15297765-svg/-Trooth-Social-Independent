@@ -1,25 +1,30 @@
-// Trooth — Groups -> Notifications realtime bridge
+// Trooth — Groups -> Notifications realtime bridge v2
 (function(){
   function boot(){
     var sb=window.troothSupabase;if(!sb||window.troothGroupNotificationsBooted)return;
     window.troothGroupNotificationsBooted=true;
-    var uid=null,ch=null,seen={};
+    var uid=null,ch=null,seen={},seenAt={};
+    var DEDUPE_TTL=12000;
     function cleanup(){if(ch){try{sb.removeChannel(ch)}catch(e){}ch=null}}
+    function prune(){var now=Date.now();Object.keys(seenAt).forEach(function(k){if(now-seenAt[k]>DEDUPE_TTL){delete seen[k];delete seenAt[k]}})}
     function notify(kind,body,actorId,postId,key){
       if(!uid||!body)return;
+      prune();
       var dedupe=key||kind+'|'+body+'|'+(actorId||'');
-      if(seen[dedupe])return;seen[dedupe]=true;
+      if(seen[dedupe])return;
+      seen[dedupe]=true;seenAt[dedupe]=Date.now();
       var row={user_id:uid,actor_id:actorId||uid,kind:kind,body:body,is_read:false};
       if(postId)row.post_id=postId;
       sb.from('notifications').insert(row).then(function(){
         window.dispatchEvent(new CustomEvent('trooth-notifications-refresh'));
         window.dispatchEvent(new CustomEvent('trooth-unread-refresh'));
-      }).catch(function(){});
+        window.dispatchEvent(new CustomEvent('trooth-group-notification',{detail:{kind:kind,body:body,postId:postId||null}}));
+      }).catch(function(){delete seen[dedupe];delete seenAt[dedupe]});
     }
     async function subscribe(){
       var r=await sb.auth.getUser();uid=r.data&&r.data.user?r.data.user.id:null;
       if(!uid){cleanup();return}
-      cleanup();
+      cleanup();seen={};seenAt={};
       ch=sb.channel('trooth-group-notifications-'+uid)
         .on('postgres_changes',{event:'INSERT',schema:'public',table:'group_join_requests'},async function(p){
           var x=p.new;if(!x||x.user_id===uid||x.status!=='pending')return;
@@ -40,11 +45,14 @@
           var g=await sb.from('groups').select('name').eq('id',x.group_id).maybeSingle();
           if(g.data)notify('group_activity','📝 New post in '+g.data.name,x.user_id,x.id,'post|'+x.id);
         })
-        .subscribe();
+        .subscribe(function(status){
+          if(status==='SUBSCRIBED')window.dispatchEvent(new CustomEvent('trooth-realtime-connected'));
+          else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')window.dispatchEvent(new CustomEvent('trooth-realtime-status',{detail:{status:'RETRYING',source:'group-notifications'}}));
+        });
     }
     subscribe();
     sb.auth.onAuthStateChange(function(e){
-      if(e==='SIGNED_OUT'){uid=null;seen={};cleanup()}
+      if(e==='SIGNED_OUT'){uid=null;seen={};seenAt={};cleanup()}
       else if(e==='SIGNED_IN'||e==='TOKEN_REFRESHED'||e==='USER_UPDATED')subscribe();
     });
     window.addEventListener('beforeunload',cleanup,{once:true});
