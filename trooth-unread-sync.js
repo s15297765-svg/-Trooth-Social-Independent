@@ -1,8 +1,8 @@
-// Trooth Social Independent — cross-page unread counter sync v5
+// Trooth Social Independent — cross-page unread counter sync v6
 (function(){
   function boot(){
     if(window.__troothUnreadSync)return;window.__troothUnreadSync=true;
-    var key='trooth_unread_messages',timer=null,online=navigator.onLine!==false,last=-1,busy=false,channel=null;
+    var key='trooth_unread_messages',timer=null,online=navigator.onLine!==false,last=-1,busy=false,channel=null,lastIncoming={};
     try{if('BroadcastChannel' in window)channel=new BroadcastChannel('trooth-unread-sync')}catch(e){}
     function badge(){
       var b=document.getElementById('trooth-unread-badge');
@@ -13,10 +13,12 @@
     function save(n,broadcast){try{localStorage.setItem(key,String(n));localStorage.setItem(key+'_at',String(Date.now()))}catch(e){}if(broadcast&&channel){try{channel.postMessage({type:'count',count:n})}catch(e){}}}
     function refresh(){if(busy||!online||!navigator.onLine)return;var sb=window.troothSupabase;if(!sb)return;busy=true;sb.auth.getUser().then(function(r){var u=r.data&&r.data.user;if(!u){show(0);save(0,true);return null}return sb.from('messages').select('id',{count:'exact',head:true}).eq('receiver_id',u.id).eq('is_read',false).then(function(x){if(x.error)return;var n=x.count||0;show(n);save(n,false);window.dispatchEvent(new CustomEvent('trooth-unread-updated',{detail:{count:n,source:'sync'}}))})}).catch(function(){}).finally(function(){busy=false})}
     function schedule(ms){clearTimeout(timer);timer=setTimeout(refresh,ms||600)}
+    function incomingId(detail){var d=detail||{};return String(d.id||d.message_id||d.created_at||'')}
+    function handleIncoming(e){var d=e&&e.detail||{},id=incomingId(d),now=Date.now();if(id&&lastIncoming[id]&&now-lastIncoming[id]<4000)return;if(id)lastIncoming[id]=now;var n=Math.max(1,last<0?1:last+1);show(n);save(n,true);schedule(100)}
     try{show(Number(localStorage.getItem(key)||0))}catch(e){}
     window.addEventListener('storage',function(e){if(e.key===key)show(Number(e.newValue||0))});
     if(channel)channel.addEventListener('message',function(e){var d=e.data||{};if(d.type==='count')show(d.count)});
-    window.addEventListener('trooth-message-incoming',function(){show(Math.max(1,last<0?1:last+1));save(Math.max(1,last<0?1:last+1),true);schedule(100)});
+    window.addEventListener('trooth-message-incoming',handleIncoming);
     window.addEventListener('trooth-messages-refresh',function(){schedule(150)});
     window.addEventListener('trooth-unread-updated',function(e){var n=e.detail&&e.detail.count;if(n!==undefined){show(n);save(n,true)}});
     window.addEventListener('trooth-auth-changed',function(){last=-1;show(0);save(0,true);schedule(250)});
