@@ -1,10 +1,12 @@
-// Trooth Social Independent — unified content actions bridge
+// Trooth Social Independent — unified content actions bridge v2
 (function(){
-  if(window.__troothContentActionsBridge)return;window.__troothContentActionsBridge=true;
+  if(window.__troothContentActionsBridgeV2)return;window.__troothContentActionsBridgeV2=true;
+  var started=Date.now(),timer=null;
   function boot(){
-    if(!window.TroothContentActions||!window.TroothInteractions)return;
+    if(!window.TroothContentActions||!window.TroothInteractions)return false;
     var original=window.TroothContentActions;
-    window.TroothContentActions=function(sb,user,type,id,host){
+    if(original.__troothBridgeWrapped)return true;
+    function unified(sb,user,type,id,host){
       if(!host)return;
       try{
         if(host.__troothUnifiedActions)return;
@@ -19,8 +21,16 @@
         host.__troothUnifiedActions=false;
         try{original(sb,user,type,id,host)}catch(_){ }
       }
-    };
+    }
+    unified.__troothBridgeWrapped=true;
+    unified.__troothOriginal=original;
+    window.TroothContentActions=unified;
+    return true;
   }
-  function wait(){if(window.TroothInteractions&&window.TroothContentActions)boot();else setTimeout(wait,400)}
+  function wait(){
+    if(boot()){if(timer){clearTimeout(timer);timer=null}return;}
+    if(Date.now()-started<30000)timer=setTimeout(wait,400);
+  }
+  ['trooth-supabase-ready','trooth-content-interaction-refresh','trooth-home-live-refresh'].forEach(function(ev){window.addEventListener(ev,wait);});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wait,{once:true});else wait();
 })();
