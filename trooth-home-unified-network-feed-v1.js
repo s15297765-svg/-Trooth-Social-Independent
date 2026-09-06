@@ -5,11 +5,11 @@
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const clean=s=>String(s??'').replace(/\s+/g,' ').trim();
   const cfg=[
-    ['news_stories','📰 News','news.html'],
-    ['sports_stories','🏆 Sports','sports.html'],
-    ['store_listings','🛍️ Stores','stores.html'],
-    ['properties','🏠 Property','property.html'],
-    ['film_fashion_stories','🎬 Film & Fashion','film-fashion.html']
+    ['news_stories','news','📰 News','news.html'],
+    ['sports_stories','sports','🏆 Sports','sports.html'],
+    ['store_listings','stores','🛍️ Stores','stores.html'],
+    ['properties','property','🏠 Property','property.html'],
+    ['film_fashion_stories','film_fashion','🎬 Film & Fashion','film-fashion.html']
   ];
   function mount(){
     if(document.getElementById('troothUnifiedNetworkFeed'))return document.getElementById('troothUnifiedNetworkFeed');
@@ -24,7 +24,7 @@
     const items=[];results.forEach(x=>x.rows.forEach(row=>items.push({cfg:x.cfg,row})));
     items.sort((a,b)=>new Date(b.row.created_at||0)-new Date(a.row.created_at||0));
     const top=items.slice(0,15);
-    box.innerHTML=top.length?top.map(x=>{const r=x.row,c=x.cfg,title=clean(r.title||r.name||'Trooth Update'),body=clean(r.body||r.description||r.location||'');return '<article class="hubitem"><span class="tag">'+esc(r.category||c[1])+'</span><h3>'+esc(title)+'</h3><p>'+esc(body.slice(0,150))+(body.length>150?'…':'')+'</p><small class="muted">'+(r.created_at?esc(new Date(r.created_at).toLocaleString()):'')+'</small><div style="margin-top:10px"><a class="btn" href="'+c[2]+'">Open '+esc(c[1])+' →</a></div></article>';}).join(''):'<div class="hubitem">ابھی کوئی نیا network content موجود نہیں۔</div>';
+    box.innerHTML=top.length?top.map(x=>{const r=x.row,c=x.cfg,title=clean(r.title||r.name||'Trooth Update'),body=clean(r.body||r.description||r.location||'');return '<article class="hubitem" data-content-type="'+esc(c[1])+'" data-content-id="'+esc(r.id)+'"><span class="tag">'+esc(r.category||c[2])+'</span><h3>'+esc(title)+'</h3><p>'+esc(body.slice(0,150))+(body.length>150?'…':'')+'</p><small class="muted">'+(r.created_at?esc(new Date(r.created_at).toLocaleString()):'')+'</small><div style="margin-top:10px"><a class="btn" href="'+c[3]+'">Open '+esc(c[2])+' →</a></div></article>';}).join(''):'<div class="hubitem">ابھی کوئی نیا network content موجود نہیں۔</div>';
   }
   async function boot(){const sb=await ready();if(!document.getElementById('feed'))return;const card=mount();if(!card)return;document.getElementById('troothUnifiedRefresh').onclick=()=>load(sb);await load(sb);
     const channel=sb.channel('trooth-home-unified-network-live');cfg.forEach(c=>channel.on('postgres_changes',{event:'*',schema:'public',table:c[0]},()=>load(sb)));channel.subscribe();
