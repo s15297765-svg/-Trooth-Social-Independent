@@ -1,7 +1,7 @@
-// Trooth Social Independent — resilient global realtime event bridge
+// Trooth Social Independent — resilient global realtime event bridge v2
 (function(){
   function boot(){
-    if(window.__troothGlobalRealtimeBooted)return;window.__troothGlobalRealtimeBooted=true;
+    if(window.__troothGlobalRealtimeBootedV2)return;window.__troothGlobalRealtimeBootedV2=true;
     var sb=window.troothSupabase;if(!sb)return;
     var retry=null,connecting=false,online=navigator.onLine!==false,attempt=0,sessionTimer=null,lastRefresh={};
     function signal(name,detail){
@@ -38,11 +38,18 @@
     connect();
     window.addEventListener('online',function(){online=true;attempt=0;signal('trooth-realtime-status',{status:'RECONNECTING'});clear();setTimeout(connect,400)});
     window.addEventListener('offline',function(){online=false;clear();signal('trooth-realtime-status',{status:'OFFLINE'})});
-    document.addEventListener('visibilitychange',function(){if(!document.hidden&&online){refreshSession();clear();setTimeout(connect,500)}});
+    document.addEventListener('visibilitychange',function(){
+      if(!document.hidden&&online){
+        clear();
+        if(!connecting)setTimeout(connect,500);
+      }else clearTimeout(retry);
+    });
+    window.addEventListener('pageshow',function(){if(online&&!document.hidden){clear();if(!connecting)setTimeout(connect,400)}});
     window.addEventListener('trooth-realtime-reconnect',function(){attempt=0;clear();connect()});
     window.addEventListener('trooth-auth-changed',function(){attempt=0;clear();setTimeout(connect,300)});
     if(sb.auth.onAuthStateChange)sb.auth.onAuthStateChange(function(event){if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'){clear();setTimeout(connect,250)}else if(event==='SIGNED_OUT'){clear();signal('trooth-realtime-status',{status:'SIGNED_OUT'})}});
     sessionTimer=setInterval(refreshSession,120000);
+    window.addEventListener('beforeunload',function(){clear();if(sessionTimer)clearInterval(sessionTimer)});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,2200)},{once:true});else setTimeout(boot,2200);
 })();
