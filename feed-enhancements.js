@@ -1,16 +1,16 @@
-// Trooth Social Independent — Feed interactions enhancement
+// Trooth Social Independent — Feed interactions enhancement v2
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
   const wait = () => new Promise(resolve => {
     if (window.troothSupabase) return resolve(window.troothSupabase);
     window.addEventListener('trooth-supabase-ready', () => resolve(window.troothSupabase), { once: true });
   });
-  const getActions = post => post.querySelector('.postactions,.actions');
-  const getPostId = post => {
+  const getActions = post => post.querySelector('.postActions,.postactions,.actions');
+  const getPostId = post => post.dataset.post || post.dataset.postId || (() => {
     const el = getActions(post)?.querySelector('button');
     const m = (el?.getAttribute('onclick') || '').match(/['\"]([^'\"]+)['\"]/);
-    return m?.[1] || post.dataset.postId || '';
-  };
+    return m?.[1] || '';
+  })();
 
   async function notifyPostOwner(s, postId, actorId, kind, body) {
     try {
@@ -52,8 +52,8 @@
         box.id = 'c-' + id;
         post.appendChild(box);
       }
-      const mineComments = comments.filter(c => c.post_id === id);
-      box.innerHTML = mineComments.map(c => `<div class="comment" style="margin-top:8px;padding:8px;border-radius:9px;background:#f4f8f5"><b>Trooth Member:</b> ${esc(c.body)} <small>• ${new Date(c.created_at).toLocaleString()}</small></div>`).join('');
+      const postComments = comments.filter(c => c.post_id === id);
+      box.innerHTML = postComments.map(c => `<div class="comment" style="margin-top:8px;padding:8px;border-radius:9px;background:#f4f8f5"><b>Trooth Member:</b> ${esc(c.body)} <small>• ${new Date(c.created_at).toLocaleString()}</small></div>`).join('');
 
       if (!post.dataset.troothDblLike) {
         post.dataset.troothDblLike = '1';
