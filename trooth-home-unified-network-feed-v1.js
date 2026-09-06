@@ -1,35 +1,17 @@
-// Trooth Social Independent — unified Home Network Feed v2
+// Trooth Social Independent — unified Home Network Feed v3
 (function(){
   if(window.__troothHomeUnifiedNetworkFeed)return;window.__troothHomeUnifiedNetworkFeed=true;
   const ready=()=>window.troothSupabase?Promise.resolve(window.troothSupabase):new Promise(r=>window.addEventListener('trooth-supabase-ready',()=>r(window.troothSupabase),{once:true}));
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'})[c]);
   const clean=s=>String(s??'').replace(/\s+/g,' ').trim();
   const cfg=[
-    ['news_stories','news','📰 News','news.html'],
-    ['sports_stories','sports','🏆 Sports','sports.html'],
-    ['store_listings','stores','🛍️ Stores','stores.html'],
-    ['properties','property','🏠 Property','property.html'],
-    ['film_fashion_stories','film_fashion','🎬 Film & Fashion','film-fashion.html'],
-    ['businesses','business','💼 Business','business.html'],
-    ['groups','group','👥 Groups','groups.html']
+    ['news_stories','news','📰 News','news.html'],['sports_stories','sports','🏆 Sports','sports.html'],['store_listings','stores','🛍️ Stores','stores.html'],['properties','property','🏠 Property','property.html'],['film_fashion_stories','film_fashion','🎬 Film & Fashion','film-fashion.html'],['businesses','business','💼 Business','business.html'],['groups','group','👥 Groups','groups.html']
   ];
-  function mount(){
-    if(document.getElementById('troothUnifiedNetworkFeed'))return document.getElementById('troothUnifiedNetworkFeed');
-    const feed=document.getElementById('feed');if(!feed)return null;
-    const card=document.createElement('section');card.className='card';card.id='troothUnifiedNetworkFeed';
-    card.innerHTML='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><span class="tag">TROOTH NETWORK</span><h2 style="margin:7px 0 3px">🌍 Unified Network Feed</h2><p class="muted" style="margin:0">News, Sports, Stores, Property, Film & Fashion, Business & Groups — all in one live stream.</p></div><button id="troothUnifiedRefresh" class="btn" type="button">↻ Refresh</button></div><div id="troothUnifiedItems" class="hubgrid" style="margin-top:14px"></div>';
-    feed.parentNode.insertBefore(card,feed.nextSibling);return card;
-  }
-  async function load(sb){
-    const card=mount();if(!card)return;const box=document.getElementById('troothUnifiedItems');
-    const results=await Promise.all(cfg.map(async c=>{const r=await sb.from(c[0]).select('*').order('created_at',{ascending:false}).limit(4);return {cfg:c,rows:r.error?[]:(r.data||[])};}));
-    const items=[];results.forEach(x=>x.rows.forEach(row=>items.push({cfg:x.cfg,row})));
-    items.sort((a,b)=>new Date(b.row.created_at||0)-new Date(a.row.created_at||0));
-    const top=items.slice(0,15);
-    box.innerHTML=top.length?top.map(x=>{const r=x.row,c=x.cfg,title=clean(r.title||r.name||'Trooth Update'),body=clean(r.body||r.description||r.location||'');return '<article class="hubitem" data-content-type="'+esc(c[1])+'" data-content-id="'+esc(r.id)+'"><span class="tag">'+esc(r.category||c[2])+'</span><h3>'+esc(title)+'</h3><p>'+esc(body.slice(0,150))+(body.length>150?'…':'')+'</p><small class="muted">'+(r.created_at?esc(new Date(r.created_at).toLocaleString()):'')+'</small><div style="margin-top:10px"><a class="btn" href="'+c[3]+'">Open '+esc(c[2])+' →</a></div></article>';}).join(''):'<div class="hubitem">ابھی کوئی نیا network content موجود نہیں۔</div>';
-  }
-  async function boot(){const sb=await ready();if(!document.getElementById('feed'))return;const card=mount();if(!card)return;document.getElementById('troothUnifiedRefresh').onclick=()=>load(sb);await load(sb);
-    const channel=sb.channel('trooth-home-unified-network-live');cfg.forEach(c=>channel.on('postgres_changes',{event:'*',schema:'public',table:c[0]},()=>load(sb)));channel.subscribe();
-  }
+  function mount(){if(document.getElementById('troothUnifiedNetworkFeed'))return document.getElementById('troothUnifiedNetworkFeed');const feed=document.getElementById('feed');if(!feed)return null;const card=document.createElement('section');card.className='card';card.id='troothUnifiedNetworkFeed';card.innerHTML='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><span class="tag">TROOTH NETWORK</span><h2 style="margin:7px 0 3px">🌍 Unified Network Feed</h2><p class="muted" style="margin:0">Friends, Following, News, Sports, Stores, Property, Film & Fashion, Business & Groups — all in one live stream.</p></div><button id="troothUnifiedRefresh" class="btn" type="button">↻ Refresh</button></div><div id="troothUnifiedItems" class="hubgrid" style="margin-top:14px"></div>';feed.parentNode.insertBefore(card,feed.nextSibling);return card;}
+  async function getUser(sb){const r=await sb.auth.getUser();return r.data&&r.data.user||null;}
+  async function friendIds(sb,userId){const r=await sb.from('friend_requests').select('sender_id,receiver_id').eq('status','accepted').or('sender_id.eq.'+userId+',receiver_id.eq.'+userId);const ids=new Set();(r.data||[]).forEach(x=>{ids.add(x.sender_id===userId?x.receiver_id:x.sender_id)});return [...ids];}
+  async function followingIds(sb,userId){const r=await sb.from('connections').select('following_id').eq('follower_id',userId);return (r.data||[]).map(x=>x.following_id);}
+  async function load(sb){const card=mount();if(!card)return;const box=document.getElementById('troothUnifiedItems');const user=await getUser(sb);const [results,fids,follow]=await Promise.all([Promise.all(cfg.map(async c=>{const r=await sb.from(c[0]).select('*').order('created_at',{ascending:false}).limit(4);return {cfg:c,rows:r.error?[]:(r.data||[])};})),user?friendIds(sb,user.id):Promise.resolve([]),user?followingIds(sb,user.id):Promise.resolve([])]);const items=[];results.forEach(x=>x.rows.forEach(row=>items.push({cfg:x.cfg,row,scope:'Network'})));if(user&&(fids.length||follow.length)){const ids=[...new Set([...fids,...follow,user.id])];const r=await sb.from('posts').select('*').in('user_id',ids).is('group_id',null).order('created_at',{ascending:false}).limit(20);(r.data||[]).forEach(row=>{const scope=row.user_id===user.id?'Your Post':fids.includes(row.user_id)&&follow.includes(row.user_id)?'Friend + Following':fids.includes(row.user_id)?'Friend':'Following';items.push({cfg:['posts','post','👤 Social Post','index.html'],row,scope});});}items.sort((a,b)=>new Date(b.row.created_at||0)-new Date(a.row.created_at||0));const top=items.slice(0,20);box.innerHTML=top.length?top.map(x=>{const r=x.row,c=x.cfg,title=clean(r.title||r.name||((c[1]==='post')?'Social Post':'Trooth Update')),body=clean(r.body||r.description||r.location||'');return '<article class="hubitem" data-content-type="'+esc(c[1])+'" data-content-id="'+esc(r.id)+'"><span class="tag">'+esc(x.scope||r.category||c[2])+'</span><h3>'+esc(title)+'</h3><p>'+esc(body.slice(0,180))+(body.length>180?'…':'')+'</p><small class="muted">'+(r.created_at?esc(new Date(r.created_at).toLocaleString()):'')+'</small><div style="margin-top:10px"><a class="btn" href="'+c[3]+'">Open →</a></div></article>';}).join(''):'<div class="hubitem">ابھی کوئی نیا network content موجود نہیں۔</div>';}
+  async function boot(){const sb=await ready();if(!document.getElementById('feed'))return;const card=mount();if(!card)return;document.getElementById('troothUnifiedRefresh').onclick=()=>load(sb);await load(sb);const channel=sb.channel('trooth-home-unified-network-live');cfg.forEach(c=>channel.on('postgres_changes',{event:'*',schema:'public',table:c[0]},()=>load(sb)));channel.on('postgres_changes',{event:'*',schema:'public',table:'posts'},()=>load(sb)).subscribe();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
