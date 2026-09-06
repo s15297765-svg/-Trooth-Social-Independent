@@ -1,4 +1,4 @@
-// Trooth Social Independent — unified Home Network Feed v1
+// Trooth Social Independent — unified Home Network Feed v2
 (function(){
   if(window.__troothHomeUnifiedNetworkFeed)return;window.__troothHomeUnifiedNetworkFeed=true;
   const ready=()=>window.troothSupabase?Promise.resolve(window.troothSupabase):new Promise(r=>window.addEventListener('trooth-supabase-ready',()=>r(window.troothSupabase),{once:true}));
@@ -9,13 +9,15 @@
     ['sports_stories','sports','🏆 Sports','sports.html'],
     ['store_listings','stores','🛍️ Stores','stores.html'],
     ['properties','property','🏠 Property','property.html'],
-    ['film_fashion_stories','film_fashion','🎬 Film & Fashion','film-fashion.html']
+    ['film_fashion_stories','film_fashion','🎬 Film & Fashion','film-fashion.html'],
+    ['businesses','business','💼 Business','business.html'],
+    ['groups','group','👥 Groups','groups.html']
   ];
   function mount(){
     if(document.getElementById('troothUnifiedNetworkFeed'))return document.getElementById('troothUnifiedNetworkFeed');
     const feed=document.getElementById('feed');if(!feed)return null;
     const card=document.createElement('section');card.className='card';card.id='troothUnifiedNetworkFeed';
-    card.innerHTML='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><span class="tag">TROOTH NETWORK</span><h2 style="margin:7px 0 3px">🌍 Unified Network Feed</h2><p class="muted" style="margin:0">News, Sports, Stores, Property, Film & Fashion — all in one live stream.</p></div><button id="troothUnifiedRefresh" class="btn" type="button">↻ Refresh</button></div><div id="troothUnifiedItems" class="hubgrid" style="margin-top:14px"></div>';
+    card.innerHTML='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><span class="tag">TROOTH NETWORK</span><h2 style="margin:7px 0 3px">🌍 Unified Network Feed</h2><p class="muted" style="margin:0">News, Sports, Stores, Property, Film & Fashion, Business & Groups — all in one live stream.</p></div><button id="troothUnifiedRefresh" class="btn" type="button">↻ Refresh</button></div><div id="troothUnifiedItems" class="hubgrid" style="margin-top:14px"></div>';
     feed.parentNode.insertBefore(card,feed.nextSibling);return card;
   }
   async function load(sb){
