@@ -20,10 +20,10 @@
     }
     async function refresh(id,post){
       var lr=await sb.from('post_likes').select('user_id').eq('post_id',id);
-      var cr=await sb.from('comments').select('id,user_id,body,created_at').eq('post_id',id).order('created_at',{ascending:false}).limit(5);
+      var cr=await sb.from('comments').select('id,user_id,body,created_at',{count:'exact'}).eq('post_id',id).order('created_at',{ascending:false}).limit(5);
       var lc=post.querySelector('.trooth-like-count'),cc=post.querySelector('.trooth-comment-count');
       if(lc)lc.textContent='👍 '+((lr.data||[]).length);
-      if(cc)cc.textContent='💬 '+((cr.data||[]).length)+' comments';
+      if(cc)cc.textContent='💬 '+(cr.count??((cr.data||[]).length))+' comments';
       var list=post.querySelector('.trooth-comments');
       if(!list){list=document.createElement('div');list.className='trooth-comments';post.appendChild(list)}
       list.innerHTML=(cr.data||[]).map(function(c){return '<div class="trooth-comment"><b>Trooth Member</b><span>'+esc(c.body)+'</span></div>'}).join('');
