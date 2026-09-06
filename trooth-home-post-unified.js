@@ -1,4 +1,4 @@
-// Trooth Social Independent — unified Home post interactions v4
+// Trooth Social Independent — unified Home post interactions v5
 (function(){
   if(window.__troothHomePostUnified)return;
   window.__troothHomePostUnified=true;
@@ -12,7 +12,9 @@
     var likeR=await sb.from('post_likes').select('user_id').eq('post_id',id);
     var commentR=await sb.from('comments').select('body,created_at,user_id').eq('post_id',id).order('created_at',{ascending:true});
     var shareR=await sb.from('post_shares').select('user_id').eq('post_id',id);
-    var likes=likeR.data||[],comments=commentR.data||[],shares=shareR.data||[];
+    var likes=likeR.data||[],comments=commentR.data||[],shares=shareR.data||[],commentProfiles={};
+    var commentIds=[...new Set(comments.map(function(x){return x.user_id}).filter(Boolean))];
+    if(commentIds.length){var pr=await sb.from('profiles').select('id,display_name,avatar_url').in('id',commentIds);(pr.data||[]).forEach(function(x){commentProfiles[x.id]=x})}
     var liked=!!user&&likes.some(function(x){return x.user_id===user.id});
     actions.innerHTML='<button class="action" data-like> '+(liked?'❤️ Liked':'🤍 Like')+' <span data-like-count>('+likes.length+')</span></button><button class="action" data-comment-focus>💬 Comment <span data-comment-count>('+comments.length+')</span></button><button class="action" data-share>↗ Share <span data-share-count>('+shares.length+')</span></button>';
     var panel=document.createElement('div');panel.style.cssText='margin-top:10px';panel.innerHTML='<div style="display:flex;gap:7px"><input data-comment-input aria-label="Write a comment" maxlength="1000" placeholder="Write a comment..." style="flex:1;min-width:0;border:1px solid #d8e9de;border-radius:999px;padding:10px 13px"><button data-send type="button" style="border:0;border-radius:999px;padding:9px 13px;background:#40916c;color:#fff;font-weight:800;cursor:pointer">💬 Send</button></div><div data-comments style="margin-top:8px"></div>';
@@ -23,7 +25,7 @@
       if(lb)lb.innerHTML=(liked?'❤️ Liked':'🤍 Like')+' <span data-like-count>('+likes.length+')</span>';
       if(cc)cc.textContent='('+comments.length+')';
       if(sc)sc.textContent='('+shares.length+')';
-      commentsBox.innerHTML=comments.map(function(x){var when=x.created_at?new Date(x.created_at).toLocaleString():'';return '<div style="padding:8px 4px;border-top:1px solid #e5eee8"><div>💬 '+esc(x.body)+'</div><small style="color:#718276">'+esc(when)+'</small></div>'}).join('')||'<small style="color:#718276">No comments yet.</small>';
+      commentsBox.innerHTML=comments.map(function(x){var p=commentProfiles[x.user_id]||{},name=p.display_name||'Trooth Member',avatar=p.avatar_url?'<img src="'+esc(p.avatar_url)+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover">':'<span style="width:28px;height:28px;border-radius:50%;background:#40916c;color:#fff;display:grid;place-items:center;font-weight:800">'+esc(name[0].toUpperCase())+'</span>',when=x.created_at?new Date(x.created_at).toLocaleString():'';return '<div style="display:flex;gap:8px;padding:9px 4px;border-top:1px solid #e5eee8"><div style="flex:none">'+avatar+'</div><div style="min-width:0"><b style="font-size:13px">'+esc(name)+'</b><div style="margin-top:2px">'+esc(x.body)+'</div><small style="color:#718276">'+esc(when)+'</small></div></div>'}).join('')||'<small style="color:#718276">No comments yet.</small>';
     }
     render();
     async function sync(){
@@ -31,7 +33,7 @@
       var c=await sb.from('comments').select('body,created_at,user_id').eq('post_id',id).order('created_at',{ascending:true});
       var s=await sb.from('post_shares').select('user_id').eq('post_id',id);
       if(!l.error){likes=l.data||[];liked=!!user&&likes.some(function(x){return x.user_id===user.id})}
-      if(!c.error)comments=c.data||[];
+      if(!c.error){comments=c.data||[];commentProfiles={};var ids=[...new Set(comments.map(function(x){return x.user_id}).filter(Boolean))];if(ids.length){var pr=await sb.from('profiles').select('id,display_name,avatar_url').in('id',ids);(pr.data||[]).forEach(function(x){commentProfiles[x.id]=x})}}
       if(!s.error)shares=s.data||[];
       render();
     }
