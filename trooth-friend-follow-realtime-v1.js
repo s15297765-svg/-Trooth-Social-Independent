@@ -19,7 +19,6 @@
     }
     who().then(subscribe);
     sb.auth.onAuthStateChange(function(){who().then(subscribe)});
-    window.addEventListener('trooth-social-graph-refresh',function(){refresh()});
   }
   if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
 })();
