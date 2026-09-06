@@ -1,9 +1,9 @@
-// Trooth Social Independent — resilient realtime health indicator v12
+// Trooth Social Independent — resilient realtime health indicator v13
 (function(){
   function boot(){
-    if(window.__troothLiveHealthV12)return;window.__troothLiveHealthV12=true;
+    if(window.__troothLiveHealthV13)return;window.__troothLiveHealthV13=true;
     var el=document.createElement('div');el.id='trooth-live-health';el.textContent='● LIVE';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.setAttribute('aria-atomic','true');
-    el.style='position:fixed;top:calc(68px + env(safe-area-inset-top,0px));right:12px;z-index:99998;background:#fff;padding:6px 10px;border-radius:999px;box-shadow:0 4px 16px #0002;font:700 11px system-ui;color:#718276;transition:.2s;cursor:default;max-width:calc(100vw - 24px)';
+    el.style='position:fixed;top:calc(68px + env(safe-area-inset-top,0px));right:12px;z-index:99998;background:#fff;padding:6px 10px;border-radius:999px;box-shadow:0 4px 16px #0002;font:700 11px system-ui;color:#718276;transition:.2s;cursor:default;pointer-events:none;user-select:none;max-width:calc(100vw - 24px)';
     document.body.appendChild(el);
     var state='',attempt=0,timer=null,watchdog=null,lastSignal=0,lastConnected=0,staleAfter=30000;
     function set(next,detail){
