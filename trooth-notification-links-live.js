@@ -1,4 +1,4 @@
-// Trooth Social Independent — clickable notification routing
+// Trooth Social Independent — clickable notification routing v2
 (function(){
   function boot(){
     var sb=window.troothSupabase;if(!sb)return setTimeout(boot,300);
@@ -7,7 +7,9 @@
       if(!n)return 'index.html';
       if(n.kind==='message')return 'chat.html';
       if(n.kind==='follow'||n.kind==='friend_request'||n.kind==='friend_accept')return 'friends.html';
-      if(n.kind==='like'||n.kind==='comment'||n.kind==='share')return n.post_id?'index.html?post='+encodeURIComponent(n.post_id):'index.html';
+      if(n.kind==='post_like'||n.kind==='post_comment'||n.kind==='like'||n.kind==='comment'||n.kind==='share')return n.post_id?'index.html?post='+encodeURIComponent(n.post_id):'index.html';
+      if(n.kind==='group_join_request')return n.group_id?'group.html?id='+encodeURIComponent(n.group_id):'groups.html';
+      if(n.kind==='business_post')return n.business_id?'business.html?id='+encodeURIComponent(n.business_id):'business.html';
       return 'notifications.html';
     }
     function decorate(){
@@ -26,6 +28,7 @@
     sb.auth.getUser().then(function(r){user=r.data&&r.data.user||null;if(user)decorate()});
     window.addEventListener('trooth-notifications-refresh',decorate);
     window.addEventListener('trooth-notification-added',decorate);
+    window.addEventListener('trooth-notification-incoming',decorate);
     new MutationObserver(decorate).observe(document.body,{childList:true,subtree:true});
   }
   if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
