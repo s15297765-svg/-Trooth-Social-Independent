@@ -1,10 +1,16 @@
-// Trooth Social Independent — interaction reliability + mobile UX bridge v2
+// Trooth Social Independent — interaction reliability + mobile UX bridge v3
 (function(){
-  if(window.__troothInteractionReliabilityV2)return;window.__troothInteractionReliabilityV2=true;
+  if(window.__troothInteractionReliabilityV3)return;window.__troothInteractionReliabilityV3=true;
   function toast(msg){
     var t=document.createElement('div');t.textContent=msg;t.setAttribute('role','status');
     t.style.cssText='position:fixed;left:50%;bottom:78px;transform:translateX(-50%);z-index:99999;background:#173b29;color:#fff;padding:10px 15px;border-radius:999px;font:700 13px system-ui;box-shadow:0 8px 24px #0003;max-width:calc(100vw - 28px);text-align:center';
     document.body.appendChild(t);setTimeout(function(){t.remove()},1800);
+  }
+  function copyFallback(url){
+    var ta=document.createElement('textarea');ta.value=url;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;opacity:0;pointer-events:none';
+    document.body.appendChild(ta);ta.select();
+    var ok=false;try{ok=document.execCommand('copy')}catch(e){}
+    ta.remove();toast(ok?'🔗 Link copied':'Copy unavailable');
   }
   function boot(){
     var sb=window.troothSupabase;if(!sb||!window.TroothInteractions)return;
@@ -18,7 +24,9 @@
         e.preventDefault();sharing=true;b.setAttribute('aria-busy','true');
         navigator.share({title:'Trooth',text:'Check this out on Trooth',url:url}).catch(function(err){if(err&&err.name!=='AbortError')toast('Share unavailable');}).finally(function(){sharing=false;b.removeAttribute('aria-busy')});
       }else if(navigator.clipboard&&window.isSecureContext){
-        e.preventDefault();navigator.clipboard.writeText(url).then(function(){toast('🔗 Link copied');}).catch(function(){toast('Copy failed');});
+        e.preventDefault();navigator.clipboard.writeText(url).then(function(){toast('🔗 Link copied');}).catch(function(){copyFallback(url);});
+      }else{
+        e.preventDefault();copyFallback(url);
       }
     });
     window.addEventListener('trooth-content-interaction-refresh',function(e){
