@@ -12,7 +12,7 @@
       Array.from(actions.querySelectorAll('button')).forEach(function(b,i){b.dataset.action=i===0?'like':i===1?'comment':'share'});
       var meta=document.createElement('div');meta.className='feed-meta';meta.dataset.feedMeta='1';actions.parentNode.insertBefore(meta,actions);
       var comments=document.createElement('div');comments.className='feed-comments';comments.dataset.feedComments='1';actions.parentNode.insertBefore(comments,actions);
-    }
+    });
     decorate();new MutationObserver(decorate).observe(document.getElementById('feed')||document.body,{childList:true,subtree:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
