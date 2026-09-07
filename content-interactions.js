@@ -9,7 +9,7 @@
     var r=await sb.from('content_shares').insert(payload);
     if(r.error && !/does not exist|relation .* not found|column .* does not exist/i.test(r.error.message||'')) throw r.error;
   }
-  window.TroothInteractions={async render:function(sb,user,type,id,box){
+  window.TroothInteractions={render:async function(sb,user,type,id,box){
     if(!sb||!box)return;
     var supported=['news','sports','business','property','film_fashion','stores'];
     if(type==='group')return renderGroup(sb,user,id,box);
@@ -37,7 +37,7 @@
         else if(navigator.clipboard){await navigator.clipboard.writeText(url);shared=true;toast('🔗 Link copied')}
         else toast('Share link: '+url);
       }catch(e){if(e&&e.name==='AbortError')return;if(navigator.clipboard)try{await navigator.clipboard.writeText(url);shared=true;toast('🔗 Link copied')}catch(_){} }
-      if(shared){try{await recordShare(sb,user,type,id)}catch(e){/* sharing still succeeded even if optional analytics table is unavailable */}await notify('Share','Someone shared your Trooth content.')}
+      if(shared){try{await recordShare(sb,user,type,id)}catch(e){}await notify('Share','Someone shared your Trooth content.')}
     };
     var send=async function(){
       if(!user){toast('Please login first.');return}var input=box.querySelector('[data-comment]'),body=input.value.trim(),btn=box.querySelector('[data-send]');if(!body)return;btn.disabled=true;
