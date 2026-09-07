@@ -1,7 +1,7 @@
 // Trooth Social Independent — stable Supabase bootstrap
 (function(){
-  if(window.__troothSupabaseBootstrapStableV1)return;
-  window.__troothSupabaseBootstrapStableV1=true;
+  if(window.__troothSupabaseBootstrapStableV2)return;
+  window.__troothSupabaseBootstrapStableV2=true;
 
   var SUPABASE_URL='https://tmshuyvtmbumtrlbhdjq.supabase.co';
   var SUPABASE_KEY='sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_GTSnhpkz';
@@ -13,13 +13,14 @@
   window.troothLoadedModules=window.troothLoadedModules||[];
   var i=0,readySent=false;
   function dispatch(n,d){try{window.dispatchEvent(new CustomEvent(n,{detail:d||{}}));}catch(e){}}
-  function finish(){
+  function signalReady(){
     if(readySent)return;
+    if(!window.troothSupabase)return;
     readySent=true;
-    dispatch('trooth-supabase-ready',{client:window.troothSupabase||null,loaded:window.troothLoadedModules||[]});
+    dispatch('trooth-supabase-ready',{client:window.troothSupabase,loaded:window.troothLoadedModules||[]});
   }
   function loadNext(){
-    if(i>=scripts.length){finish();return;}
+    if(i>=scripts.length)return;
     var src=scripts[i++],s=document.createElement('script');
     s.src=src;
     s.async=false;
@@ -27,9 +28,13 @@
       if(src.indexOf('cdn.jsdelivr.net')!==-1 && window.supabase && window.supabase.createClient && !window.troothSupabase){
         try{
           window.troothSupabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+          window.troothLoadedModules.push(src);
+          dispatch('trooth-supabase-client-ready',{client:window.troothSupabase});
+          signalReady();
         }catch(e){dispatch('trooth-supabase-error',{error:e});}
+      }else if(window.troothLoadedModules.indexOf(src)===-1){
+        window.troothLoadedModules.push(src);
       }
-      if(window.troothLoadedModules.indexOf(src)===-1)window.troothLoadedModules.push(src);
       dispatch('trooth-module-loaded',{src:src});
       loadNext();
     };
