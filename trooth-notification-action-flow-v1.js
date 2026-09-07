@@ -1,24 +1,28 @@
-// Trooth Social Independent — notification action routing v1
+// Trooth Social Independent — notification action routing v2
 (function(){
-  if(window.__troothNotificationActionFlowV1)return;
-  window.__troothNotificationActionFlowV1=true;
+  if(window.__troothNotificationActionFlowV2)return;
+  window.__troothNotificationActionFlowV2=true;
   function boot(){
+    function route(action,id){
+      if(!action||!id)return false;
+      var map={chat:'chat.html?user=',friend:'friends.html?chat=',profile:'profile.html?user=',post:'index.html?post=',group:'group.html?id='};
+      if(!map[action])return false;
+      location.href=map[action]+encodeURIComponent(id);return true;
+    }
     document.addEventListener('click',function(e){
-      var el=e.target&&e.target.closest&&e.target.closest('[data-notification-action],[data-trooth-notification-action]');
+      var el=e.target&&e.target.closest&&e.target.closest('[data-notification-action],[data-trooth-notification-action],[data-trooth-action]');
       if(!el)return;
-      var action=el.getAttribute('data-notification-action')||el.getAttribute('data-trooth-notification-action');
-      var id=el.getAttribute('data-user-id')||el.getAttribute('data-actor-id')||el.getAttribute('data-post-id');
-      if(!action)return;
-      if(action==='chat'&&id){e.preventDefault();location.href='chat.html?user='+encodeURIComponent(id);return}
-      if((action==='friend'||action==='profile')&&id){e.preventDefault();location.href='friends.html?user='+encodeURIComponent(id);return}
-      if(action==='post'&&id){e.preventDefault();location.href='index.html?post='+encodeURIComponent(id);return}
-      if(action==='group'&&id){e.preventDefault();location.href='group.html?id='+encodeURIComponent(id)}
+      var action=el.getAttribute('data-notification-action')||el.getAttribute('data-trooth-notification-action')||el.getAttribute('data-trooth-action');
+      var id=el.getAttribute('data-user-id')||el.getAttribute('data-actor-id')||el.getAttribute('data-post-id')||el.getAttribute('data-group-id');
+      if(route(action,id))e.preventDefault();
     },true);
     window.TroothNotificationFlow={
-      openChat:function(id){if(id)location.href='chat.html?user='+encodeURIComponent(id)},
-      openFriend:function(id){if(id)location.href='friends.html?user='+encodeURIComponent(id)},
-      openPost:function(id){if(id)location.href='index.html?post='+encodeURIComponent(id)},
-      openGroup:function(id){if(id)location.href='group.html?id='+encodeURIComponent(id)}
+      route:route,
+      openChat:function(id){route('chat',id)},
+      openFriend:function(id){route('friend',id)},
+      openProfile:function(id){route('profile',id)},
+      openPost:function(id){route('post',id)},
+      openGroup:function(id){route('group',id)}
     };
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
