@@ -1,7 +1,7 @@
-// Trooth Social Independent — notification action routing v4
+// Trooth Social Independent — notification action routing v5
 (function(){
-  if(window.__troothNotificationActionFlowV4)return;
-  window.__troothNotificationActionFlowV4=true;
+  if(window.__troothNotificationActionFlowV5)return;
+  window.__troothNotificationActionFlowV5=true;
   function boot(){
     function route(action,id){
       if(!action||!id)return false;
@@ -16,12 +16,23 @@
       if(action==='chat'||action==='friend'||action==='profile')return el.getAttribute('data-user-id')||el.getAttribute('data-actor-id')||'';
       return el.getAttribute('data-user-id')||el.getAttribute('data-actor-id')||el.getAttribute('data-post-id')||el.getAttribute('data-group-id')||el.getAttribute('data-business-id')||'';
     }
-    document.addEventListener('click',function(e){
+    async function markNotificationRead(el){
+      var nid=el.getAttribute('data-notification-id');
+      if(!nid||!window.troothSupabase)return;
+      try{
+        var user=(await window.troothSupabase.auth.getUser()).data.user;
+        if(user)await window.troothSupabase.from('notifications').update({is_read:true}).eq('id',nid).eq('user_id',user.id);
+      }catch(e){}
+    }
+    document.addEventListener('click',async function(e){
       var el=e.target&&e.target.closest&&e.target.closest('[data-notification-action],[data-trooth-notification-action],[data-trooth-action]');
       if(!el)return;
       var action=el.getAttribute('data-notification-action')||el.getAttribute('data-trooth-notification-action')||el.getAttribute('data-trooth-action');
       var id=getId(el,action);
-      if(route(action,id))e.preventDefault();
+      if(!id)return;
+      e.preventDefault();
+      await markNotificationRead(el);
+      route(action,id);
     },true);
     window.TroothNotificationFlow={route:route,openChat:function(id){return route('chat',id)},openFriend:function(id){return route('friend',id)},openProfile:function(id){return route('profile',id)},openPost:function(id){return route('post',id)},openGroup:function(id){return route('group',id)},openBusiness:function(id){return route('business',id)}};
   }
