@@ -6,6 +6,10 @@
   link.rel='stylesheet';
   link.href='trooth-vision-v1.css?v=1';
   document.head.appendChild(link);
+  var dream=document.createElement('script');
+  dream.src='trooth-dream-home-v1.js?v=1';
+  dream.async=false;
+  document.head.appendChild(dream);
   window.addEventListener('load',function(){
     document.body.classList.add('trooth-vision-active');
   });
