@@ -1,0 +1,37 @@
+name: Validate Trooth
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  javascript-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=$(find . -type f -name '*.js' -not -path './.git/*' -not -path './node_modules/*' | sort)
+          test -n "$files"
+          while IFS= read -r file; do
+            echo "Checking $file"
+            node --check "$file"
+          done <<< "$files"
+      - name: Check required Supabase bootstrap
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f supabase-client.js
+          grep -q "trooth-business-owner-v1.js" supabase-client.js
+          grep -q "trooth-business-analytics-v1.js" supabase-client.js
