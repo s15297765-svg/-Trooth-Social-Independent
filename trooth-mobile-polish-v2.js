@@ -1,4 +1,4 @@
-/* Trooth Social Independent — mobile polish v3 */
+/* Trooth Social Independent — mobile polish v4 */
 (function(){
   function boot(){
     if(document.getElementById('trooth-mobile-polish-v2'))return;
@@ -10,7 +10,7 @@
         .postactions{position:sticky;bottom:8px;background:#fff;padding:7px;border-radius:12px;box-shadow:0 3px 14px #245c3a18;z-index:4}.action{font-size:12px;padding:10px 5px;min-height:40px}
         .hubgrid,.grid{gap:9px}.hubitem,.tile{padding:12px}.hero{padding:14px}.hero h1{font-size:20px}
         .trooth-bottom-nav{position:fixed;left:8px;right:8px;bottom:8px;height:56px;background:#fff;border:1px solid #d8eee0;border-radius:16px;display:flex;align-items:center;justify-content:space-around;box-shadow:0 5px 22px #245c3a25;z-index:50;backdrop-filter:blur(8px)}
-        .trooth-bottom-nav a{font-size:20px;text-align:center;padding:6px 9px;min-width:44px;min-height:44px;text-decoration:none}.trooth-bottom-nav small{display:block;font-size:9px;color:#718276}
+        .trooth-bottom-nav a{font-size:20px;text-align:center;padding:6px 9px;min-width:44px;min-height:44px;text-decoration:none;border-radius:12px;transition:background .16s,transform .16s}.trooth-bottom-nav a:hover{background:#e7f8ee}.trooth-bottom-nav a:active{transform:scale(.94)}.trooth-bottom-nav a:focus-visible{outline:3px solid #74c69d;outline-offset:1px}.trooth-bottom-nav small{display:block;font-size:9px;color:#718276}
       }
       @media(min-width:651px){.trooth-bottom-nav{display:none}}
       .trooth-focus{outline:3px solid #74c69d;outline-offset:2px;transition:outline .2s}
