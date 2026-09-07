@@ -13,13 +13,15 @@
     style.textContent = `
       #${NAV_ID}{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 10px;margin:4px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
       #${NAV_ID}::-webkit-scrollbar{display:none}
-      #${NAV_ID} button{flex:0 0 auto;border:1px solid rgba(39,174,96,.22);background:#fff;border-radius:999px;padding:8px 13px;font:600 13px/1.1 system-ui,sans-serif;color:#247a49;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer}
+      #${NAV_ID} button{flex:0 0 auto;border:1px solid rgba(39,174,96,.22);background:#fff;border-radius:999px;padding:8px 13px;font:600 13px/1.1 system-ui,sans-serif;color:#247a49;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer;transition:.18s ease}
+      #${NAV_ID} button:hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(24,91,57,.10)}
       #${NAV_ID} button:active{transform:scale(.97)}
-      #${NAV_ID} button.is-active{background:#dff7e8;border-color:#62c889}
+      #${NAV_ID} button:focus-visible{outline:3px solid rgba(39,132,91,.25);outline-offset:2px}
+      #${NAV_ID} button.is-active{background:#dff7e8;border-color:#62c889;box-shadow:0 4px 12px rgba(39,132,91,.12)}
       @media(max-width:700px){
         body{padding-bottom:max(72px,calc(72px + env(safe-area-inset-bottom)))}
-        #${NAV_ID}{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);margin-left:-4px;margin-right:-4px;padding-left:6px;padding-right:6px}
-        #${NAV_ID} button{padding:9px 14px;font-size:12px}
+        #${NAV_ID}{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);margin-left:-4px;margin-right:-4px;padding:9px 6px 10px}
+        #${NAV_ID} button{padding:9px 14px;font-size:12px;min-height:38px}
       }
     `;
     document.head.appendChild(style);
@@ -31,7 +33,6 @@
 
   function scrollToMatch(words) {
     const nodes = document.querySelectorAll('h1,h2,h3,h4,button,a,[data-category],[data-section],section,article,.card');
-    const needle = words.join(' ').toLowerCase();
     for (const el of nodes) {
       const text = (el.textContent || '').trim().toLowerCase();
       if (text && words.some(w => text.includes(w.toLowerCase())) && text.length < 180) {
@@ -61,6 +62,7 @@
       const b = document.createElement('button');
       b.type = 'button';
       b.textContent = icon + ' ' + label;
+      b.title = 'Explore ' + label + ' on Trooth';
       if (index === 0) b.classList.add('is-active');
       b.addEventListener('click', () => {
         nav.querySelectorAll('button').forEach(x => x.classList.remove('is-active'));
