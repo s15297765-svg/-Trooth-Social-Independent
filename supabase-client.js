@@ -4,7 +4,7 @@
   window.__troothSupabaseBootstrapStableV4=true;
   var SUPABASE_URL='https://tmshuyvtmbumtrlbhdjq.supabase.co';
   var SUPABASE_KEY='sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_GTSnhpkz';
-  var RELEASE='20260908-v9';
+  var RELEASE='20260908-v10';
   var scripts=[
     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
     'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js',
