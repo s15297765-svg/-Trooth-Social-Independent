@@ -26,22 +26,19 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Force latest Trooth live layer
+      - name: Keep Home search bridge current
         run: |
           python - <<'PY'
           from pathlib import Path
           import re
           page = Path('index.html')
           html = page.read_text(encoding='utf-8')
-          html = re.sub(r'<script[^>]+trooth-live-final-v1\.js[^>]*></script>', '', html, flags=re.I)
-          html = re.sub(r'<script[^>]+trooth-live-final-v2\.js[^>]*></script>', '', html, flags=re.I)
+          html = re.sub(r'<script[^>]+trooth-live-final-v1\\.js[^>]*></script>', '', html, flags=re.I)
+          html = re.sub(r'<script[^>]+trooth-live-final-v2\\.js[^>]*></script>', '', html, flags=re.I)
+          html = re.sub(r'<div id="trooth-build-marker"[^>]*>.*?</div>', '', html, flags=re.I|re.S)
           bridge = '<script src="trooth-home-search-fix-v1.js?v=${{ github.sha }}"></script>'
           if 'trooth-home-search-fix-v1.js' not in html:
               html = html.replace('</body>', bridge + '</body>', 1)
-          live = '<script src="trooth-live-final-v1.js?v=${{ github.sha }}"></script>'
-          html = html.replace('</body>', live + '</body>', 1)
-          marker = '<div id="trooth-build-marker" style="position:fixed;top:72px;right:10px;z-index:9999;background:#145238;color:#fff;padding:7px 11px;border-radius:999px;font:800 11px system-ui;box-shadow:0 6px 18px rgba(20,82,56,.18)">TROOTH LIVE • ${{ github.sha }}</div>'
-          html = html.replace('</body>', marker + '</body>', 1)
           page.write_text(html, encoding='utf-8')
           PY
       - name: Upload artifact
