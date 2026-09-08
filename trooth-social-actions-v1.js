@@ -1,4 +1,4 @@
-/* Trooth social actions v2: live counts + current-user Like state, without replacing the existing feed. */
+/* Trooth social actions v3: live counts + current-user Like state + visible feedback, without replacing the existing feed. */
 (function(){
   'use strict';
   function sb(){ return window.troothSupabase; }
@@ -13,6 +13,9 @@
     button.classList.toggle('trooth-liked',!!liked);
     button.setAttribute('aria-pressed',liked?'true':'false');
     button.setAttribute('data-liked',liked?'1':'0');
+    button.style.fontWeight=liked?'700':'';
+    button.style.transform=liked?'translateY(-1px)':'';
+    button.style.filter=liked?'brightness(.9)':'';
   }
   async function refreshPost(article){
     var id=article && article.getAttribute('data-post-id');
@@ -30,6 +33,10 @@
       setCount(buttons[1],'Comment','💬',comments);
       if(buttons[2]) buttons[2].innerHTML='↗ Share';
       var u=user();
+      if(!u && s.auth && s.auth.getUser){
+        var authResult=await s.auth.getUser();
+        u=authResult && authResult.data && authResult.data.user || null;
+      }
       if(u && buttons[0]){
         var mine=await s.from('post_likes').select('post_id').eq('post_id',id).eq('user_id',u.id).maybeSingle();
         setLiked(buttons[0],!!(mine && mine.data));
@@ -42,8 +49,8 @@
     document.querySelectorAll('.post[data-post-id]').forEach(function(article){
       var actions=article.querySelector('.postactions');
       if(!actions) return;
-      if(article.getAttribute('data-social-ready')!=='2'){
-        article.setAttribute('data-social-ready','2');
+      if(article.getAttribute('data-social-ready')!=='3'){
+        article.setAttribute('data-social-ready','3');
         actions.addEventListener('click',function(){
           setTimeout(function(){refreshPost(article);},350);
           setTimeout(function(){refreshPost(article);},1200);
