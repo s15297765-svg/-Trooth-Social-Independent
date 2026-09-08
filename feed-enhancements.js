@@ -1,4 +1,4 @@
-// Trooth Social Independent — Feed interactions enhancement v6
+// Trooth Social Independent — Feed interactions enhancement v7
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
   const wait = () => new Promise(resolve => {
@@ -13,15 +13,16 @@
   })();
   const refreshActivity = type => window.dispatchEvent(new CustomEvent('trooth-content-interaction-refresh', { detail: { type } }));
   function polish(){
-    if(document.getElementById('trooth-feed-v6-style')) return;
-    const st=document.createElement('style');st.id='trooth-feed-v6-style';st.textContent=`
+    if(document.getElementById('trooth-feed-v7-style')) return;
+    const st=document.createElement('style');st.id='trooth-feed-v7-style';st.textContent=`
       .postActions,.postactions,.actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
       .postActions .action,.postactions .action,.actions .action{border:1px solid #e1eee6;background:#fff;border-radius:12px;padding:8px 11px;font-weight:700;color:#315541;transition:.16s;cursor:pointer}
       .postActions .action:hover,.postactions .action:hover,.actions .action:hover{background:#e9f8ef;transform:translateY(-1px)}
       .postActions .like-action{color:#237b53}.postActions .save-action{color:#2d6a4f}
       .comments-box{margin-top:8px;display:flex;flex-direction:column;gap:6px}
-      .comments-box .comment{border:1px solid #e5eee8;background:#f7fbf8!important;border-radius:12px!important;font-size:13px;line-height:1.45}
+      .comments-box .comment{border:1px solid #e5eee8;background:#f7fbf8!important;border-radius:12px!important;font-size:13px;line-height:1.45;padding:8px 10px}
       .comments-box small{color:#829188}
+      .comment-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;border:1px solid #dcece2}
       @media(max-width:700px){.postActions,.postactions,.actions{gap:5px}.postActions .action,.postactions .action,.actions .action{flex:1 1 auto;min-height:40px;padding:8px 7px;font-size:12px}.comments-box .comment{font-size:12px}}
     `;document.head.appendChild(st);
   }
@@ -38,6 +39,12 @@
       s.from('post_shares').select('post_id,user_id').in('post_id', ids)
     ]);
     const likes = likesRes.data || [], comments = commentsRes.data || [], saves = savesRes.data || [], shares = sharesRes.data || [];
+    const commenterIds = [...new Set(comments.map(c => c.user_id).filter(Boolean))];
+    let profiles = [];
+    if (commenterIds.length) {
+      try { const r = await s.from('profiles').select('id,display_name,avatar_url').in('id', commenterIds); profiles = r.data || []; } catch (_) {}
+    }
+    const profileMap = Object.fromEntries(profiles.map(p => [p.id, p]));
     let me = null; try { me = (await s.auth.getUser()).data.user || null; } catch (_) {}
     const counts = {}, commentCounts = {}, shareCounts = {};
     likes.forEach(l => { counts[l.post_id] = (counts[l.post_id] || 0) + 1; });
@@ -49,7 +56,13 @@
       const id = getPostId(post), actions = getActions(post); if (!id || !actions) return;
       actions.innerHTML = `<button class="action like-action" onclick="toggleLike('${id}',this)">${mine.has(id) ? '❤️ Liked' : '👍 Like'} <span>${counts[id] || 0}</span></button><button class="action" onclick="addComment('${id}')">💬 Comment <span>${commentCounts[id] || 0}</span></button><button class="action" onclick="sharePost('${id}')">↗ Share <span>${shareCounts[id] || 0}</span></button><button class="action save-action" onclick="toggleSave('${id}',this)">${savedMine.has(id) ? '🔖 Saved' : '🔖 Save'}</button>`;
       let box = post.querySelector('.comments-box,#c-' + CSS.escape(id)); if (!box) { box = document.createElement('div'); box.className = 'comments-box'; box.id = 'c-' + id; post.appendChild(box); }
-      const postComments = comments.filter(c => c.post_id === id); box.innerHTML = postComments.map(c => `<div class="comment"><b>Trooth Member:</b> ${esc(c.body)} <small>• ${new Date(c.created_at).toLocaleString()}</small></div>`).join('');
+      const postComments = comments.filter(c => c.post_id === id);
+      box.innerHTML = postComments.map(c => {
+        const p = profileMap[c.user_id] || {};
+        const name = p.display_name || 'Trooth Member';
+        const avatar = p.avatar_url ? `<img class="comment-avatar" src="${esc(p.avatar_url)}" alt="">` : '';
+        return `<div class="comment">${avatar}<b>${esc(name)}</b>: ${esc(c.body)} <small>• ${new Date(c.created_at).toLocaleString()}</small></div>`;
+      }).join('');
       if (!post.dataset.troothDblLike) { post.dataset.troothDblLike = '1'; post.addEventListener('dblclick', event => { if (event.target.closest('button,input,textarea,a,video')) return; const likeButton = post.querySelector('.like-action'); if (likeButton && /Liked/i.test(likeButton.textContent)) return; window.toggleLike(id); }); }
     });
   }
