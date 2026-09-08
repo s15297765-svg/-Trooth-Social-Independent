@@ -1,8 +1,8 @@
-// Trooth mobile live polish v1 — additive only, safe on desktop
+// Trooth mobile live polish v2 — additive only, safe on desktop
 (function(){
-  if(window.__troothMobileLiveV1)return;
-  window.__troothMobileLiveV1=true;
-  var css='@media(max-width:700px){html,body{width:100%;max-width:100%;overflow-x:hidden}.top{min-height:58px}.layout{width:100%;max-width:100%;margin:0;padding:10px 9px 14px}.hero,.card{max-width:100%;overflow:hidden}.searchwrap{min-width:0}.search{min-width:0}.composer{min-width:0}.postinput{min-width:0;width:100%}.uploadbar{width:100%}.postactions .action{min-width:0}.hubgrid,.grid{width:100%}.bottomnav{padding-bottom:env(safe-area-inset-bottom);height:calc(64px + env(safe-area-inset-bottom))}}@media(max-width:430px){.brand{flex:0 0 auto}.logo{font-size:24px}.top{gap:7px}.search{height:38px}.circle{width:36px;height:36px}.hero h1{line-height:1.2}.postbody{overflow-wrap:anywhere}}';
-  var s=document.createElement('style');s.id='trooth-mobile-live-v1';s.textContent=css;document.head.appendChild(s);
-  document.documentElement.setAttribute('data-trooth-mobile-live','v1');
+  if(window.__troothMobileLiveV2)return;
+  window.__troothMobileLiveV2=true;
+  var css='@media(max-width:700px){html,body{width:100%;max-width:100%;overflow-x:hidden}.top{min-height:58px}.layout{width:100%;max-width:100%;margin:0;padding:10px 9px 14px}.hero,.card{max-width:100%;overflow:hidden}.searchwrap{min-width:0}.search{min-width:0}.composer{min-width:0}.postinput{min-width:0;width:100%;font-size:16px}.uploadbar{width:100%;gap:6px}.filelabel,.btn{max-width:100%}.postactions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}.postactions .action{min-width:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hubgrid,.grid{width:100%}.bottomnav{padding-bottom:env(safe-area-inset-bottom);height:calc(64px + env(safe-area-inset-bottom));padding-left:4px;padding-right:4px}.bottomnav a{min-width:0;flex:1}.bottomnav .create{flex:0 0 45px}}@media(max-width:430px){.brand{flex:0 0 auto}.logo{font-size:24px}.top{gap:7px}.search{height:38px;font-size:14px}.circle{width:36px;height:36px}.hero h1{line-height:1.2}.postbody{overflow-wrap:anywhere}.uploadbar{align-items:center}.filelabel,.btn{font-size:12px;padding:9px 10px}.postactions{gap:4px}.postactions .action{font-size:11px;padding:9px 3px}}';
+  var s=document.createElement('style');s.id='trooth-mobile-live-v2';s.textContent=css;document.head.appendChild(s);
+  document.documentElement.setAttribute('data-trooth-mobile-live','v2');
 })();
