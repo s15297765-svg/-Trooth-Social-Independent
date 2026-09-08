@@ -17,20 +17,15 @@
     const r=await s.from('posts').select('id,group_id').in('id',ids);
     if(r.error)return;
     const grouped=(r.data||[]).filter(x=>x.group_id);
-    if(!grouped.length)return;
     const gids=[...new Set(grouped.map(x=>x.group_id))];
+    if(!gids.length)return;
     const g=await s.from('groups').select('id,name,privacy').in('id',gids);
     if(g.error)return;
     const map=new Map((g.data||[]).map(x=>[x.id,x]));
+    posts.forEach(post=>post.querySelector('.trooth-group-badge')?.remove());
     grouped.forEach(row=>{
       const post=posts.find(p=>postId(p)===row.id), group=map.get(row.group_id);
-      if(!post||!group||post.querySelector('.trooth-group-badge'))return;
-      const badge=post.querySelector('.trooth-group-badge');
-      if(badge)badge.remove();
-    });
-    grouped.forEach(row=>{
-      const post=posts.find(p=>postId(p)===row.id), group=map.get(row.group_id);
-      if(!post||!group||post.querySelector('.trooth-group-badge'))return;
+      if(!post||!group)return;
       const head=post.querySelector('.posthead')||post.firstElementChild;
       const badge=document.createElement('a');
       badge.className='trooth-group-badge';
