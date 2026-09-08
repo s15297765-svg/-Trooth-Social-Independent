@@ -20,7 +20,7 @@
       (comments.data||[]).forEach(function(x){cc[x.post_id]=(cc[x.post_id]||0)+1;});
       cards.forEach(function(card){
         var id=card.getAttribute('data-post'),bs=card.querySelectorAll('.postActions button');
-        if(bs[0]){bs[0].innerHTML='👍 Like <span class="trooth-like-count">'+(lc[id]||0)+'</span>';bs[0].classList.toggle('trooth-liked',!!mine[id]);}
+        if(bs[0]){bs[0].innerHTML='👍 Like <span id="lc-'+id+'" class="trooth-like-count">'+(lc[id]||0)+'</span>';bs[0].classList.toggle('trooth-liked',!!mine[id]);}
         if(bs[1]){bs[1].innerHTML='💬 Comment <span class="trooth-comment-count">'+(cc[id]||0)+'</span>';}
       });
     }catch(e){}
