@@ -2,6 +2,7 @@
 (function(){
   if(window.__troothLiveFeedV1)return;
   window.__troothLiveFeedV1=true;
+  var refreshing=false;
   function client(){return window.troothSupabase||null;}
   function style(){
     if(document.getElementById('trooth-live-feed-style'))return;
@@ -9,9 +10,10 @@
   }
   async function refresh(){
     var sb=client(), feed=document.getElementById('feed');
-    if(!sb||!feed)return;
+    if(!sb||!feed||refreshing)return;
     var cards=[].slice.call(feed.querySelectorAll('[data-post]'));if(!cards.length)return;
     var ids=cards.map(function(c){return c.getAttribute('data-post');}).filter(Boolean);
+    refreshing=true;
     try{
       var likes=await sb.from('post_likes').select('post_id,user_id').in('post_id',ids);
       var comments=await sb.from('comments').select('post_id').in('post_id',ids);
@@ -23,14 +25,18 @@
         if(bs[0]){bs[0].innerHTML='👍 Like <span id="lc-'+id+'" class="trooth-like-count">'+(lc[id]||0)+'</span>';bs[0].classList.toggle('trooth-liked',!!mine[id]);}
         if(bs[1]){bs[1].innerHTML='💬 Comment <span class="trooth-comment-count">'+(cc[id]||0)+'</span>';}
       });
-    }catch(e){}
+    }catch(e){}finally{refreshing=false;}
   }
   function start(){
     style();
     var sb=client();
     if(sb)sb.auth.getUser().then(function(r){window.troothCurrentUser=r.data&&r.data.user||null;refresh();});
     var feed=document.getElementById('feed');if(!feed)return;
-    new MutationObserver(function(){clearTimeout(window.__troothLiveFeedTimer);window.__troothLiveFeedTimer=setTimeout(refresh,350);}).observe(feed,{childList:true,subtree:true});
+    new MutationObserver(function(){
+      if(refreshing)return;
+      clearTimeout(window.__troothLiveFeedTimer);
+      window.__troothLiveFeedTimer=setTimeout(refresh,350);
+    }).observe(feed,{childList:true,subtree:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
