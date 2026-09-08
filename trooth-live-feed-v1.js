@@ -32,8 +32,13 @@
     var sb=client();
     if(sb)sb.auth.getUser().then(function(r){window.troothCurrentUser=r.data&&r.data.user||null;refresh();});
     var feed=document.getElementById('feed');if(!feed)return;
-    new MutationObserver(function(){
+    new MutationObserver(function(records){
       if(refreshing)return;
+      var changed=records.some(function(record){
+        return Array.prototype.some.call(record.addedNodes||[],function(node){return node.nodeType===1&&(node.matches&&node.matches('[data-post]')||(node.querySelector&&node.querySelector('[data-post]')));})||
+          Array.prototype.some.call(record.removedNodes||[],function(node){return node.nodeType===1&&(node.matches&&node.matches('[data-post]')||(node.querySelector&&node.querySelector('[data-post]')));});
+      });
+      if(!changed)return;
       clearTimeout(window.__troothLiveFeedTimer);
       window.__troothLiveFeedTimer=setTimeout(refresh,350);
     }).observe(feed,{childList:true,subtree:true});
