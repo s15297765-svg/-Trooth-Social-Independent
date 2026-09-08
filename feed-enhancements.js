@@ -1,4 +1,4 @@
-// Trooth Social Independent — Feed interactions enhancement v7
+// Trooth Social Independent — Feed interactions enhancement v8
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
   const wait = () => new Promise(resolve => {
@@ -13,8 +13,8 @@
   })();
   const refreshActivity = type => window.dispatchEvent(new CustomEvent('trooth-content-interaction-refresh', { detail: { type } }));
   function polish(){
-    if(document.getElementById('trooth-feed-v7-style')) return;
-    const st=document.createElement('style');st.id='trooth-feed-v7-style';st.textContent=`
+    if(document.getElementById('trooth-feed-v8-style')) return;
+    const st=document.createElement('style');st.id='trooth-feed-v8-style';st.textContent=`
       .postActions,.postactions,.actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
       .postActions .action,.postactions .action,.actions .action{border:1px solid #e1eee6;background:#fff;border-radius:12px;padding:8px 11px;font-weight:700;color:#315541;transition:.16s;cursor:pointer}
       .postActions .action:hover,.postactions .action:hover,.actions .action:hover{background:#e9f8ef;transform:translateY(-1px)}
@@ -23,7 +23,7 @@
       .comments-box .comment{border:1px solid #e5eee8;background:#f7fbf8!important;border-radius:12px!important;font-size:13px;line-height:1.45;padding:8px 10px}
       .comments-box small{color:#829188}
       .comment-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;border:1px solid #dcece2}
-      @media(max-width:700px){.postActions,.postactions,.actions{gap:5px}.postActions .action,.postactions .action,.actions .action{flex:1 1 auto;min-height:40px;padding:8px 7px;font-size:12px}.comments-box .comment{font-size:12px}}
+      @media(max-width:700px){.postActions,.postactions,.actions{gap:5px}.postActions .action,.postactions .action,.actions .action{flex:1 1 calc(50% - 5px);min-height:42px;padding:8px 7px;font-size:12px}.comments-box .comment{font-size:12px}}
     `;document.head.appendChild(st);
   }
   async function notifyPostOwner(s, postId, actorId, kind, body) {
@@ -54,7 +54,7 @@
     const savedMine = new Set(saves.filter(x => me && x.user_id === me.id).map(x => x.content_id));
     posts.forEach(post => {
       const id = getPostId(post), actions = getActions(post); if (!id || !actions) return;
-      actions.innerHTML = `<button class="action like-action" onclick="toggleLike('${id}',this)">${mine.has(id) ? '❤️ Liked' : '👍 Like'} <span>${counts[id] || 0}</span></button><button class="action" onclick="addComment('${id}')">💬 Comment <span>${commentCounts[id] || 0}</span></button><button class="action" onclick="sharePost('${id}')">↗ Share <span>${shareCounts[id] || 0}</span></button><button class="action save-action" onclick="toggleSave('${id}',this)">${savedMine.has(id) ? '🔖 Saved' : '🔖 Save'}</button>`;
+      actions.innerHTML = `<button class="action like-action" aria-label="Like post" onclick="toggleLike('${id}',this)">${mine.has(id) ? '❤️ Liked' : '👍 Like'} <span>${counts[id] || 0}</span></button><button class="action" aria-label="Comment on post" onclick="addComment('${id}')">💬 Comment <span>${commentCounts[id] || 0}</span></button><button class="action" aria-label="Share post" onclick="sharePost('${id}')">↗ Share <span>${shareCounts[id] || 0}</span></button><button class="action save-action" aria-label="Save post" onclick="toggleSave('${id}',this)">${savedMine.has(id) ? '🔖 Saved' : '🔖 Save'}</button>`;
       let box = post.querySelector('.comments-box,#c-' + CSS.escape(id)); if (!box) { box = document.createElement('div'); box.className = 'comments-box'; box.id = 'c-' + id; post.appendChild(box); }
       const postComments = comments.filter(c => c.post_id === id);
       box.innerHTML = postComments.map(c => {
@@ -68,7 +68,7 @@
   }
   window.toggleLike = async function (id) { const s = await wait(), me = (await s.auth.getUser()).data.user; if (!me) { alert('Please login first.'); location.href = 'auth.html'; return; } const q = await s.from('post_likes').select('post_id').eq('post_id', id).eq('user_id', me.id).maybeSingle(); if (q.error) { alert(q.error.message); return; } if (q.data) { const r = await s.from('post_likes').delete().eq('post_id', id).eq('user_id', me.id); if (r.error) { alert(r.error.message); return; } refreshActivity('unlike'); } else { const r = await s.from('post_likes').insert({ post_id: id, user_id: me.id }); if (r.error) { alert(r.error.message); return; } await notifyPostOwner(s, id, me.id, 'like', 'liked your post on Trooth.'); refreshActivity('like'); } await hydrateFeed(); };
   window.addComment = async function (id) { const s = await wait(), me = (await s.auth.getUser()).data.user; if (!me) { alert('Please login first.'); location.href = 'auth.html'; return; } const v = prompt('Write your comment:'); if (!v || !v.trim()) return; const r = await s.from('comments').insert({ post_id: id, user_id: me.id, body: v.trim() }); if (r.error) { alert(r.error.message); return; } await notifyPostOwner(s, id, me.id, 'comment', 'commented on your post on Trooth.'); refreshActivity('comment'); await hydrateFeed(); };
-  window.sharePost = async function (id) { const s = await wait(), me = (await s.auth.getUser()).data.user; if (!me) { alert('Please login first.'); location.href = 'auth.html'; return; } const url = location.origin + location.pathname + '#post-' + id; try { const shareRecord = await s.from('post_shares').insert({ post_id: id, user_id: me.id }); if (shareRecord.error) { alert(shareRecord.error.message); return; } if (navigator.share) await navigator.share({ title: 'Trooth Social Independent', text: 'Check this post on Trooth', url }); else { await navigator.clipboard.writeText(url); alert('Post link copied!'); } await notifyPostOwner(s, id, me.id, 'share', 'shared your post on Trooth.'); refreshActivity('share'); await hydrateFeed(); } catch (_) {} };
+  window.sharePost = async function (id) { const s = await wait(), me = (await s.auth.getUser()).data.user; if (!me) { alert('Please login first.'); location.href = 'auth.html'; return; } const url = location.origin + location.pathname + '#post-' + id; try { const shareRecord = await s.from('post_shares').insert({ post_id: id, user_id: me.id }); if (shareRecord.error) { alert(shareRecord.error.message); return; } if (navigator.share) { try { await navigator.share({ title: 'Trooth Social Independent', text: 'Check this post on Trooth', url }); } catch (shareError) { if (shareError?.name !== 'AbortError') { try { await navigator.clipboard.writeText(url); alert('Post link copied!'); } catch (_) {} } } } else { try { await navigator.clipboard.writeText(url); alert('Post link copied!'); } catch (_) { prompt('Copy this Trooth post link:', url); } } await notifyPostOwner(s, id, me.id, 'share', 'shared your post on Trooth.'); refreshActivity('share'); await hydrateFeed(); } catch (_) {} };
   window.toggleSave = async function (id) { const s = await wait(), me = (await s.auth.getUser()).data.user; if (!me) { alert('Please login first.'); location.href = 'auth.html'; return; } const q = await s.from('saved_content').select('id').eq('content_type','post').eq('content_id',id).eq('user_id',me.id).maybeSingle(); if(q.error){alert(q.error.message);return;} if(q.data){const r=await s.from('saved_content').delete().eq('id',q.data.id).eq('user_id',me.id);if(r.error){alert(r.error.message);return;} alert('Removed from Saved ✓');refreshActivity('unsave');}else{const r=await s.from('saved_content').insert({user_id:me.id,content_type:'post',content_id:id});if(r.error){alert(r.error.message);return;} alert('Saved to your Trooth ✓');refreshActivity('save');} window.dispatchEvent(new CustomEvent('trooth-saved-content-refresh')); await hydrateFeed(); };
   window.refreshTroothFeed = hydrateFeed;
   window.addEventListener('trooth-supabase-ready', () => setTimeout(hydrateFeed, 700));
