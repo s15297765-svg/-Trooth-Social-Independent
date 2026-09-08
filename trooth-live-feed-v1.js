@@ -27,10 +27,20 @@
       });
     }catch(e){}finally{refreshing=false;}
   }
+  function scheduleRefresh(delay){
+    clearTimeout(window.__troothLiveFeedTimer);
+    window.__troothLiveFeedTimer=setTimeout(refresh,delay||250);
+  }
   function start(){
     style();
     var sb=client();
-    if(sb)sb.auth.getUser().then(function(r){window.troothCurrentUser=r.data&&r.data.user||null;refresh();});
+    if(sb){
+      sb.auth.getUser().then(function(r){window.troothCurrentUser=r.data&&r.data.user||null;refresh();});
+      sb.auth.onAuthStateChange(function(_event,session){
+        window.troothCurrentUser=session&&session.user||null;
+        scheduleRefresh(100);
+      });
+    }
     var feed=document.getElementById('feed');if(!feed)return;
     new MutationObserver(function(records){
       if(refreshing)return;
@@ -39,9 +49,11 @@
           Array.prototype.some.call(record.removedNodes||[],function(node){return node.nodeType===1&&(node.matches&&node.matches('[data-post]')||(node.querySelector&&node.querySelector('[data-post]')));});
       });
       if(!changed)return;
-      clearTimeout(window.__troothLiveFeedTimer);
-      window.__troothLiveFeedTimer=setTimeout(refresh,350);
+      scheduleRefresh(350);
     }).observe(feed,{childList:true,subtree:true});
+    window.addEventListener('online',function(){scheduleRefresh(150);});
+    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')scheduleRefresh(120);});
+    window.addEventListener('pageshow',function(){scheduleRefresh(120);});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
