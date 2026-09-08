@@ -31,12 +31,14 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           page = Path('index.html')
-          bridge = Path('trooth-home-search-fix-v1.js')
           html = page.read_text(encoding='utf-8')
           marker = '<script src="trooth-home-search-fix-v1.js"></script>'
           if marker not in html:
               html = html.replace('</body>', marker + '</body>', 1)
-              page.write_text(html, encoding='utf-8')
+          live = '<script src="trooth-live-final-v1.js?v=${{ github.sha }}"></script>'
+          if 'trooth-live-final-v1.js' not in html:
+              html = html.replace('</body>', live + '</body>', 1)
+          page.write_text(html, encoding='utf-8')
           PY
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
