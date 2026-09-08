@@ -9,6 +9,11 @@
         body.trooth-reference-home .profile-access-card{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
         body.trooth-reference-home .profile-access-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(30,105,66,.08);background:#f5fcf7}
         body.trooth-reference-home .profile-access-card:focus-visible{outline:3px solid #b9e9ca;outline-offset:2px}
+        @media(max-width:600px){
+          body:has(#actions) #actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+          body:has(#actions) #actions .btn{min-height:44px;width:100%;padding:10px 8px}
+          body:has(#editor) .body{padding-bottom:16px}
+        }
       `;document.head.appendChild(s);
     }
     function wire(){
