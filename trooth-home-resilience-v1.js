@@ -2,29 +2,24 @@
 (function(){
   if(window.__troothHomeResilienceV1)return;
   window.__troothHomeResilienceV1=true;
+  var settled=false;
   function setFallback(id,text){
     var el=document.getElementById(id);
     if(!el)return;
     var s=(el.textContent||'').trim().toLowerCase();
-    if(s==='loading...'||s.indexOf('loading your trooth feed')===0){
-      el.innerHTML='<div class="hubitem">'+text+'</div>';
-    }
+    if(s==='loading...'||s.indexOf('loading your trooth feed')===0) el.innerHTML='<div class="hubitem">'+text+'</div>';
   }
   function recover(){
-    setFallback('feed','No posts yet — be the first to share on Trooth.');
-    setFallback('newsHub','No news stories yet.');
-    setFallback('sportsHub','No sports stories yet.');
-    setFallback('storesHub','No marketplace listings yet.');
-    setFallback('propertyHub','No property listings yet.');
+    if(window.troothSupabase){settled=true;return;}
+    setFallback('feed','Trooth is reconnecting. Please refresh in a moment.');
+    setFallback('newsHub','News is temporarily unavailable.');
+    setFallback('sportsHub','Sports is temporarily unavailable.');
+    setFallback('storesHub','Marketplace is temporarily unavailable.');
+    setFallback('propertyHub','Property is temporarily unavailable.');
   }
-  window.setTimeout(recover,12000);
-  window.addEventListener('trooth-supabase-error',function(){
-    setTimeout(function(){
-      setFallback('feed','Trooth is reconnecting. Please refresh in a moment.');
-      setFallback('newsHub','News is temporarily unavailable.');
-      setFallback('sportsHub','Sports is temporarily unavailable.');
-      setFallback('storesHub','Marketplace is temporarily unavailable.');
-      setFallback('propertyHub','Property is temporarily unavailable.');
-    },500);
-  });
+  function clearLoadingIfReady(){if(window.troothSupabase){settled=true;return true;}return false;}
+  window.addEventListener('trooth-supabase-ready',clearLoadingIfReady);
+  window.addEventListener('trooth-supabase-client-ready',clearLoadingIfReady);
+  window.addEventListener('trooth-supabase-error',function(){setTimeout(recover,250);});
+  window.setTimeout(function(){if(!settled)recover();},7000);
 })();
