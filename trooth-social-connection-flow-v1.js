@@ -1,7 +1,7 @@
-// Trooth Social Independent — Friends + Profile + Chat connected flow v4
+// Trooth Social Independent — Friends + Profile + Chat connected flow v5
 (function(){
-  if(window.__troothSocialConnectionFlowV4)return;
-  window.__troothSocialConnectionFlowV4=true;
+  if(window.__troothSocialConnectionFlowV5)return;
+  window.__troothSocialConnectionFlowV5=true;
   function boot(){
     var path=(location.pathname||'').split('/').pop().toLowerCase(),qs=new URLSearchParams(location.search);
     function profile(id){if(id)location.href='auth.html?profile='+encodeURIComponent(id)}
@@ -17,7 +17,14 @@
     document.addEventListener('click',function(e){var el=e.target&&e.target.closest&&e.target.closest('[data-trooth-chat-user],[data-trooth-friend-user],[data-trooth-action="profile"]');if(!el||!route(el))return;e.preventDefault()},true);
     if(path==='friends.html'&&qs.get('chat')){
       var id=qs.get('chat');
-      setTimeout(function(){try{if(typeof window.selectFriend==='function')window.selectFriend(id);var tabs=document.querySelectorAll('.tab');if(tabs[4]&&typeof window.showTab==='function')window.showTab('chat',tabs[4])}catch(e){}},350);
+      function open(){
+        try{
+          if(typeof window.selectFriend==='function')window.selectFriend(id);
+          var tab=document.querySelector('.tab[onclick*="showTab(\'chat\'"]')||Array.from(document.querySelectorAll('.tab')).find(function(x){return /chat/i.test(x.textContent||'')});
+          if(tab&&typeof window.showTab==='function')window.showTab('chat',tab);
+        }catch(e){}
+      }
+      setTimeout(open,350);setTimeout(open,1000);
     }
     window.TroothSocialFlow={openChat:chat,openFriendsChat:friends,openProfile:profile};
   }
