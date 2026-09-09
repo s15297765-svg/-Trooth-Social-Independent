@@ -1,0 +1,29 @@
+name: Trooth temporary email auth patch
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add email auth bridge to auth page
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('auth.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="trooth-email-auth-v1.js"></script>'
+          if tag not in s:
+              s=s.replace('</body>',tag+'</body>')
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit patched auth page
+        run: |
+          git config user.name 'Trooth Bot'
+          git config user.email 'actions@github.com'
+          git add auth.html
+          git diff --cached --quiet || git commit -m 'Enable temporary email auth on Trooth profile'
+          git push
