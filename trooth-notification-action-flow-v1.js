@@ -1,11 +1,11 @@
-// Trooth Social Independent — notification action routing v5
+// Trooth Social Independent — notification action routing v6
 (function(){
-  if(window.__troothNotificationActionFlowV5)return;
-  window.__troothNotificationActionFlowV5=true;
+  if(window.__troothNotificationActionFlowV6)return;
+  window.__troothNotificationActionFlowV6=true;
   function boot(){
     function route(action,id){
       if(!action||!id)return false;
-      var map={chat:'chat.html?user=',friend:'friends.html?chat=',profile:'profile.html?user=',post:'index.html?post=',group:'group.html?id=',business:'business.html?id='};
+      var map={chat:'chat.html?user=',friend:'friends.html?chat=',profile:'auth.html?profile=',post:'index.html?post=',group:'group.html?id=',business:'business.html?id='};
       if(!map[action])return false;
       location.href=map[action]+encodeURIComponent(id);return true;
     }
