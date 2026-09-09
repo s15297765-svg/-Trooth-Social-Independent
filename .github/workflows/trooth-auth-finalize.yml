@@ -1,0 +1,41 @@
+name: Trooth Auth Finalize
+on:
+  push:
+    paths:
+      - '.github/workflows/trooth-auth-finalize.yml'
+permissions:
+  contents: write
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove temporary OTP signup redirect
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('auth.html')
+          s=p.read_text(encoding='utf-8')
+          old='نیا پروفائل بنانے کے لیے فون نمبر اور پاس ورڈ درج کریں۔ نئے اکاؤنٹ کی تصدیق SMS OTP سے ہوگی۔'
+          new='نیا پروفائل بنانے کے لیے فون نمبر اور پاس ورڈ درج کریں۔'
+          if old in s:
+              s=s.replace(old,new,1)
+          old2="if(r.data.user&&!r.data.session){sessionStorage.setItem('trooth_pending_phone',tel);sessionStorage.setItem('trooth_pending_name',name);location.href='phone-verify.html';return}"
+          new2="if(r.data.user&&!r.data.session){setStatus('اکاؤنٹ بنا ہے، لیکن Supabase Phone Confirmation ابھی فعال ہے۔ اسے OFF کرنے کے بعد دوبارہ کوشش کریں۔');return}"
+          if old2 not in s:
+              raise SystemExit('Expected signup OTP redirect was not found; no change made.')
+          s=s.replace(old2,new2,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit auth cleanup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add auth.html
+          git commit -m 'fix: use phone and password signup without OTP redirect'
+          git push
+      - name: Remove temporary workflow
+        run: |
+          git rm .github/workflows/trooth-auth-finalize.yml
+          git commit -m 'chore: remove temporary auth finalize workflow'
+          git push
