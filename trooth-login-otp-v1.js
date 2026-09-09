@@ -1,14 +1,17 @@
-// Trooth login OTP bridge — keeps signup unchanged and switches Login to SMS OTP.
+// Trooth Social Independent — owner-only SMS OTP login
 (function(){
-  if(window.__troothLoginOtpV1)return;
-  window.__troothLoginOtpV1=true;
+  if(window.__troothLoginOtpV2)return;
+  window.__troothLoginOtpV2=true;
+  var OWNER_PHONE='+923442726322';
   function phone(){return (document.getElementById('phone')?.value||'').trim()}
   function status(t){const e=document.getElementById('authMsg');if(e)e.textContent=t}
   function valid(v){return /^\+[1-9]\d{7,14}$/.test(v)}
+  function isOwner(){return phone()===OWNER_PHONE}
   async function sendLoginOtp(){
     const sb=window.troothSupabase,tel=phone();
+    if(!isOwner())return status('عام users کے لیے Login پاس ورڈ سے ہوگا۔');
     if(!sb)return status('Trooth connection ابھی تیار نہیں۔ دوبارہ کوشش کریں۔');
-    if(!valid(tel))return status('براہِ کرم درست فون نمبر دیں، مثال: +923001234567');
+    if(!valid(tel))return status('براہِ کرم درست فون نمبر دیں۔');
     const b=document.getElementById('loginBtn');if(b)b.disabled=true;
     status('OTP بھیجا جا رہا ہے…');
     try{
@@ -21,23 +24,38 @@
       setTimeout(()=>location.href='phone-verify.html',350);
     }catch(e){status(e?.message||'OTP نہیں بھیجا جا سکا۔');if(b)b.disabled=false}
   }
-  window.sendLoginOtp=sendLoginOtp;
-  function patch(){
+  function restoreNormal(){
+    const pass=document.getElementById('password');
+    const btn=document.getElementById('loginBtn');
+    if(pass)pass.style.display='block';
+    if(btn){btn.textContent='Login';btn.onclick=window.login}
+    const p=document.getElementById('authMsg');
+    if(p)p.textContent='فون نمبر اور پاس ورڈ سے Login کریں۔';
+  }
+  function apply(){
     if(typeof window.showLogin!=='function')return false;
-    if(window.__troothLoginOtpPatched)return true;
     const original=window.showLogin;
-    window.showLogin=function(){
+    if(original.__troothOwnerOtpWrapped)return true;
+    const wrapped=function(){
       original();
       const pass=document.getElementById('password');
-      if(pass){pass.style.display='none';pass.value='';}
       const btn=document.getElementById('loginBtn');
-      if(btn){btn.textContent='📱 Send OTP';btn.onclick=sendLoginOtp}
-      const p=document.querySelector('#authMsg');
-      if(p)p.textContent='Login کے لیے فون نمبر دیں؛ ہم SMS OTP بھیجیں گے۔';
+      const input=document.getElementById('phone');
+      if(!input)return;
+      function sync(){
+        if(isOwner()){
+          if(pass)pass.style.display='none';
+          if(btn){btn.textContent='📱 Send OTP';btn.onclick=sendLoginOtp}
+          status('Owner Login: SMS OTP استعمال کریں۔');
+        }else restoreNormal();
+      }
+      input.addEventListener('input',sync);
+      sync();
     };
-    window.__troothLoginOtpPatched=true;
+    wrapped.__troothOwnerOtpWrapped=true;
+    window.showLogin=wrapped;
     return true;
   }
-  const timer=setInterval(()=>{if(patch())clearInterval(timer)},100);
+  const timer=setInterval(()=>{if(apply())clearInterval(timer)},100);
   setTimeout(()=>clearInterval(timer),15000);
 })();
