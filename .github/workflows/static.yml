@@ -52,6 +52,10 @@ jobs:
               h = re.sub(r'<script[^>]+trooth-profile-bridge-v[12]\\.js[^>]*></script>', '', h, flags=re.I)
               tag = '<script src="trooth-profile-bridge-v2.js?v=${{ github.sha }}"></script>'
               h = h.replace('</body>', tag + '</body>', 1)
+              if name == 'auth.html':
+                  email_tag = '<script src="trooth-email-auth-v1.js?v=${{ github.sha }}"></script>'
+                  h = re.sub(r'<script[^>]+trooth-email-auth-v1\\.js[^>]*></script>', '', h, flags=re.I)
+                  h = h.replace('</body>', email_tag + '</body>', 1)
               p.write_text(h, encoding='utf-8')
           PY
       - name: Upload artifact
