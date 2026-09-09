@@ -1,9 +1,10 @@
-// Trooth Social Independent — post deep-link v1
+// Trooth Social Independent — post deep-link v2
 (function(){
-  if(window.__troothPostDeepLinkV1)return;
-  window.__troothPostDeepLinkV1=true;
+  if(window.__troothPostDeepLinkV2)return;
+  window.__troothPostDeepLinkV2=true;
   function boot(){
     var qs=new URLSearchParams(location.search),postId=qs.get('post');
+    if(!postId){var h=location.hash||'',m=h.match(/^#post-(.+)$/);if(m)postId=decodeURIComponent(m[1]);}
     if(!postId)return;
     function findPost(){
       var nodes=document.querySelectorAll('[data-post],[data-post-id],[data-postId]');
@@ -25,7 +26,7 @@
       return true;
     }
     var tries=0;
-    function wait(){tries++;if(reveal()||tries>=24)return;setTimeout(wait,300)}
+    function wait(){tries++;if(reveal()||tries>=30)return;setTimeout(wait,300)}
     wait();
     window.TroothPostDeepLink={open:function(id){if(id)location.href='index.html?post='+encodeURIComponent(id)}};
   }
