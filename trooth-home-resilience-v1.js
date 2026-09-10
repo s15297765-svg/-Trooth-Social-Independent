@@ -1,12 +1,16 @@
-// Trooth Home Resilience v3 — never leave Home hubs/feed stuck on Loading.
+// Trooth Home Resilience v4 — never leave Home hubs/feed stuck on Loading.
 (function(){
-  if(window.__troothHomeResilienceV3)return;
-  window.__troothHomeResilienceV3=true;
+  if(window.__troothHomeResilienceV4)return;
+  window.__troothHomeResilienceV4=true;
   function fallback(id,html){
     var el=document.getElementById(id);
-    if(!el)return;
+    if(!el)return false;
     var s=(el.textContent||'').trim().toLowerCase();
-    if(s==='loading...'||s.indexOf('loading your trooth feed')===0||s==='') el.innerHTML=html;
+    if(s==='loading...'||s.indexOf('loading your trooth feed')===0||s===''){
+      el.innerHTML=html;
+      return true;
+    }
+    return false;
   }
   function recover(){
     fallback('feed','<div class="card empty">Trooth feed is ready. Login to publish and see your posts. 👋<br><a class="tag" href="auth.html" style="margin-top:10px">Profile / Login</a></div>');
@@ -18,6 +22,14 @@
     fallback('filmFashionHub','<a class="hubitem" href="film-fashion.html"><span class="tag">STORY SPACE</span><h3>🎬 Film & Fashion</h3><p>One shared story space for film, fashion and trends.</p></a>');
     fallback('groupsHub','<a class="hubitem" href="groups.html"><span class="tag">COMMUNITY</span><h3>👨‍👩‍👧 Trooth Groups</h3><p>Create, discover and join Trooth communities.</p></a>');
   }
-  window.addEventListener('trooth-supabase-error',function(){setTimeout(recover,250);});
-  window.setTimeout(recover,8000);
+  function boot(){
+    recover();
+    var tries=0;
+    var timer=setInterval(function(){
+      recover();
+      if(++tries>=10)clearInterval(timer);
+    },1000);
+  }
+  window.addEventListener('trooth-supabase-error',function(){recover();setTimeout(boot,250);});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
