@@ -1,0 +1,32 @@
+name: Trooth auth syntax fix
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix auth.html without replacing the page
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('auth.html')
+          s = p.read_text(encoding='utf-8')
+          old = "</div>\"}function validPhone"
+          new = "</div>'}function validPhone"
+          if old not in s:
+              raise SystemExit('Expected auth.html syntax marker was not found')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+      - name: Commit auth fix and remove this workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add auth.html .github/workflows/trooth-auth-syntax-fix.yml
+          git commit -m 'fix: repair auth page syntax'
+          git rm .github/workflows/trooth-auth-syntax-fix.yml
+          git commit -m 'chore: remove temporary auth syntax fix workflow'
+          git push
