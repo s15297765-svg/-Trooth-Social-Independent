@@ -1,7 +1,7 @@
-// Trooth Home Resilience v4 — never leave Home hubs/feed stuck on Loading.
+// Trooth Home Resilience v5 — polished Home fallbacks without hiding real content.
 (function(){
-  if(window.__troothHomeResilienceV4)return;
-  window.__troothHomeResilienceV4=true;
+  if(window.__troothHomeResilienceV5)return;
+  window.__troothHomeResilienceV5=true;
   function fallback(id,html){
     var el=document.getElementById(id);
     if(!el)return false;
@@ -13,7 +13,7 @@
     return false;
   }
   function recover(){
-    fallback('feed','<div class="card empty">Trooth feed is ready. Login to publish and see your posts. 👋<br><a class="tag" href="auth.html" style="margin-top:10px">Profile / Login</a></div>');
+    fallback('feed','<div class="card empty">Trooth Feed is ready. Login to publish and see your posts. 👋<br><a class="tag" href="auth.html" style="margin-top:10px">Profile / Login</a></div>');
     fallback('newsHub','<a class="hubitem" href="news.html"><span class="tag">NEWS</span><h3>📰 National & International</h3><p>Open the live News Center to read and publish stories.</p></a>');
     fallback('sportsHub','<a class="hubitem" href="sports.html"><span class="tag">SPORTS</span><h3>🏆 Sports News</h3><p>Open Trooth Sports for sports stories and updates.</p></a>');
     fallback('storesHub','<a class="hubitem" href="stores.html"><span class="tag">MARKETPLACE</span><h3>🛍️ Global Stores</h3><p>Explore the Trooth marketplace and international shopping space.</p></a>');
@@ -27,9 +27,10 @@
     var tries=0;
     var timer=setInterval(function(){
       recover();
-      if(++tries>=10)clearInterval(timer);
+      if(++tries>=12)clearInterval(timer);
     },1000);
   }
   window.addEventListener('trooth-supabase-error',function(){recover();setTimeout(boot,250);});
+  window.addEventListener('trooth-final-ready',recover);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
