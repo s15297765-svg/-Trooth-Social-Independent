@@ -30,10 +30,9 @@ jobs:
         run: |
           set -e
           mkdir -p android/app/src/main/java/com/trooth/social
-          mkdir -p android/app/src/main/assets
+          mkdir -p android/app/src/main/assets/site
           mkdir -p android/app/src/main/res/values
-          cp -r . android/app/src/main/assets/site
-          rm -rf android/app/src/main/assets/site/android android/app/src/main/assets/site/.git
+          git archive HEAD | tar -x -C android/app/src/main/assets/site
           cat > android/settings.gradle <<'EOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
