@@ -1,35 +1,10 @@
-// Trooth Social Independent — profile access polish v1
+// Trooth Social Independent — profile access + editor save polish v2
 (function(){
-  if(window.__troothProfileAccessPolishV1)return;window.__troothProfileAccessPolishV1=true;
-  function boot(){
-    var sb=window.troothSupabase;if(!sb)return;
-    function style(){
-      if(document.getElementById('trooth-profile-access-polish-v1'))return;
-      var s=document.createElement('style');s.id='trooth-profile-access-polish-v1';s.textContent=`
-        body.trooth-reference-home .profile-access-card{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
-        body.trooth-reference-home .profile-access-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(30,105,66,.08);background:#f5fcf7}
-        body.trooth-reference-home .profile-access-card:focus-visible{outline:3px solid #b9e9ca;outline-offset:2px}
-        @media(max-width:600px){
-          body:has(#actions) #actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-          body:has(#actions) #actions .btn{min-height:44px;width:100%;padding:10px 8px}
-          body:has(#editor) .body{padding-bottom:16px}
-        }
-      `;document.head.appendChild(s);
-    }
-    function wire(){
-      var mini=document.querySelector('.menu .mini');
-      var navs=document.querySelectorAll('.menu .nav');
-      var profileNav=null;
-      Array.prototype.forEach.call(navs,function(a){if((a.getAttribute('href')||'')==='auth.html')profileNav=a});
-      if(mini){mini.classList.add('profile-access-card');mini.setAttribute('role','link');mini.setAttribute('tabindex','0');mini.onclick=function(){location.href='auth.html'};mini.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();location.href='auth.html'}}}
-      sb.auth.getUser().then(function(r){
-        var logged=!!(r&&r.data&&r.data.user);
-        if(profileNav)profileNav.textContent=logged?'👤 My Profile':'👤 Profile / Login';
-      }).catch(function(){if(profileNav)profileNav.textContent='👤 Profile / Login'});
-    }
-    style();wire();
-    window.addEventListener('trooth-auth-changed',wire);
-    window.addEventListener('trooth-profile-identity-synced',wire);
-  }
-  if(window.troothSupabase)boot();else window.addEventListener('trooth-supabase-ready',boot,{once:true});
+  if(window.__troothProfileAccessPolishV2)return;window.__troothProfileAccessPolishV2=true;
+  function style(){if(document.getElementById('trooth-profile-access-polish-v2'))return;var s=document.createElement('style');s.id='trooth-profile-access-polish-v2';s.textContent='.trooth-profile-save{margin-top:10px;padding:12px;border:1px solid #d8e9de;border-radius:12px;background:#f7fbf8}.trooth-profile-save .row{display:flex;gap:8px;flex-wrap:wrap}.trooth-profile-save button,.trooth-profile-save label{border:0;border-radius:10px;padding:10px 13px;font-weight:800;cursor:pointer}.trooth-profile-save button{background:#40916c;color:#fff}.trooth-profile-save label{background:#d8f3dc;color:#2d6a4f}.trooth-profile-save input{display:none}.trooth-profile-save small{display:block;margin-top:7px;color:#718276}';document.head.appendChild(s)}
+  function dataUrl(file){return new Promise(function(resolve,reject){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas'),m=Math.min(512/Math.max(im.width,im.height),1);c.width=Math.max(1,Math.round(im.width*m));c.height=Math.max(1,Math.round(im.height*m));c.getContext('2d').drawImage(im,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.82))};im.onerror=reject;im.src=r.result};r.onerror=reject;r.readAsDataURL(file)})}
+  async function saveProfile(){var sb=window.troothSupabase;if(!sb)return;var r=await sb.auth.getUser(),u=r.data&&r.data.user;if(!u)return;var name=(document.getElementById('editName')?.value||'').trim(),bio=(document.getElementById('editBio')?.value||'').trim(),file=document.getElementById('troothProfilePhoto')?.files?.[0],msg=document.getElementById('troothProfileSaveMsg'),btn=document.getElementById('troothProfileSaveBtn');if(!name){if(msg)msg.textContent='نام درج کریں۔';return}if(btn)btn.disabled=true;if(msg)msg.textContent='محفوظ ہو رہا ہے…';try{var patch={display_name:name,bio:bio};if(file)patch.avatar_url=await dataUrl(file);var q=await sb.from('profiles').update(patch).eq('id',u.id);if(q.error)throw q.error;if(window.profile)Object.assign(window.profile,patch);if(typeof window.init==='function')await window.init();if(msg)msg.textContent='پروفائل کامیابی سے محفوظ ہوگیا۔';}catch(e){if(msg)msg.textContent=e?.message||'پروفائل محفوظ نہیں ہو سکا۔'}finally{if(btn)btn.disabled=false}}
+  function enhance(){var edit=document.getElementById('edit');if(!edit||!edit.innerHTML||edit.querySelector('.trooth-profile-save'))return;var box=document.createElement('div');box.className='trooth-profile-save';box.innerHTML='<div class="row"><label>📷 Profile Picture<input id="troothProfilePhoto" type="file" accept="image/*"></label><button type="button" id="troothProfileSaveBtn">💾 Save Profile</button></div><small>نام اور Short Bio اوپر درج کریں۔ فون نمبر اکاؤنٹ کے ساتھ محفوظ ہے۔ پاس ورڈ سیکیورٹی کے لیے یہاں دکھایا نہیں جاتا۔</small><small id="troothProfileSaveMsg"></small>';edit.appendChild(box);document.getElementById('troothProfileSaveBtn').onclick=saveProfile}
+  function boot(){style();var mini=document.querySelector('.menu .mini'),navs=document.querySelectorAll('.menu .nav'),profileNav=null;Array.prototype.forEach.call(navs,function(a){if((a.getAttribute('href')||'')==='auth.html')profileNav=a});if(mini){mini.classList.add('profile-access-card');mini.onclick=function(){location.href='auth.html'}};if(window.troothSupabase)window.troothSupabase.auth.getUser().then(function(r){if(profileNav)profileNav.textContent=r?.data?.user?'👤 My Profile':'👤 Profile / Login'}).catch(function(){});enhance();var app=document.getElementById('app');if(app){new MutationObserver(function(){enhance()}).observe(app,{childList:true,subtree:true})}}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();window.addEventListener('trooth-supabase-ready',boot);window.addEventListener('trooth-auth-changed',boot);
 })();
