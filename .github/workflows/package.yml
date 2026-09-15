@@ -33,6 +33,8 @@ jobs:
           mkdir -p android/app/src/main/assets/site
           mkdir -p android/app/src/main/res/values
           git archive HEAD | tar -x -C android/app/src/main/assets/site
+          sed -i 's/Welcome back to your Trooth 👋/Trooth Social Independent/g' android/app/src/main/assets/site/index.html
+          sed -i 's/A more human place to connect, share, discover and build your network\.//g' android/app/src/main/assets/site/index.html
           cat > android/settings.gradle <<'EOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
