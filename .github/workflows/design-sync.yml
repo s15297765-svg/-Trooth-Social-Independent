@@ -1,0 +1,55 @@
+name: Trooth SI design sync
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sync-design:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Apply strong green theme and dashboard navigation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          replacements={
+            '#69c79a':'#16a34a','#27845b':'#15803d','#145238':'#166534',
+            '#e3f8eb':'#dcfce7','#f4faf6':'#f4fbf6','#173b29':'#102d1b',
+            '#718276':'#66786c','#e3eee7':'#dcebe1','#d9f7e4':'#dcfce7',
+            '#e9f8ef':'#ecfdf3','#dff7e8':'#dcfce7','#24734f':'#166534',
+            '#3b9a70':'#16a34a','#2d6a4f':'#15803d','#31684d':'#166534',
+            '#19583b':'#14532d','#8de0b2':'#22c55e','#c9ead6':'#bbf7d0',
+            '#a9dcc0':'#86efac','#d7ebdf':'#bbf7d0','#eff9f3':'#f0fdf4',
+            '#d9eee1':'#d1fae5','#f5faf7':'#f0fdf4','#f6fbf8':'#f0fdf4',
+            'rgba(105,199,154,.94)':'rgba(22,163,74,.96)',
+            'rgba(39,132,91,.18)':'rgba(21,128,61,.18)',
+            'rgba(39,132,91,.15)':'rgba(21,128,61,.15)',
+          }
+          for a,b in replacements.items(): s=s.replace(a,b)
+          marker='trooth-dashboard-header-v1'
+          if marker not in s:
+            needle='<button class="circle" onclick="location.href=\'notifications-messages.html\'" title="Messages">💬</button>'
+            if needle in s:
+              s=s.replace(needle, needle+'<button class="circle" id="trooth-dashboard-header-v1" title="Professional Dashboard" aria-label="Professional Dashboard" onclick="location.href=\'dashboard.html\'">📊</button><!-- '+marker+' -->')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit design sync if changed
+        shell: bash
+        run: |
+          git config user.name 'Trooth SI Design Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git diff --quiet; then
+            echo 'No design changes needed.'
+            exit 0
+          fi
+          git add index.html
+          git commit -m 'Update Trooth home to strong green and dashboard navigation'
+          git push
