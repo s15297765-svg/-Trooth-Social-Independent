@@ -29,9 +29,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          mkdir -p android/app/src/main/java/com/trooth/si
-          mkdir -p android/app/src/main/assets/site
-          mkdir -p android/app/src/main/res/values
+          mkdir -p android/app/src/main/java/com/trooth/si android/app/src/main/assets/site android/app/src/main/res/values
           git archive HEAD | tar -x -C android/app/src/main/assets/site
           sed -i 's/Welcome back to your Trooth 👋/Trooth Social Independent/g' android/app/src/main/assets/site/index.html
           sed -i 's/A more human place to connect, share, discover and build your network\.//g' android/app/src/main/assets/site/index.html
@@ -59,65 +57,20 @@ jobs:
           }
           EOF
           cat > android/app/src/main/res/values/styles.xml <<'EOF'
-          <resources>
-            <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
-              <item name="android:fontFamily">sans</item>
-              <item name="android:colorAccent">#27845B</item>
-              <item name="android:statusBarColor">#69C79A</item>
-              <item name="android:navigationBarColor">#FFFFFF</item>
-              <item name="android:windowLightStatusBar">true</item>
-            </style>
-          </resources>
+          <resources><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#27845B</item><item name="android:statusBarColor">#69C79A</item><item name="android:navigationBarColor">#FFFFFF</item><item name="android:windowLightStatusBar">true</item></style></resources>
           EOF
           cat > android/app/src/main/AndroidManifest.xml <<'EOF'
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-            <uses-permission android:name="android.permission.INTERNET" />
-            <application android:theme="@style/AppTheme" android:label="Trooth Social Independent" android:usesCleartextTraffic="true">
-              <activity android:name=".MainActivity" android:screenOrientation="portrait" android:exported="true">
-                <intent-filter>
-                  <action android:name="android.intent.action.MAIN" />
-                  <category android:name="android.intent.category.LAUNCHER" />
-                </intent-filter>
-              </activity>
-            </application>
-          </manifest>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android"><uses-permission android:name="android.permission.INTERNET"/><application android:theme="@style/AppTheme" android:label="Trooth Social Independent" android:usesCleartextTraffic="true"><activity android:name=".MainActivity" android:screenOrientation="portrait" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>
           EOF
           cat > android/app/src/main/java/com/trooth/si/MainActivity.java <<'EOF'
           package com.trooth.si;
-          import android.app.Activity;
-          import android.os.Bundle;
-          import android.webkit.WebSettings;
-          import android.webkit.WebView;
-          import android.webkit.WebViewClient;
-          public class MainActivity extends Activity {
-            private WebView webView;
-            @Override public void onCreate(Bundle state) {
-              super.onCreate(state);
-              webView = new WebView(this);
-              WebSettings s = webView.getSettings();
-              s.setJavaScriptEnabled(true);
-              s.setDomStorageEnabled(true);
-              s.setDatabaseEnabled(true);
-              s.setAllowFileAccess(true);
-              s.setAllowContentAccess(true);
-              webView.setWebViewClient(new WebViewClient());
-              webView.loadUrl("file:///android_asset/site/index.html");
-              setContentView(webView);
-            }
-            @Override public void onBackPressed() {
-              if (webView != null && webView.canGoBack()) webView.goBack(); else super.onBackPressed();
-            }
-          }
+          import android.app.Activity; import android.os.Bundle; import android.webkit.WebSettings; import android.webkit.WebView; import android.webkit.WebViewClient;
+          public class MainActivity extends Activity { private WebView webView; @Override public void onCreate(Bundle state){ super.onCreate(state); webView=new WebView(this); WebSettings s=webView.getSettings(); s.setJavaScriptEnabled(true); s.setDomStorageEnabled(true); s.setDatabaseEnabled(true); s.setAllowFileAccess(true); s.setAllowContentAccess(true); webView.setWebViewClient(new WebViewClient()); webView.loadUrl("file:///android_asset/site/index.html"); setContentView(webView);} @Override public void onBackPressed(){ if(webView!=null&&webView.canGoBack()) webView.goBack(); else super.onBackPressed(); } }
           EOF
-
       - name: Build debug APK
-        run: |
-          cd android
-          gradle clean assembleDebug --no-daemon
-
+        run: cd android && gradle clean assembleDebug --no-daemon
       - name: Verify APK
         run: test -s android/app/build/outputs/apk/debug/app-debug.apk
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
