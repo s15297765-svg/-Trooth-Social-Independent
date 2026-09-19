@@ -22,13 +22,13 @@
         document.querySelectorAll('[data-trooth-auth-only]').forEach(e=>e.hidden=!user);
         document.querySelectorAll('[data-trooth-guest-only]').forEach(e=>e.hidden=!!user);
         if(user){
-          const {data:p,error}=await sb.from('profiles').select('id,display_name,bio,avatar_url,cover_url,is_public').eq('id',user.id).maybeSingle();
+          const {data:p,error}=await sb.from('profiles').select('id,display_name,bio,avatar_url,cover_url,is_public,updated_at').eq('id',user.id).maybeSingle();
           if(stopped)return;
           if(error)console.warn('Trooth profile sync:',error);
           window.troothCurrentProfile=p||null;
           if(p){
             document.querySelectorAll('[data-trooth-display-name]').forEach(e=>e.textContent=p.display_name||user.email||'Trooth User');
-            document.querySelectorAll('[data-trooth-avatar]').forEach(e=>{if(p.avatar_url)e.src=p.avatar_url});
+            document.querySelectorAll('[data-trooth-avatar]').forEach(e=>{if(p.avatar_url){const raw=p.avatar_url;const src=raw+(raw.includes('?')?'&':'?')+'v='+encodeURIComponent(p.updated_at||Date.now());if(e.tagName==='IMG'){e.src=src;e.onerror=()=>{e.removeAttribute('src')}}else e.style.backgroundImage='url("'+src.replace(/"/g,'')+'")'}});
           }
         }else window.troothCurrentProfile=null;
         ready();
