@@ -15,4 +15,4 @@ window.addEventListener("trooth-profile-live-refresh",async e=>{
   if(a){if(raw){a.innerHTML="";const img=document.createElement("img");img.src=raw+(raw.includes("?")?"&":"?")+"v="+encodeURIComponent(p.data.updated_at||Date.now());img.alt=n+" profile photo";img.style.cssText="width:100%;height:100%;object-fit:cover;border-radius:50%";img.onerror=()=>{a.textContent=n[0]?.toUpperCase()||"T"};a.appendChild(img)}else a.textContent=n[0]?.toUpperCase()||"T"}
  }catch(err){console.warn("Trooth dashboard live profile refresh failed",err)}
 });
-</script><script src="trooth-profile-live-sync.js"></script></body></html>
+</script><script src="trooth-profile-live-sync.js"></script><script src="trooth-globe-logo-v1.js"></script></body></html>
