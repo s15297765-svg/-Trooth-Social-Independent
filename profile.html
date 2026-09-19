@@ -12,4 +12,4 @@
     if(cv){cv.dataset.bound='1';cv.style.backgroundImage=cv.style.backgroundImage;cv.addEventListener('error',function(){cv.style.backgroundImage='none';cv.classList.add('media-fallback');cv.textContent='Cover photo'})}
   };
 })();
-</script><script>var _troothRenderProfile=window.renderProfile;window.renderProfile=window.renderProfile||function(){};</script><script src="trooth-profile-live-sync.js"></script><script src="trooth-globe-logo-v1.js"></script></body></html>
+</script><script>var _troothRenderProfile=window.renderProfile;window.addEventListener('trooth-profile-updated',function(e){window.profile=e.detail?.profile||window.profile;if(window.troothBindProfileMedia)window.troothBindProfileMedia()});setTimeout(function(){if(window.troothBindProfileMedia)window.troothBindProfileMedia()},500);</script><script src="trooth-profile-live-sync.js"></script><script src="trooth-globe-logo-v1.js"></script></body></html>
