@@ -1,7 +1,7 @@
 // Trooth Vision v6 — safe premium interaction layer; preserves existing modules.
 (function(){
-  if(window.__troothVisionV6)return;
-  window.__troothVisionV6=true;
+  if(window.__troothVisionV6Layer)return;
+  window.__troothVisionV6Layer=true;
   function addLiveBadge(){
     if(document.getElementById('troothLiveBadge'))return;
     var b=document.createElement('div'); b.id='troothLiveBadge'; b.textContent='● LIVE';
