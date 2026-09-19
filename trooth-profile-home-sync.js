@@ -20,8 +20,8 @@
       document.querySelectorAll('#sideName,#profileName').forEach(function(e){e.textContent=name;});
       document.querySelectorAll('#sideAvatar,#profileAvatar,#composerAvatar').forEach(function(e){
         if(!avatar) return;
-        if(e.tagName==='IMG') e.src=avatar;
-        else e.innerHTML='<img src="'+String(avatar).replace(/"/g,'&quot;')+'" style="width:100%;height:100%;object-fit:cover">';
+        if(e.tagName==='IMG') e.src=freshAvatar;
+        else e.innerHTML='<img src="'+String(freshAvatar).replace(/"/g,'&quot;')+'" style="width:100%;height:100%;object-fit:cover">';
       });
     }
 
