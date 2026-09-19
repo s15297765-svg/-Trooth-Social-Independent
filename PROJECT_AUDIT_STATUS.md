@@ -2,10 +2,10 @@
 
 ## Web app
 - Main public entry: `index.html`
-- Home Feed: `feed.html`
+- Home route: `index.html` (the legacy `feed.html` route now forwards to the main Home)
 - Current Home UI includes social feed, Stories, post composer, photo/video posting, comments, likes, sharing, profile/login, Friends, Groups, Business, News, Sports, Stores, Property, and Film & Fashion.
 - Current home design uses the saved strong-green professional theme and responsive mobile navigation.
-- Latest Home Feed design commit: `5092cf3667c15392874c588724bab45ddd50b66e`.
+- Main Home is the single primary feed experience; navigation is kept on `index.html`.
 
 ## Deployment
 - GitHub Pages deployment workflow: `.github/workflows/static.yml`
