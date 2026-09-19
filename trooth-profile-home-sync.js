@@ -9,12 +9,14 @@
       document.querySelectorAll('[data-trooth-display-name]').forEach(function(e){ if(p.display_name) e.textContent=p.display_name; });
       document.querySelectorAll('[data-trooth-avatar]').forEach(function(e){
         if(p.avatar_url){
-          if(e.tagName==='IMG') e.src=p.avatar_url;
+          var freshAvatar=String(p.avatar_url)+(String(p.avatar_url).indexOf('?')>=0?'&':'?')+'v='+encodeURIComponent(p.updated_at||Date.now());
+          if(e.tagName==='IMG') e.src=freshAvatar;
           else e.style.backgroundImage='url("'+String(p.avatar_url).replace(/"/g,'')+'")';
         }
       });
       var name=p.display_name||'Trooth Member';
       var avatar=p.avatar_url;
+      var freshAvatar=avatar ? String(avatar)+(String(avatar).indexOf('?')>=0?'&':'?')+'v='+encodeURIComponent(p.updated_at||Date.now()) : '';
       document.querySelectorAll('#sideName,#profileName').forEach(function(e){e.textContent=name;});
       document.querySelectorAll('#sideAvatar,#profileAvatar,#composerAvatar').forEach(function(e){
         if(!avatar) return;
