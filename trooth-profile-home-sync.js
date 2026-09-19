@@ -11,7 +11,7 @@
         if(p.avatar_url){
           var freshAvatar=String(p.avatar_url)+(String(p.avatar_url).indexOf('?')>=0?'&':'?')+'v='+encodeURIComponent(p.updated_at||Date.now());
           if(e.tagName==='IMG') e.src=freshAvatar;
-          else e.style.backgroundImage='url("'+String(p.avatar_url).replace(/"/g,'')+'")';
+          else e.style.backgroundImage='url("'+String(freshAvatar).replace(/"/g,'')+'")';
         }
       });
       var name=p.display_name||'Trooth Member';
