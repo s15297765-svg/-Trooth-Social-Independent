@@ -18,9 +18,9 @@ h2{margin:0 0 8px}.muted{color:#718276}input{width:100%;padding:13px;border:1px 
 <div class="brand"><h1>Trooth</h1><p>Social Independent • Connect • Build • Grow</p></div>
 <section class="card">
 <h2>Welcome to Trooth 👋</h2>
-<p class="muted">اپنا نام، ای میل اور پاس ورڈ استعمال کریں۔</p>
+<p class="muted">اپنا نام، ای میل یا موبائل نمبر اور پاس ورڈ استعمال کریں۔</p>
 <input id="displayName" placeholder="Your name (for new account)" autocomplete="name">
-<input id="email" type="email" inputmode="email" autocomplete="email" placeholder="Email address">
+<input id="identifier" type="text" inputmode="email" autocomplete="username" placeholder="Email or mobile number">
 <input id="password" type="password" autocomplete="current-password" placeholder="Password (6+ characters)">
 <div class="actions">
 <button class="btn" id="loginBtn" onclick="login()">Login</button>
@@ -37,6 +37,10 @@ let sb=null;
 const $=id=>document.getElementById(id);
 function msg(t){$('authMsg').textContent=t||''}
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
+function isEmail(v){return validEmail(v)}
+function phoneValue(v){let p=String(v||'').trim().replace(/[\s()-]/g,'');if(/^00\d{8,15}$/.test(p))p='+'+p.slice(2);return p}
+function isPhone(v){const p=phoneValue(v);return /^\+?[1-9]\d{7,14}$/.test(p)}
+function identifier(v){return isEmail(v)?{email:v.trim().toLowerCase()}:isPhone(v)?{phone:phoneValue(v)}:null}
 function busy(id,on){const b=$(id);if(b)b.disabled=on}
 async function ready(){
  if(window.troothSupabase)return window.troothSupabase;
@@ -50,19 +54,19 @@ async function ready(){
 }
 async function start(){try{sb=await ready();const r=await sb.auth.getUser();if(r.data?.user)location.href='profile.html';}catch(e){msg(e.message)}}
 async function login(){
- const email=$('email').value.trim().toLowerCase(),pass=$('password').value;
- if(!validEmail(email)||!pass){msg('براہِ کرم درست ای میل اور پاس ورڈ درج کریں۔');return}
+ const raw=$('identifier').value.trim(),pass=$('password').value,cred=identifier(raw);
+ if(!cred||!pass){msg('براہِ کرم درست ای میل/موبائل نمبر اور پاس ورڈ درج کریں۔');return}
  busy('loginBtn',true);msg('Login ہو رہا ہے…');
- try{const r=await sb.auth.signInWithPassword({email,password:pass});if(r.error)throw r.error;msg('Login کامیاب ✓');location.href='profile.html';}
+ try{const r=await sb.auth.signInWithPassword({...cred,password:pass});if(r.error)throw r.error;msg('Login کامیاب ✓');location.href='profile.html';}
  catch(e){msg(e?.message||'Login نہیں ہو سکا۔ اگر confirmation باقی ہے تو نیچے Resend confirmation email دبائیں۔')}
  finally{busy('loginBtn',false)}
 }
 async function signup(){
- const name=$('displayName').value.trim(),email=$('email').value.trim().toLowerCase(),pass=$('password').value;
- if(!name||!validEmail(email)||pass.length<6){msg('نام، درست ای میل اور کم از کم 6 حروف/اعداد کا پاس ورڈ دیں۔');return}
+ const name=$('displayName').value.trim(),raw=$('identifier').value.trim(),cred=identifier(raw),pass=$('password').value;
+ if(!name||!cred||pass.length<6){msg('نام، درست ای میل/موبائل نمبر اور کم از کم 6 حروف/اعداد کا پاس ورڈ دیں۔');return}
  busy('signupBtn',true);msg('Account بنایا جا رہا ہے…');
  try{
-  const r=await sb.auth.signUp({email,password:pass,options:{data:{display_name:name}}});
+  const r=await sb.auth.signUp({...cred,password:pass,options:{data:{display_name:name}}});
   if(r.error)throw r.error;
   if(r.data?.session){msg('Account تیار ہے ✓');location.href='profile.html';return}
   msg('Account بن گیا ہے۔ Confirmation email آئے تو اسے confirm کریں، پھر Login کریں۔');
@@ -70,10 +74,10 @@ async function signup(){
  finally{busy('signupBtn',false)}
 }
 async function resendConfirmation(){
- const email=$('email').value.trim().toLowerCase();
- if(!validEmail(email)){msg('پہلے اپنی درست ای میل درج کریں۔');return}
+ const raw=$('identifier').value.trim(),cred=identifier(raw);
+ if(!cred){msg('پہلے درست ای میل یا موبائل نمبر درج کریں۔');return}
  busy('resendBtn',true);msg('Confirmation email بھیجی جا رہی ہے…');
- try{const r=await sb.auth.resend({type:'signup',email});if(r.error)throw r.error;msg('Confirmation email دوبارہ بھیج دی گئی ہے۔ Inbox/Spam چیک کریں۔')}
+ try{const r=cred.email?await sb.auth.resend({type:'signup',email:cred.email}):await sb.auth.resend({type:'sms',phone:cred.phone});if(r.error)throw r.error;msg(cred.email?'Confirmation email دوبارہ بھیج دی گئی ہے۔ Inbox/Spam چیک کریں۔':'SMS confirmation دوبارہ بھیج دی گئی ہے۔')}
  catch(e){msg(e?.message||'Confirmation email نہیں بھیجی جا سکی۔')}
  finally{busy('resendBtn',false)}
 }
