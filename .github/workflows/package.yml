@@ -144,3 +144,5 @@ jobs:
           name: Trooth-Social-Independent-APK-v1.5
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+# Force a fresh Android build after the profile/photo cache-bust release.
