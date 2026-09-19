@@ -11,7 +11,24 @@
  .reference-nav .nav-row{padding:5px 8px;gap:5px}
  .reference-nav a{font-size:11px;padding:6px 10px}
 }
-.stories-card{padding-bottom:11px}.composer-card{padding-top:13px}.stories-card .section,.composer-card .section{margin-bottom:9px}.stories-card .story{box-shadow:0 1px 5px rgba(30,60,45,.08)}.composer-card .postbox{font-size:14px}.composer-card .tools{margin-top:10px}.stories-card .story.add b{font-size:11px;z-index:2}.feed-divider{display:flex;align-items:center;gap:8px;margin:2px 3px 9px;color:#718078;font-size:11px;font-weight:800}.feed-divider:before,.feed-divider:after{content:"";height:1px;background:#dfe8e2;flex:1}.hero-actions{display:flex;gap:8px;overflow:auto;margin-top:13px}.hero-actions a{white-space:nowrap;text-decoration:none;background:#fff;border:1px solid #cfe8d8;border-radius:18px;padding:8px 11px;color:#246143;font-size:11px;font-weight:850}.hero-actions a:hover{background:#dff4e7}@media(max-width:700px){.hero-actions a{font-size:11px;padding:7px 10px}}</style></head><body><header class="top"><div class="brand">Trooth<small>SOCIAL INDEPENDENT</small></div><input id="search" class="search" placeholder="Search people, posts & ideas..." oninput="filterPosts()"><div class="icons"><button class="ico" onclick="location.href='index.html'">⌂</button><span class="icoWrap"><button class="ico" onclick="location.href='notifications-messages.html'">🔔</button><span id="notifBadge" class="badgeCount" hidden>0</span></span><span class="icoWrap"><button class="ico" onclick="location.href='notifications-messages.html'">💬</button><span id="msgBadge" class="badgeCount" hidden>0</span></span><button class="ico" onclick="location.href='auth.html'">👤</button></div></header><nav class="reference-nav" aria-label="Trooth main navigation">
+.stories-card{padding-bottom:11px}.composer-card{padding-top:13px}.stories-card .section,.composer-card .section{margin-bottom:9px}.stories-card .story{box-shadow:0 1px 5px rgba(30,60,45,.08)}.composer-card .postbox{font-size:14px}.composer-card .tools{margin-top:10px}.stories-card .story.add b{font-size:11px;z-index:2}.feed-divider{display:flex;align-items:center;gap:8px;margin:2px 3px 9px;color:#718078;font-size:11px;font-weight:800}.feed-divider:before,.feed-divider:after{content:"";height:1px;background:#dfe8e2;flex:1}.hero-actions{display:flex;gap:8px;overflow:auto;margin-top:13px}.hero-actions a{white-space:nowrap;text-decoration:none;background:#fff;border:1px solid #cfe8d8;border-radius:18px;padding:8px 11px;color:#246143;font-size:11px;font-weight:850}.hero-actions a:hover{background:#dff4e7}@media(max-width:700px){.hero-actions a{font-size:11px;padding:7px 10px}}<style>
+/* Trooth Reference Match v1.6 — stable top-to-bottom feed layout */
+@media(max-width:700px){
+  .hero{display:none}
+  .reference-nav{box-shadow:0 1px 5px rgba(30,60,45,.05)}
+  .stories-card{margin-top:2px}
+  .stories-card .section h2{font-size:16px}
+  .composer-card .section{display:none}
+  .composer-card{padding-top:10px}
+  .composer-card .tools{border-top:1px solid var(--line);padding-top:8px}
+  .feed-divider{margin-top:5px}
+}
+@media(min-width:701px){
+  .stories-card{padding:13px}
+  .stories-card .story{min-width:108px;height:166px}
+  .composer-card{padding:14px}
+}
+</style></style></head><body><header class="top"><div class="brand">Trooth<small>SOCIAL INDEPENDENT</small></div><input id="search" class="search" placeholder="Search people, posts & ideas..." oninput="filterPosts()"><div class="icons"><button class="ico" onclick="location.href='index.html'">⌂</button><span class="icoWrap"><button class="ico" onclick="location.href='notifications-messages.html'">🔔</button><span id="notifBadge" class="badgeCount" hidden>0</span></span><span class="icoWrap"><button class="ico" onclick="location.href='notifications-messages.html'">💬</button><span id="msgBadge" class="badgeCount" hidden>0</span></span><button class="ico" onclick="location.href='auth.html'">👤</button></div></header><nav class="reference-nav" aria-label="Trooth main navigation">
  <div class="nav-row" aria-label="Discovery navigation">
   <a href="news.html">📰 News</a>
   <a href="sports.html">🏆 Sports</a>
