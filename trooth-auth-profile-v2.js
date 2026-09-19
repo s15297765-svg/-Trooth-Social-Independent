@@ -42,7 +42,7 @@
     window.troothUpdateProfile=async function(patch){
       const {data:{user}}=await sb.auth.getUser();
       if(!user)throw new Error('Please login first');
-      const allowed={display_name:patch.display_name,bio:patch.bio,avatar_url:patch.avatar_url,cover_url:patch.cover_url,is_public:patch.is_public};
+      const allowed={display_name:patch.display_name,bio:patch.bio,avatar_url:patch.avatar_url,cover_url:patch.cover_url,is_public:patch.is_public,updated_at:new Date().toISOString()};
       Object.keys(allowed).forEach(k=>allowed[k]===undefined&&delete allowed[k]);
       const r=await sb.from('profiles').update(allowed).eq('id',user.id).select().single();
       if(r.error)throw r.error;
