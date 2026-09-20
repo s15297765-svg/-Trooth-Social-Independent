@@ -19,14 +19,14 @@
     const busyKey='__troothProfileUpload_'+kind;
     if(window[busyKey])return;
     window[busyKey]=true;
-    const sb=client(),u=(await sb.auth.getUser()).data.user,status=document.getElementById('status');
-    if(!sb||!u){if(status)status.textContent='Please login again.';return}
-    if(!file){return}
-    if(!file.type.startsWith('image/')){if(status)status.textContent='Please choose an image file.';return}
-    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){if(status)status.textContent='Use JPG, PNG or WebP.';return}
-    if(file.size>8*1024*1024){if(status)status.textContent='Image must be 8 MB or smaller.';return}
-    if(status)status.textContent='Uploading '+(kind==='avatar'?'profile photo':'cover photo')+'…';
     try{
+      const sb=client(),u=(await sb.auth.getUser()).data.user,status=document.getElementById('status');
+      if(!sb||!u){if(status)status.textContent='Please login again.';return}
+      if(!file){return}
+      if(!file.type.startsWith('image/')){if(status)status.textContent='Please choose an image file.';return}
+      if(!['image/jpeg','image/png','image/webp'].includes(file.type)){if(status)status.textContent='Use JPG, PNG or WebP.';return}
+      if(file.size>8*1024*1024){if(status)status.textContent='Image must be 8 MB or smaller.';return}
+      if(status)status.textContent='Uploading '+(kind==='avatar'?'profile photo':'cover photo')+'…';
       let profile=await ensureProfile(sb,u);
       const img=await new Promise((resolve,reject)=>{
         const im=new Image(),url=URL.createObjectURL(file);
@@ -62,9 +62,9 @@
   async function save(){
     if(window.__troothProfileSaveBusy)return;
     window.__troothProfileSaveBusy=true;
-    const sb=client(),status=document.getElementById('status'),u=(await sb?.auth.getUser?.()).data?.user;
-    if(!sb||!u){if(status)status.textContent='Please login again.';return}
     try{
+      const sb=client(),status=document.getElementById('status'),u=(await sb?.auth.getUser?.()).data?.user;
+      if(!sb||!u){if(status)status.textContent='Please login again.';return}
       const existing=await ensureProfile(sb,u);
       const patch={id:u.id,display_name:(document.getElementById('displayName')?.value||'').trim()||existing.display_name||'Trooth Member',bio:(document.getElementById('bioInput')?.value||'').trim(),avatar_url:(document.getElementById('avatarInput')?.value||'').trim()||existing.avatar_url||null,cover_url:(document.getElementById('coverInput')?.value||'').trim()||existing.cover_url||null,is_public:existing.is_public!==false,updated_at:new Date().toISOString()};
       const r=await sb.from('profiles').upsert(patch,{onConflict:'id'}).select('id,display_name,bio,is_public,avatar_url,cover_url,updated_at').maybeSingle();
