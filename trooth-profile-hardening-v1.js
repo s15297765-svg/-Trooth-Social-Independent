@@ -20,8 +20,10 @@
     if(window[busyKey])return;
     window[busyKey]=true;
     try{
-      const sb=client(),u=(await sb.auth.getUser()).data.user,status=document.getElementById('status');
-      if(!sb||!u){if(status)status.textContent='Please login again.';return}
+      const sb=client(),status=document.getElementById('status');
+      if(!sb){if(status)status.textContent='Please login again.';return}
+      const u=(await sb.auth.getUser()).data.user;
+      if(!u){if(status)status.textContent='Please login again.';return}
       if(!file){return}
       if(!file.type.startsWith('image/')){if(status)status.textContent='Please choose an image file.';return}
       if(!['image/jpeg','image/png','image/webp'].includes(file.type)){if(status)status.textContent='Use JPG, PNG or WebP.';return}
@@ -62,9 +64,13 @@
   async function save(){
     if(window.__troothProfileSaveBusy)return;
     window.__troothProfileSaveBusy=true;
+    const saveBtn=document.querySelector('button[onclick="saveProfile()"]');
+    if(saveBtn){saveBtn.disabled=true;saveBtn.dataset.originalText=saveBtn.textContent;saveBtn.textContent='Saving…'}
     try{
-      const sb=client(),status=document.getElementById('status'),u=(await sb?.auth.getUser?.()).data?.user;
-      if(!sb||!u){if(status)status.textContent='Please login again.';return}
+      const sb=client(),status=document.getElementById('status');
+      if(!sb){if(status)status.textContent='Please login again.';return}
+      const u=(await sb.auth.getUser()).data.user;
+      if(!u){if(status)status.textContent='Please login again.';return}
       const existing=await ensureProfile(sb,u);
       const patch={id:u.id,display_name:(document.getElementById('displayName')?.value||'').trim()||existing.display_name||'Trooth Member',bio:(document.getElementById('bioInput')?.value||'').trim(),avatar_url:(document.getElementById('avatarInput')?.value||'').trim()||existing.avatar_url||null,cover_url:(document.getElementById('coverInput')?.value||'').trim()||existing.cover_url||null,is_public:existing.is_public!==false,updated_at:new Date().toISOString()};
       const r=await sb.from('profiles').upsert(patch,{onConflict:'id'}).select('id,display_name,bio,is_public,avatar_url,cover_url,updated_at').maybeSingle();
@@ -74,7 +80,10 @@
       if(typeof window.renderProfile==='function')window.renderProfile();
       window.dispatchEvent(new CustomEvent('trooth-profile-updated',{detail:{profile:r.data}}));
     }catch(e){if(status)status.textContent='Save failed: '+(e?.message||'Please try again.')}
-    finally{window.__troothProfileSaveBusy=false}
+    finally{
+      window.__troothProfileSaveBusy=false;
+      if(saveBtn){saveBtn.disabled=false;saveBtn.textContent=saveBtn.dataset.originalText||'💾 Save Profile';delete saveBtn.dataset.originalText}
+    }
   }
   window.uploadProfileImage=upload;
   window.saveProfile=save;
