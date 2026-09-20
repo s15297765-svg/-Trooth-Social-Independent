@@ -14,7 +14,7 @@
 
 ## APK
 - Target release: v1.5
-- Android versionCode: 7
+- Android versionCode: 9
 - Android versionName: 1.5
 - APK artifact name: `Trooth-Social-Independent-APK-v1.5`
 - Build workflow: `.github/workflows/package.yml`
