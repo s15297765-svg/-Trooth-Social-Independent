@@ -16,6 +16,9 @@
     return ins.data;
   }
   async function upload(kind,file){
+    const busyKey='__troothProfileUpload_'+kind;
+    if(window[busyKey])return;
+    window[busyKey]=true;
     const sb=client(),u=(await sb.auth.getUser()).data.user,status=document.getElementById('status');
     if(!sb||!u){if(status)status.textContent='Please login again.';return}
     if(!file){return}
@@ -54,8 +57,11 @@
       if(status)status.textContent=(kind==='avatar'?'Profile photo':'Cover photo')+' updated ✓';
       window.dispatchEvent(new CustomEvent('trooth-profile-updated',{detail:{profile:profile}}));
     }catch(e){if(status)status.textContent='Upload failed: '+(e?.message||'Please try again.')}
+    finally{window[busyKey]=false}
   }
   async function save(){
+    if(window.__troothProfileSaveBusy)return;
+    window.__troothProfileSaveBusy=true;
     const sb=client(),status=document.getElementById('status'),u=(await sb?.auth.getUser?.()).data?.user;
     if(!sb||!u){if(status)status.textContent='Please login again.';return}
     try{
@@ -68,6 +74,7 @@
       if(typeof window.renderProfile==='function')window.renderProfile();
       window.dispatchEvent(new CustomEvent('trooth-profile-updated',{detail:{profile:r.data}}));
     }catch(e){if(status)status.textContent='Save failed: '+(e?.message||'Please try again.')}
+    finally{window.__troothProfileSaveBusy=false}
   }
   window.uploadProfileImage=upload;
   window.saveProfile=save;
