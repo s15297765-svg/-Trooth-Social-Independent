@@ -35,7 +35,7 @@ h2{margin:0 0 8px}.muted{color:#718276}input{width:100%;padding:13px;border:1px 
 <script>
 let sb=null;
 const $=id=>document.getElementById(id);
-function msg(t){$('authMsg').textContent=t||''}
+function msg(t){$('authMsg').textContent=t||''}\nfunction authErrorText(e,action){const code=e?.code||'',status=e?.status||'';if(code==='invalid_credentials')return 'ای میل/موبائل یا پاس ورڈ درست نہیں۔';if(code==='email_not_confirmed')return 'ای میل ابھی confirm نہیں ہوئی۔ نیچے Resend confirmation email دبائیں۔';if(status===401||/invalid api key|invalid api/i.test(e?.message||''))return 'Supabase API رابطہ مستحکم نہیں۔ تازہ Trooth build استعمال کریں؛ API configuration دوبارہ چیک کی گئی ہے۔';return e?.message||(' '+action+' نہیں ہو سکا۔')}
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
 function isEmail(v){return validEmail(v)}
 function phoneValue(v){let p=String(v||'').trim().replace(/[\s()-]/g,'');if(/^00\d{8,15}$/.test(p))p='+'+p.slice(2);return p}
@@ -58,7 +58,7 @@ async function login(){
  if(!cred||!pass){msg('براہِ کرم درست ای میل/موبائل نمبر اور پاس ورڈ درج کریں۔');return}
  busy('loginBtn',true);msg('Login ہو رہا ہے…');
  try{const r=await sb.auth.signInWithPassword({...cred,password:pass});if(r.error)throw r.error;msg('Login کامیاب ✓');location.href='profile.html';}
- catch(e){msg(e?.message||'Login نہیں ہو سکا۔ اگر confirmation باقی ہے تو نیچے Resend confirmation email دبائیں۔')}
+ catch(e){msg(authErrorText(e,'Login')+' اگر confirmation باقی ہے تو نیچے Resend confirmation email دبائیں۔')}
  finally{busy('loginBtn',false)}
 }
 async function signup(){
@@ -70,7 +70,7 @@ async function signup(){
   if(r.error)throw r.error;
   if(r.data?.session){msg('Account تیار ہے ✓');location.href='profile.html';return}
   msg('Account بن گیا ہے۔ Confirmation email آئے تو اسے confirm کریں، پھر Login کریں۔');
- }catch(e){msg(e?.message||'Account create نہیں ہو سکا۔')}
+ }catch(e){msg(authErrorText(e,'Account create')+'')}
  finally{busy('signupBtn',false)}
 }
 async function resendConfirmation(){
@@ -78,7 +78,7 @@ async function resendConfirmation(){
  if(!cred){msg('پہلے درست ای میل یا موبائل نمبر درج کریں۔');return}
  busy('resendBtn',true);msg('Confirmation email بھیجی جا رہی ہے…');
  try{const r=cred.email?await sb.auth.resend({type:'signup',email:cred.email}):await sb.auth.resend({type:'sms',phone:cred.phone});if(r.error)throw r.error;msg(cred.email?'Confirmation email دوبارہ بھیج دی گئی ہے۔ Inbox/Spam چیک کریں۔':'SMS confirmation دوبارہ بھیج دی گئی ہے۔')}
- catch(e){msg(e?.message||'Confirmation email نہیں بھیجی جا سکی۔')}
+ catch(e){msg(authErrorText(e,'Confirmation email'))}
  finally{busy('resendBtn',false)}
 }
 window.addEventListener('load',start);
