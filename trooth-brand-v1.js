@@ -1,11 +1,20 @@
-// Trooth Social Independent — green brand logo
+// Trooth Social Independent — unified professional logo fallback
 (function(){
   function apply(){
     document.querySelectorAll('.logo').forEach(function(el){
-      if(el.getAttribute('data-trooth-brand')==='v1')return;
-      el.setAttribute('data-trooth-brand','v1');
-      el.innerHTML='<span style="display:inline-flex;align-items:center;gap:8px;line-height:1"><span aria-hidden="true" style="width:34px;height:34px;border-radius:10px;background:#fff;display:grid;place-items:center;box-shadow:0 3px 10px rgba(20,82,56,.16);font-size:21px;font-weight:950;color:#27845b">T</span><span style="font-weight:950;letter-spacing:-1px;color:#fff">Trooth</span></span>';
+      // Let the dedicated globe-logo module own elements it has already upgraded.
+      if(el.dataset && el.dataset.troothGlobe==='6')return;
+      if(el.getAttribute('data-trooth-brand')==='v2')return;
+      el.setAttribute('data-trooth-brand','v2');
+      el.innerHTML='<img class="trooth-logo-3d" src="assets/trooth-logo-3d.svg?v=20260921-2" alt="Trooth SI">';
+      el.title='Trooth SI';
     });
+    if(!document.getElementById('trooth-brand-css')){
+      var s=document.createElement('style');
+      s.id='trooth-brand-css';
+      s.textContent='.logo .trooth-logo-3d{display:block;width:250px;height:auto;max-height:58px;object-fit:contain;object-position:left center}@media(max-width:600px){.logo .trooth-logo-3d{width:190px;max-height:52px}}';
+      document.head.appendChild(s);
+    }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
 })();
