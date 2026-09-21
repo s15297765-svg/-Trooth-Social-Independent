@@ -1,39 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 330" role="img" aria-labelledby="title desc">
-  <title id="title">Trooth Social Independent 3D Logo</title>
-  <desc id="desc">Green 3D Trooth wordmark with two blue globe O letters and green Social Independent subtitle.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 300" role="img" aria-labelledby="title desc">
+  <title id="title">Trooth SI</title>
+  <desc id="desc">Green 3D Trooth wordmark with both O letters shown as blue globes and a small SI mark.</desc>
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#b8ff55"/><stop offset=".45" stop-color="#45df32"/><stop offset="1" stop-color="#119447"/>
+    <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b9ff63"/><stop offset=".45" stop-color="#45df32"/><stop offset="1" stop-color="#119447"/>
     </linearGradient>
-    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#66e8ff"/><stop offset=".45" stop-color="#168cff"/><stop offset="1" stop-color="#0649b8"/>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#72ecff"/><stop offset=".45" stop-color="#168cff"/><stop offset="1" stop-color="#0649b8"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-30%" width="140%" height="170%">
-      <feDropShadow dx="0" dy="10" stdDeviation="7" flood-opacity=".35"/>
+    <filter id="shadow" x="-20%" y="-30%" width="145%" height="175%">
+      <feDropShadow dx="0" dy="9" stdDeviation="6" flood-opacity=".30"/>
     </filter>
-    <filter id="glow"><feGaussianBlur stdDeviation="4" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="3.5" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>
   <g filter="url(#shadow)" font-family="Arial,Helvetica,sans-serif" font-weight="900">
-    <text x="35" y="145" font-size="145" fill="url(#g)" stroke="#0b7f38" stroke-width="3">Tr</text>
+    <text x="28" y="145" font-size="145" fill="url(#green)" stroke="#0b7f38" stroke-width="3">Tr</text>
+
     <g>
-      <circle cx="385" cy="96" r="67" fill="url(#b)" stroke="#0b67d1" stroke-width="5"/>
-      <ellipse cx="385" cy="96" rx="29" ry="67" fill="none" stroke="#b8f4ff" stroke-width="2.5" opacity=".8"/>
-      <path d="M318 96h134M330 68h110M330 124h110" fill="none" stroke="#b8f4ff" stroke-width="2.5" opacity=".8"/>
-      <path d="M350 49c18-15 43-17 62-8-12 6-17 17-15 30-18 2-35-6-47-22z" fill="#6df05a"/>
-      <path d="M367 101c14-9 28-8 42 2-4 20-17 34-35 42-12-12-14-28-7-44z" fill="#62e44f"/>
-      <circle cx="365" cy="62" r="4" fill="#fff"/>
+      <circle cx="378" cy="94" r="66" fill="url(#blue)" stroke="#0b67d1" stroke-width="5"/>
+      <ellipse cx="378" cy="94" rx="28" ry="66" fill="none" stroke="#c2f6ff" stroke-width="2.5" opacity=".85"/>
+      <path d="M312 94h132M324 67h108M324 121h108" fill="none" stroke="#c2f6ff" stroke-width="2.5" opacity=".85"/>
+      <path d="M344 48c18-14 41-16 59-8-11 7-16 17-14 29-18 3-34-5-45-21zM361 99c14-9 28-8 41 2-4 19-16 32-34 40-12-12-14-27-7-42z" fill="#64e84f"/>
+      <circle cx="358" cy="61" r="4" fill="#fff"/>
     </g>
+
     <g>
-      <circle cx="535" cy="96" r="67" fill="url(#b)" stroke="#0b67d1" stroke-width="5"/>
-      <ellipse cx="535" cy="96" rx="29" ry="67" fill="none" stroke="#b8f4ff" stroke-width="2.5" opacity=".8"/>
-      <path d="M468 96h134M480 68h110M480 124h110" fill="none" stroke="#b8f4ff" stroke-width="2.5" opacity=".8"/>
-      <path d="M502 50c20-13 42-13 60-5-8 8-12 17-10 28-17 5-35-2-50-23z" fill="#62e44f"/>
-      <path d="M524 99c15-7 31-2 40 10-5 18-17 30-34 37-13-11-16-28-6-47z" fill="#62e44f"/>
-      <circle cx="514" cy="61" r="4" fill="#fff"/>
+      <circle cx="526" cy="94" r="66" fill="url(#blue)" stroke="#0b67d1" stroke-width="5"/>
+      <ellipse cx="526" cy="94" rx="28" ry="66" fill="none" stroke="#c2f6ff" stroke-width="2.5" opacity=".85"/>
+      <path d="M460 94h132M472 67h108M472 121h108" fill="none" stroke="#c2f6ff" stroke-width="2.5" opacity=".85"/>
+      <path d="M493 49c19-13 41-13 58-5-8 8-11 17-9 27-17 5-34-2-49-22zM515 97c14-7 29-2 39 9-5 18-17 30-33 37-13-11-16-27-6-46z" fill="#64e84f"/>
+      <circle cx="505" cy="61" r="4" fill="#fff"/>
     </g>
-    <text x="600" y="145" font-size="145" fill="url(#g)" stroke="#0b7f38" stroke-width="3">th</text>
-    <text x="600" y="245" font-size="62" fill="url(#g)" stroke="#0b7f38" stroke-width="1.5">Social Independent</text>
-    <path d="M95 275 Q600 335 1105 275" fill="none" stroke="url(#g)" stroke-width="16" stroke-linecap="round" filter="url(#glow)"/>
+
+    <text x="592" y="145" font-size="145" fill="url(#green)" stroke="#0b7f38" stroke-width="3">th</text>
+
+    <text x="780" y="139" font-size="74" fill="url(#green)" stroke="#0b7f38" stroke-width="2">SI</text>
+    <path d="M78 250 Q585 302 1088 250" fill="none" stroke="url(#green)" stroke-width="12" stroke-linecap="round" filter="url(#glow)"/>
   </g>
 </svg>
