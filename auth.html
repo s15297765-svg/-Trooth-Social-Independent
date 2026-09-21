@@ -63,13 +63,13 @@ async function login(){
  catch(e){msg(authErrorText(e,'Login')+' اگر confirmation باقی ہے تو نیچے Resend confirmation email دبائیں۔')}
  finally{busy('loginBtn',false)}
 }
-async function signup(){
+function authRedirect(){return location.origin+location.pathname}\nasync function signup(){
  if(!sb){try{sb=await ready()}catch(e){msg(e.message);return}}
  const name=$('displayName').value.trim(),raw=$('identifier').value.trim(),cred=identifier(raw),pass=$('password').value;
  if(!name||!cred||pass.length<6){msg('نام، درست ای میل/موبائل نمبر اور کم از کم 6 حروف/اعداد کا پاس ورڈ دیں۔');return}
  busy('signupBtn',true);msg('Account بنایا جا رہا ہے…');
  try{
-  const r=await sb.auth.signUp({...cred,password:pass,options:{data:{display_name:name}}});
+  const r=await sb.auth.signUp({...cred,password:pass,options:{data:{display_name:name},emailRedirectTo:cred.email?authRedirect():undefined}});
   if(r.error)throw r.error;
   if(r.data?.session){msg('Account تیار ہے ✓');location.href='profile.html';return}
   msg('Account بن گیا ہے۔ Confirmation email آئے تو اسے confirm کریں، پھر Login کریں۔');
@@ -81,10 +81,10 @@ async function resendConfirmation(){
  const raw=$('identifier').value.trim(),cred=identifier(raw);
  if(!cred){msg('پہلے درست ای میل یا موبائل نمبر درج کریں۔');return}
  busy('resendBtn',true);msg('Confirmation email بھیجی جا رہی ہے…');
- try{const r=cred.email?await sb.auth.resend({type:'signup',email:cred.email}):await sb.auth.resend({type:'sms',phone:cred.phone});if(r.error)throw r.error;msg(cred.email?'Confirmation email دوبارہ بھیج دی گئی ہے۔ Inbox/Spam چیک کریں۔':'SMS confirmation دوبارہ بھیج دی گئی ہے۔')}
+ try{const r=cred.email?await sb.auth.resend({type:'signup',email:cred.email,options:{emailRedirectTo:authRedirect()}}):await sb.auth.resend({type:'sms',phone:cred.phone});if(r.error)throw r.error;msg(cred.email?'Confirmation email دوبارہ بھیج دی گئی ہے۔ Inbox/Spam چیک کریں۔':'SMS confirmation دوبارہ بھیج دی گئی ہے۔')}
  catch(e){msg(authErrorText(e,'Confirmation email'))}
  finally{busy('resendBtn',false)}
 }
-window.addEventListener('load',start);
+window.addEventListener('load',start);\nif(location.hash.includes('error_code=')){try{const p=new URLSearchParams(location.hash.slice(1));msg('Email confirmation response: '+(p.get('error_description')||'Please request a fresh confirmation email.'))}catch(e){}}
 </script>
 </body></html>
