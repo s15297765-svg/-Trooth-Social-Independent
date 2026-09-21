@@ -75,7 +75,7 @@
         ['Ali','Sara','Sports','News'].forEach(function(n){var d=document.createElement('div');d.className='story';d.style.background='linear-gradient(145deg,#74c69d,#1b4332)';d.innerHTML='<b>'+n+'</b>';stories.appendChild(d);});
       }
     }
-    setTimeout(addDemoContent,1400);
+    // Demo/sample cards are disabled; Home shows live Supabase content only.
   }
   if(window.troothSupabase)boot();
   else window.addEventListener('trooth-supabase-ready',boot,{once:true});
