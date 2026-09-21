@@ -56,7 +56,7 @@ async function saveProfile(){if(!currentUser||!sb){$('status').textContent='Plea
     if(cv){cv.dataset.bound='1';var u=cv.dataset.mediaUrl;if(u){var test=new Image();test.onload=function(){cv.classList.remove('media-fallback');cv.textContent=''};test.onerror=function(){cv.style.backgroundImage='none';cv.classList.add('media-fallback');cv.textContent='Cover photo unavailable'};test.src=u}else{cv.style.backgroundImage='';cv.classList.remove('media-fallback');cv.textContent=''}}
   };
 })();
-</script><script>var _troothRenderProfile=window.renderProfile;window.addEventListener('trooth-profile-updated',function(e){window.profile=e.detail?.profile||window.profile;if(window.troothBindProfileMedia)window.troothBindProfileMedia()});setTimeout(function(){if(window.troothBindProfileMedia)window.troothBindProfileMedia()},500);</script><script src="trooth-profile-live-sync.js"></script><script src="trooth-profile-hardening-v1.js?v=20260920"></script><script src="trooth-globe-logo-v1.js"></script><script>
+</script><script>var _troothRenderProfile=window.renderProfile;window.addEventListener('trooth-profile-updated',function(e){window.profile=e.detail?.profile||window.profile;if(window.troothBindProfileMedia)window.troothBindProfileMedia()});setTimeout(function(){if(window.troothBindProfileMedia)window.troothBindProfileMedia()},500);</script><script src="trooth-profile-live-sync.js"></script><script src="trooth-profile-hardening-v1.js?v=20260921"></script><script src="trooth-globe-logo-v1.js"></script><script>
 function previewAndUploadProfileImage(kind,file){previewProfileChoice(kind,file);return uploadProfileImage(kind,file)}
 function previewProfileChoice(kind,file){
  if(!file)return;
