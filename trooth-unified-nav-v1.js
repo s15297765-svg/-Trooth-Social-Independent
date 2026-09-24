@@ -28,7 +28,7 @@
         <a href="news.html">News</a><a href="sports.html">Sports</a><a href="stores.html">International Stores</a><a href="film-fashion.html">Film/Fashion</a><a href="property.html">Property</a>
       </nav>
       <nav class="trooth-nav-row trooth-nav-tertiary" aria-label="Trooth social navigation">
-        <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="index.html#feed">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications-messages.html">Notifications</a><a href="profile.html">Profile</a>
+        <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="reels.html">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications-messages.html">Notifications</a><a href="profile.html">Profile</a>
       </nav>`;
     document.body.insertBefore(wrap,document.body.firstChild);
 
@@ -45,11 +45,46 @@
     if(plusBtn){
       var createMenu=document.createElement('div');
       createMenu.className='trooth-create-menu';
-      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="index.html#postInput">📝 Post</a><a href="index.html#story">⭕ Story</a><a href="index.html#reel">🎞️ Reel</a><a href="index.html#live">🔴 Live Video</a><a href="index.html#note">📒 Note</a>';
+      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="index.html#postInput" data-create="post">📝 Post</a><a href="index.html#story" data-create="story">⭕ Story</a><a href="reels.html" data-create="reel">🎞️ Reel</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="index.html#note" data-create="note">📒 Note</a>';
       wrap.querySelector('.trooth-toprow').appendChild(createMenu);
       plusBtn.addEventListener('click',function(){
         var open=createMenu.classList.toggle('open');
         plusBtn.setAttribute('aria-expanded',open?'true':'false');
+      });
+      createMenu.addEventListener('click',function(e){
+        var a=e.target.closest('a[data-create]');
+        if(!a)return;
+        var type=a.getAttribute('data-create');
+        if(type==='post' || type==='story' || type==='live' || type==='note'){
+          var isIndex=/index\\.html$/i.test(location.pathname)||location.pathname==='/'||location.pathname.endsWith('/');
+          if(!isIndex)return;
+          e.preventDefault();
+          createMenu.classList.remove('open');
+          plusBtn.setAttribute('aria-expanded','false');
+          if(type==='post'){
+            var p=document.getElementById('postInput');
+            if(p){p.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){p.focus()},250);}
+          }else if(type==='story'){
+            var s=document.getElementById('storyInput');
+            if(s){s.click();}else{location.hash='story';}
+          }else if(type==='note'){
+            var n=prompt('اپنا Note لکھیں:');
+            if(!n||!n.trim())return;
+            var sb=window.troothSupabase;
+            if(!sb){alert('Trooth connection is not ready.');return;}
+            sb.auth.getUser().then(function(r){
+              var u=r.data&&r.data.user;
+              if(!u){location.href='auth.html';return;}
+              return sb.from('posts').insert({user_id:u.id,body:'📒 Note\\n\\n'+n.trim(),media_url:null,media_type:null});
+            }).then(function(r){
+              if(r&&r.error)throw r.error;
+              var feed=document.getElementById('feed');
+              if(feed)feed.scrollIntoView({behavior:'smooth',block:'start'});
+            }).catch(function(err){alert('Note save failed: '+(err.message||'Please try again.'))});
+          }else if(type==='live'){
+            alert('🔴 Live Video setup: camera/microphone access will be connected here. The current project does not yet have a live-stream backend, so I am not pretending this is already live.');
+          }
+        }
       });
       document.addEventListener('click',function(e){
         if(!wrap.contains(e.target)){createMenu.classList.remove('open');plusBtn.setAttribute('aria-expanded','false');}
