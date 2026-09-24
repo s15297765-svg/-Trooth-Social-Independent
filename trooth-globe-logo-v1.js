@@ -3,7 +3,7 @@
   if(window.__troothGlobeLogoV6)return;
   window.__troothGlobeLogoV6=true;
   function apply(){
-    document.querySelectorAll('.logo,.brand').forEach(function(el){
+    document.querySelectorAll('.logo,.brand,.trooth-top-logo').forEach(function(el){
       if(el.dataset.troothGlobe==='6')return;
       el.innerHTML='<img class="trooth-logo-3d" src="assets/trooth-logo-3d.svg?v=20260921-4" alt="Trooth SI">';
       el.dataset.troothGlobe='6';
