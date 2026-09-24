@@ -19,7 +19,7 @@
             <img class="trooth-logo-3d" src="assets/trooth-logo-3d.svg?v=20260924-3" alt="Trooth Social Independent" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
             <strong>Trooth</strong>
           </a>
-          <a class="trooth-icon trooth-plus" href="index.html#postInput" aria-label="Create post">＋</a>
+          <button class="trooth-icon trooth-plus" type="button" aria-label="Create" aria-expanded="false">＋</button>
           <button class="trooth-icon trooth-search-trigger" type="button" aria-label="Search">⌕</button>
           <a class="trooth-icon trooth-messenger" href="chat.html" aria-label="Messenger">💬</a>
         </div>
@@ -41,6 +41,21 @@
       }
     });
 
+    var plusBtn=wrap.querySelector('.trooth-plus');
+    if(plusBtn){
+      var createMenu=document.createElement('div');
+      createMenu.className='trooth-create-menu';
+      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="index.html#postInput">📝 Post</a><a href="index.html#story">⭕ Story</a><a href="index.html#reel">🎞️ Reel</a><a href="index.html#live">🔴 Live Video</a><a href="index.html#note">📒 Note</a>';
+      wrap.querySelector('.trooth-toprow').appendChild(createMenu);
+      plusBtn.addEventListener('click',function(){
+        var open=createMenu.classList.toggle('open');
+        plusBtn.setAttribute('aria-expanded',open?'true':'false');
+      });
+      document.addEventListener('click',function(e){
+        if(!wrap.contains(e.target)){createMenu.classList.remove('open');plusBtn.setAttribute('aria-expanded','false');}
+      });
+    }
+
     var searchBtn=wrap.querySelector('.trooth-search-trigger');
     if(searchBtn)searchBtn.addEventListener('click',function(){
       var input=document.getElementById('search');
@@ -57,7 +72,12 @@
       .trooth-topbar{background:#18a957!important;color:#fff!important;padding:0!important;margin:0!important;position:relative!important;border:0!important}
       .trooth-toprow{min-height:62px;display:flex;align-items:center;gap:8px;padding:7px 10px}
       .trooth-menu,.trooth-icon{width:42px;height:42px;display:flex!important;align-items:center;justify-content:center;font-size:27px;font-weight:900;border:0;background:transparent;color:#fff!important;text-decoration:none!important;cursor:pointer;flex:none}
-      .trooth-plus{font-size:31px!important}
+      .trooth-plus{font-size:31px!important;position:relative}
+      .trooth-create-menu{display:none;position:absolute;top:58px;right:74px;width:190px;background:#fff;border:1px solid #dcebe2;border-radius:14px;box-shadow:0 10px 28px rgba(20,82,56,.18);padding:7px;z-index:1100}
+      .trooth-create-menu.open{display:block}
+      .trooth-create-title{padding:7px 10px 5px;font-weight:900;color:#14532d;font-size:14px;border-bottom:1px solid #e8f1eb;margin-bottom:4px}
+      .trooth-create-menu a{display:block!important;color:#14532d!important;text-decoration:none!important;font-weight:800;padding:10px;border-radius:9px;font-size:14px}
+      .trooth-create-menu a:hover{background:#e5f7eb}
       .trooth-messenger{font-size:23px!important}
       .trooth-search-trigger{font-size:28px!important}
       .trooth-top-logo{display:flex;align-items:center;gap:6px;min-width:0;flex:1;color:#fff!important;text-decoration:none!important}
