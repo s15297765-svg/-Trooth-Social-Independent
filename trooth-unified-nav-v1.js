@@ -14,7 +14,7 @@
       <header class="top trooth-topbar" aria-label="Trooth top bar">
         <div class="trooth-toprow">
           <a class="trooth-menu" href="index.html" aria-label="Menu">☰</a>
-          <a class="logo trooth-top-logo" href="index.html" aria-label="Trooth home"><img class="trooth-logo-3d" src="assets/trooth-logo-3d.svg?v=20260924-1" alt="Trooth"></a>
+          <a class="logo trooth-top-logo" href="index.html" aria-label="Trooth home"><img class="trooth-logo-3d" src="assets/trooth-logo-3d.svg?v=20260924-2" alt="Trooth"></a>
           <a class="trooth-icon" href="index.html#postInput" aria-label="Create post">＋</a>
           <button class="trooth-icon trooth-search-trigger" type="button" aria-label="Search">⌕</button>
           <a class="trooth-icon" href="chat.html" aria-label="Messenger">✉</a>
@@ -27,7 +27,18 @@
         <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="index.html#feed">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications.html">Notifications</a><a href="profile.html">Profile</a>
       </nav>`;
     document.body.insertBefore(wrap,document.body.firstChild);
-    var searchBtn=wrap.querySelector('.trooth-search-trigger');\n    if(searchBtn)searchBtn.addEventListener('click',function(){\n      var input=document.getElementById('search');\n      if(input){input.classList.toggle('trooth-search-open');input.focus();input.scrollIntoView({block:'nearest'});return;}\n      location.href='index.html#feed';\n    });\n    var style=document.createElement('style');
+    var searchBtn=wrap.querySelector('.trooth-search-trigger');
+    if(searchBtn)searchBtn.addEventListener('click',function(){
+      var input=document.getElementById('search');
+      if(input){
+        input.classList.toggle('trooth-search-open');
+        input.focus();
+        input.scrollIntoView({block:'nearest'});
+        return;
+      }
+      location.href='index.html#feed';
+    });
+    var style=document.createElement('style');
     style.id='trooth-unified-nav-css';
     style.textContent=`
       .trooth-unified-nav{position:sticky;top:0;z-index:1000;background:#fff;box-shadow:0 2px 12px rgba(20,82,56,.12)}
