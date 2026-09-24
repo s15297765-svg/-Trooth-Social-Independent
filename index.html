@@ -64,7 +64,25 @@
  .trooth-line-2 a,.trooth-line-3 a{font-size:19px}
  .trooth-composer-card{margin-top:3px}
 }
-</style></head><body><header class="top"><div class="brand">Trooth<small>SOCIAL INDEPENDENT</small></div><input id="search" class="search" placeholder="Search people, posts & ideas..." oninput="filterPosts()"><div class="icons"><button class="ico" onclick="location.href='index.html'">⌂</button><span class="icoWrap"><button class="ico" onclick="location.href='notifications-messages.html'">🔔</button><span id="notifBadge" class="badgeCount" hidden>0</span></span><span class="icoWrap"><button class="ico" onclick="location.href='notifications-messages.html'">💬</button><span id="msgBadge" class="badgeCount" hidden>0</span></span><button class="ico" onclick="location.href='auth.html'">👤</button></div></header><nav class="reference-nav trooth-three-line-nav" aria-label="Trooth main navigation">
+
+/* Final compact top bar: menu + Trooth + search + messenger only */
+.trooth-topbar{height:56px!important;min-height:56px!important;padding:0 10px!important;gap:8px!important;background:#fff!important;box-shadow:0 1px 5px rgba(30,60,45,.08)!important;z-index:25}
+.trooth-topbar .trooth-icon-btn{flex:none;width:38px;height:38px;font-size:23px;background:transparent;color:#18231d;border:0}
+.trooth-top-logo{display:flex;align-items:center;gap:6px;text-decoration:none;color:#18a957;min-width:0;margin-right:auto}
+.trooth-top-logo span{width:30px;height:30px;border-radius:8px;background:#18a957;color:#fff;display:grid;place-items:center;font-size:17px;font-weight:950}
+.trooth-top-logo strong{font-size:24px;letter-spacing:-1px;font-weight:950}
+.trooth-hidden-search{display:none!important}.trooth-hidden-search.trooth-search-open{display:block!important;position:absolute;top:60px;left:8px;right:8px;max-width:none!important;height:40px;z-index:40;border:1px solid #cfe8d8;border-radius:22px;background:#fff;box-shadow:0 8px 24px rgba(30,60,45,.12)}
+.trooth-topbar #troothSearchBtn{margin-left:auto}
+.trooth-three-line-nav{top:56px!important}
+.trooth-three-line-nav .trooth-line-1{display:none!important}
+@media(max-width:700px){.trooth-topbar{height:56px!important}.trooth-top-logo strong{font-size:22px}.trooth-top-logo span{width:28px;height:28px}}
+</style></head><body><header class="top trooth-topbar">
+ <button class="trooth-icon-btn" type="button" aria-label="Menu" onclick="document.querySelector('.left')?.classList.toggle('trooth-mobile-open')">☰</button>
+ <a class="trooth-top-logo" href="index.html" aria-label="Trooth Home"><span>T</span><strong>Trooth</strong></a>
+ <button id="troothSearchBtn" class="trooth-icon-btn" type="button" aria-label="Search">⌕</button>
+ <a class="trooth-icon-btn" href="notifications-messages.html" aria-label="Messenger">💬</a>
+ <input id="search" class="search trooth-hidden-search" placeholder="Search people, posts & ideas..." oninput="filterPosts()" aria-label="Search">
+</header><nav class="reference-nav trooth-three-line-nav" aria-label="Trooth main navigation">
  <div class="nav-row trooth-line-1" aria-label="Main tools">
   <button class="trooth-icon-btn" type="button" aria-label="Menu" onclick="document.querySelector('.left')?.classList.toggle('trooth-mobile-open')">☰</button>
   <a class="trooth-logo-link" href="index.html" aria-label="Trooth Home"><span class="trooth-logo-mark">T</span><strong>Trooth</strong></a>
@@ -82,7 +100,7 @@
   <a class="active" href="index.html" aria-label="Home">⌂</a>
   <a href="friends.html" aria-label="Friends">👥</a>
   <a href="index.html#feed" aria-label="Videos">▶</a>
-  <a href="creator-dashboard.html" aria-label="Dashboard">▥</a>
+  <a href="index.html#creator-dashboard" aria-label="Dashboard">▥</a>
   <a href="notifications-messages.html" aria-label="Notifications">🔔</a>
   <a href="profile.html" aria-label="User Profile">👤</a>
  </div>
@@ -108,19 +126,14 @@ async function editComment(commentId,postId){if(!currentUser)return;const s=wind
 async function deletePost(id){if(!currentUser)return;if(!confirm('Delete this post? This cannot be undone.'))return;const r=await window.troothSupabase.from('posts').delete().eq('id',id).eq('user_id',currentUser.id);if(r.error){alert('Delete failed: '+r.error.message);return}const article=$('post-'+id);if(article)article.remove();if(!$('feed').querySelector('.post'))$('feed').innerHTML='<div class="card empty">ابھی کوئی پوسٹ نہیں۔ پہلی پوسٹ آپ کریں! 🚀</div>'}
 async function sharePost(id){const b=document.querySelector('[onclick="sharePost(\\''+id+'\\')"]');if(b?.dataset.busy==='1')return;if(b)b.dataset.busy='1';try{if(currentUser){const s=window.troothSupabase;const r=await s.from('post_shares').insert({post_id:id,user_id:currentUser.id});if(r.error&&r.error.code!=='23505')console.warn('Share record failed:',r.error.message);else{await refreshShareCount(id);const p=await s.from('posts').select('user_id').eq('id',id).maybeSingle();if(!p.error&&p.data?.user_id&&p.data.user_id!==currentUser.id){const n=await s.from('notifications').insert({user_id:p.data.user_id,actor_id:currentUser.id,kind:'Share',body:'Someone shared your post.',post_id:id});if(n.error)console.warn('Share notification failed:',n.error.message)}}}const u=location.origin+location.pathname+'#post-'+id;if(navigator.share){try{await navigator.share({title:'Trooth',text:'Check this post on Trooth',url:u})}catch(e){}}else{try{await navigator.clipboard?.writeText(u);alert('Post link copied ✓')}catch(e){alert(u)}}}catch(e){console.warn('Share action failed:',e.message||e)}finally{if(b)b.dataset.busy='0'}}function filterPosts(){const q=$('search').value.toLowerCase().trim();document.querySelectorAll('.post').forEach(p=>p.style.display=(p.dataset.text||'').includes(q)?'':'none')}function openHashPost(){const h=location.hash;if(h==='#feed'){const f=document.getElementById('feed');if(f)f.scrollIntoView({behavior:'smooth',block:'start'});return;}if(!h.startsWith('#post-'))return;const id=h.slice(6);setTimeout(()=>{const el=$('post-'+id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='3px solid #18a957';el.style.outlineOffset='2px';setTimeout(()=>{el.style.outline='';el.style.outlineOffset=''},2200)}},250)}window.addEventListener('trooth-profile-live-refresh',async e=>{if(!currentUser||e.detail?.profileId!==currentUser.id)return;const s=window.troothSupabase,r=await s.from('profiles').select('display_name,avatar_url,updated_at').eq('id',currentUser.id).maybeSingle();if(r.data){const n=r.data.display_name||currentUser.email?.split('@')[0]||'Trooth User',raw=r.data.avatar_url,av=raw?(raw+(raw.includes('?')?'&':'?')+'v='+encodeURIComponent(r.data.updated_at||Date.now())):null,a=av?'<img src="'+esc(av)+'" alt="'+esc(n)+'">':esc(n[0].toUpperCase());$('sideName').textContent=n;$('sideAvatar').innerHTML=a;$('composerAvatar').innerHTML=a}});window.addEventListener('hashchange',openHashPost);boot().then(openHashPost)</script><script src="trooth-profile-live-sync.js"></script><script src="trooth-globe-logo-v1.js"><script>
 (function(){
-  function initTroothIssueTabs(){
-    var tabs=document.querySelectorAll('[data-issue-tab]');
-    if(!tabs.length)return;
-    tabs.forEach(function(tab){
-      tab.addEventListener('click',function(){
-        tabs.forEach(function(t){t.classList.remove('active');t.setAttribute('aria-selected','false')});
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected','true');
-        var target=tab.getAttribute('href');
-        if(target)history.replaceState(null,'',target);
-      });
-    });
+  function initTroothSearch(){
+    var b=document.getElementById('troothSearchBtn'),s=document.getElementById('search');
+    if(!b||!s)return;
+    b.onclick=function(){
+      s.classList.toggle('trooth-search-open');
+      if(s.classList.contains('trooth-search-open'))s.focus();
+    };
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initTroothIssueTabs,{once:true});else initTroothIssueTabs();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initTroothSearch,{once:true});else initTroothSearch();
 })();
 </script></body></html>
