@@ -107,7 +107,20 @@ body{background:#fff!important;color:#18231d}
  .left.trooth-mobile-open{display:block!important;position:fixed!important;left:0!important;top:56px!important;bottom:0!important;width:min(315px,86vw)!important;background:#fff!important;z-index:80!important;padding:8px!important;overflow:auto!important;box-shadow:8px 0 28px rgba(0,0,0,.18)!important}
  .left.trooth-mobile-open .menu{display:block!important;position:static!important;max-height:none!important}
 }
-</style></head><body><header class="top trooth-topbar" aria-label="Trooth top bar">
+<style id="trooth-final-three-line-target">
+.trooth-topbar{background:#18a957!important;border-bottom:0!important;height:62px!important;color:#fff!important;padding:0 max(10px,4%)!important;gap:10px!important}
+.trooth-topbar .trooth-icon-btn{color:#fff!important;background:transparent!important;width:40px!important;height:40px!important;font-size:23px!important}
+.trooth-topbar .trooth-icon-btn:hover{background:rgba(255,255,255,.14)!important;color:#fff!important}
+.trooth-top-logo{display:flex!important;align-items:center!important;text-decoration:none!important;color:#fff!important;min-width:92px!important}
+.trooth-top-logo strong{color:#fff!important;font-size:25px!important;letter-spacing:-1px!important}
+.trooth-topbar #troothSearchBtn{margin-left:auto!important}
+.trooth-three-line-nav{top:62px!important;background:#fff!important}
+.trooth-three-line-nav .nav-row{height:auto!important;min-height:46px!important;padding:5px 8px!important;gap:5px!important}
+.trooth-three-line-nav .nav-row a{width:auto!important;max-width:none!important;flex:1!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;border:0!important;border-radius:9px!important;background:transparent!important;color:#244b38!important;padding:7px 5px!important;font-size:14px!important;font-weight:850!important}
+.trooth-three-line-nav .nav-row a span{font-size:11px!important;white-space:nowrap!important}
+.trooth-three-line-nav .nav-row a:hover,.trooth-three-line-nav .nav-row a.active{background:#eaf8ef!important;color:#15803d!important}
+@media(max-width:700px){.trooth-topbar{height:56px!important;padding:0 7px!important;gap:3px!important}.trooth-top-logo{min-width:76px!important}.trooth-top-logo strong{font-size:21px!important}.trooth-topbar .trooth-icon-btn{width:34px!important;height:34px!important;font-size:21px!important}.trooth-three-line-nav{top:56px!important}.trooth-three-line-nav .nav-row{overflow-x:auto!important;justify-content:flex-start!important}.trooth-three-line-nav .nav-row a{flex:0 0 auto!important;min-width:max-content!important;padding:6px 8px!important}}
+</style></style></head><body><header class="top trooth-topbar" aria-label="Trooth top bar">
  <button class="trooth-icon-btn" type="button" aria-label="Menu" onclick="document.querySelector('.left')?.classList.toggle('trooth-mobile-open')">☰</button>
  <a class="trooth-top-logo" href="index.html" aria-label="Trooth Home"><strong>Trooth</strong></a>
  <a class="trooth-icon-btn trooth-plus-btn" href="index.html#postInput" aria-label="Create">＋</a>
@@ -116,19 +129,19 @@ body{background:#fff!important;color:#18231d}
  <input id="search" class="search trooth-hidden-search" placeholder="Search people, posts & ideas..." oninput="filterPosts()" aria-label="Search">
 </header><nav class="reference-nav trooth-three-line-nav" aria-label="Trooth navigation">
  <div class="nav-row trooth-line-2" aria-label="Trooth services">
-  <a href="news.html" aria-label="News">📰 News</a>
-  <a href="sports.html" aria-label="Sports">🏆 Sports</a>
-  <a href="stores.html" aria-label="International Stores">🛍️ Stores</a>
-  <a href="film-fashion.html" aria-label="Film and Fashion">🎬 Film/Fashion</a>
-  <a href="property.html" aria-label="Property">🏠 Property</a>
+  <a href="news.html" aria-label="News">📰 <span>News</span></a>
+  <a href="sports.html" aria-label="Sports">🏆 <span>Sports</span></a>
+  <a href="stores.html" aria-label="International Stores">🛍️ <span>Stores</span></a>
+  <a href="film-fashion.html" aria-label="Film and Fashion">🎬 <span>Film/Fashion</span></a>
+  <a href="property.html" aria-label="Property">🏠 <span>Property</span></a>
  </div>
  <div class="nav-row trooth-line-3" aria-label="Social navigation">
-  <a class="active" href="index.html" aria-label="Home">⌂ Home</a>
-  <a href="friends.html" aria-label="Friends">👥 Friends</a>
-  <a href="index.html#feed" aria-label="Videos">▶ Videos</a>
-  <a href="dashboard.html" aria-label="Creator Dashboard">▥ Dashboard</a>
-  <a href="notifications-messages.html" aria-label="Notifications">🔔 Notifications</a>
-  <a href="profile.html" aria-label="User Profile">👤 Profile</a>
+  <a class="active" href="index.html" aria-label="Home">⌂ <span>Home</span></a>
+  <a href="friends.html" aria-label="Friends">👥 <span>Friends</span></a>
+  <a href="index.html#feed" aria-label="Videos">▶ <span>Videos</span></a>
+  <a href="dashboard.html" aria-label="Creator Dashboard">▥ <span>Dashboard</span></a>
+  <a href="notifications-messages.html" aria-label="Notifications">🔔 <span>Notifications</span></a>
+  <a href="profile.html" aria-label="User Profile">👤 <span>Profile</span></a>
  </div>
 </nav><main class="layout"><aside class="left"><nav class="menu"><div class="profile"><div id="sideAvatar" class="avatar">T</div><b id="sideName">Trooth Social</b><div id="sideRole" class="muted">Independent Social Network</div></div><a class="nav active" href="index.html">🏠 Home</a><a class="nav" href="friends.html">👥 Friends & Following</a><a class="nav" href="index.html#feed">▶️ Videos</a><a class="nav" href="groups.html">👨‍👩‍👧 Groups</a><a class="nav" href="activity.html">🕘 Memories & Activity</a><a class="nav" href="saved.html">🔖 Saved</a><a class="nav" href="business.html">💼 Business</a><a class="nav" href="news.html">📰 News</a><a class="nav" href="sports.html">🏆 Sports</a><a class="nav" href="stores.html">🛍️ International Stores</a><a class="nav" href="property.html">🏠 Property</a><a class="nav" href="film-fashion.html">🎬 Film & Fashion</a><a class="nav" href="creator-page.html">📄 Pages / Creator</a><a class="nav" href="dashboard.html">📊 Creator Dashboard</a><a class="nav" href="settings.html">⚙️ Settings</a><a class="nav" href="profile.html">👤 Profile</a></nav></aside><section><div class="card composer-card trooth-composer-card">
  <div class="composer">
