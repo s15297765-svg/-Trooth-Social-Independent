@@ -16,7 +16,7 @@
           <a class="trooth-menu" href="index.html" aria-label="Menu">☰</a>
           <a class="logo trooth-top-logo" href="index.html" aria-label="Trooth home"><img class="trooth-logo-3d" src="assets/trooth-logo-3d.svg?v=20260924-1" alt="Trooth"></a>
           <a class="trooth-icon" href="index.html#postInput" aria-label="Create post">＋</a>
-          <a class="trooth-icon" href="index.html#feed" aria-label="Search">⌕</a>
+          <button class="trooth-icon trooth-search-trigger" type="button" aria-label="Search">⌕</button>
           <a class="trooth-icon" href="chat.html" aria-label="Messenger">✉</a>
         </div>
       </header>
@@ -27,14 +27,14 @@
         <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="index.html#feed">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications.html">Notifications</a><a href="profile.html">Profile</a>
       </nav>`;
     document.body.insertBefore(wrap,document.body.firstChild);
-    var style=document.createElement('style');
+    var searchBtn=wrap.querySelector('.trooth-search-trigger');\n    if(searchBtn)searchBtn.addEventListener('click',function(){\n      var input=document.getElementById('search');\n      if(input){input.classList.toggle('trooth-search-open');input.focus();input.scrollIntoView({block:'nearest'});return;}\n      location.href='index.html#feed';\n    });\n    var style=document.createElement('style');
     style.id='trooth-unified-nav-css';
     style.textContent=`
       .trooth-unified-nav{position:sticky;top:0;z-index:1000;background:#fff;box-shadow:0 2px 12px rgba(20,82,56,.12)}
       .trooth-topbar{background:#18a957!important;color:#fff!important;padding:0!important;margin:0!important;position:relative!important}
       .trooth-toprow{min-height:62px;display:flex;align-items:center;gap:10px;padding:7px 12px}
       .trooth-toprow a{color:#fff!important;text-decoration:none!important}
-      .trooth-menu,.trooth-icon{width:42px;height:42px;display:flex!important;align-items:center;justify-content:center;font-size:27px;font-weight:900}
+      .trooth-menu,.trooth-icon{width:42px;height:42px;display:flex!important;align-items:center;justify-content:center;font-size:27px;font-weight:900;border:0;background:transparent;cursor:pointer}
       .trooth-icon{font-size:29px}
       .trooth-top-logo{display:flex;align-items:center;min-width:0;flex:1}
       .trooth-top-logo .trooth-logo-3d{width:205px;max-width:100%;height:auto;filter:grayscale(1) brightness(0) invert(1)}
