@@ -1,41 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 300" role="img" aria-labelledby="title desc">
-  <title id="title">Trooth SI</title>
-  <desc id="desc">Green 3D Trooth wordmark with both O letters shown as blue globes and a small SI mark.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 250" role="img" aria-labelledby="title desc">
+  <title id="title">Trooth</title>
+  <desc id="desc">Premium 3D Trooth wordmark with both O letters represented by blue globes.</desc>
   <defs>
     <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#b9ff63"/><stop offset=".45" stop-color="#45df32"/><stop offset="1" stop-color="#119447"/>
+      <stop offset="0" stop-color="#baff78"/><stop offset=".45" stop-color="#43df43"/><stop offset="1" stop-color="#0c984a"/>
     </linearGradient>
     <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#72ecff"/><stop offset=".45" stop-color="#168cff"/><stop offset="1" stop-color="#0649b8"/>
+      <stop offset="0" stop-color="#8af2ff"/><stop offset=".42" stop-color="#168dff"/><stop offset="1" stop-color="#0646b7"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-30%" width="145%" height="175%">
-      <feDropShadow dx="0" dy="9" stdDeviation="6" flood-opacity=".30"/>
+    <radialGradient id="shine" cx=".28" cy=".22" r=".75">
+      <stop offset="0" stop-color="#fff" stop-opacity=".8"/><stop offset=".2" stop-color="#fff" stop-opacity=".15"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#001b63" stop-opacity=".25"/>
+    </radialGradient>
+    <filter id="shadow" x="-15%" y="-25%" width="135%" height="165%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-opacity=".28"/>
     </filter>
-    <filter id="glow"><feGaussianBlur stdDeviation="3.5" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow" x="-20%" y="-80%" width="140%" height="260%">
+      <feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
   <g filter="url(#shadow)" font-family="Arial,Helvetica,sans-serif" font-weight="900">
-    <text x="28" y="145" font-size="145" fill="url(#green)" stroke="#0b7f38" stroke-width="3">Tr</text>
+    <text x="24" y="154" font-size="142" fill="url(#green)" stroke="#08783b" stroke-width="3" paint-order="stroke">Tr</text>
 
     <g>
-      <circle cx="378" cy="94" r="66" fill="url(#blue)" stroke="#0b67d1" stroke-width="5"/>
-      <ellipse cx="378" cy="94" rx="28" ry="66" fill="none" stroke="#c2f6ff" stroke-width="2.5" opacity=".85"/>
-      <path d="M312 94h132M324 67h108M324 121h108" fill="none" stroke="#c2f6ff" stroke-width="2.5" opacity=".85"/>
-      <path d="M344 48c18-14 41-16 59-8-11 7-16 17-14 29-18 3-34-5-45-21zM361 99c14-9 28-8 41 2-4 19-16 32-34 40-12-12-14-27-7-42z" fill="#64e84f"/>
-      <circle cx="358" cy="61" r="4" fill="#fff"/>
+      <circle cx="338" cy="101" r="62" fill="url(#blue)" stroke="#075bc5" stroke-width="5"/>
+      <circle cx="338" cy="101" r="62" fill="url(#shine)"/>
+      <ellipse cx="338" cy="101" rx="25" ry="62" fill="none" stroke="#d5fbff" stroke-width="2.5" opacity=".9"/>
+      <path d="M276 101h124M285 74h106M285 128h106" fill="none" stroke="#d5fbff" stroke-width="2.5" opacity=".85"/>
+      <path d="M305 55c17-13 38-16 56-9-10 7-15 16-13 27-17 4-32-2-43-18zM323 104c13-8 27-5 37 5-4 17-15 29-30 37-11-11-14-25-7-42z" fill="#56d84f"/>
+      <circle cx="319" cy="67" r="5" fill="#fff" opacity=".9"/>
     </g>
 
     <g>
-      <circle cx="526" cy="94" r="66" fill="url(#blue)" stroke="#0b67d1" stroke-width="5"/>
-      <ellipse cx="526" cy="94" rx="28" ry="66" fill="none" stroke="#c2f6ff" stroke-width="2.5" opacity=".85"/>
-      <path d="M460 94h132M472 67h108M472 121h108" fill="none" stroke="#c2f6ff" stroke-width="2.5" opacity=".85"/>
-      <path d="M493 49c19-13 41-13 58-5-8 8-11 17-9 27-17 5-34-2-49-22zM515 97c14-7 29-2 39 9-5 18-17 30-33 37-13-11-16-27-6-46z" fill="#64e84f"/>
-      <circle cx="505" cy="61" r="4" fill="#fff"/>
+      <circle cx="476" cy="101" r="62" fill="url(#blue)" stroke="#075bc5" stroke-width="5"/>
+      <circle cx="476" cy="101" r="62" fill="url(#shine)"/>
+      <ellipse cx="476" cy="101" rx="25" ry="62" fill="none" stroke="#d5fbff" stroke-width="2.5" opacity=".9"/>
+      <path d="M414 101h124M423 74h106M423 128h106" fill="none" stroke="#d5fbff" stroke-width="2.5" opacity=".85"/>
+      <path d="M443 57c18-12 39-14 55-6-8 7-11 16-9 26-16 4-31-3-46-20zM466 105c13-7 27-2 36 8-5 17-15 28-30 35-12-10-14-25-6-43z" fill="#56d84f"/>
+      <circle cx="457" cy="67" r="5" fill="#fff" opacity=".9"/>
     </g>
 
-    <text x="592" y="145" font-size="145" fill="url(#green)" stroke="#0b7f38" stroke-width="3">th</text>
-
-    <text x="780" y="139" font-size="74" fill="url(#green)" stroke="#0b7f38" stroke-width="2">SI</text>
-    <path d="M78 250 Q585 302 1088 250" fill="none" stroke="url(#green)" stroke-width="12" stroke-linecap="round" filter="url(#glow)"/>
+    <text x="540" y="154" font-size="142" fill="url(#green)" stroke="#08783b" stroke-width="3" paint-order="stroke">th</text>
+    <path d="M75 218 Q448 244 825 218" fill="none" stroke="url(#green)" stroke-width="10" stroke-linecap="round" filter="url(#glow)"/>
   </g>
 </svg>
