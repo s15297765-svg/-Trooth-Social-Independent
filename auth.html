@@ -72,7 +72,7 @@ async function signup(){
  try{
   const r=await sb.auth.signUp({...cred,password:pass,options:{data:{display_name:name},emailRedirectTo:cred.email?authRedirect():undefined}});
   if(r.error)throw r.error;
-  if(r.data?.session){msg('Account تیار ہے ✓');location.href='profile.html';return}
+  if(r.data?.session){msg('Account تیار ہے ✓');location.href='index.html';return}
   msg('Account بن گیا ہے۔ Confirmation email آئے تو اسے confirm کریں، پھر Login کریں۔');
  }catch(e){msg(authErrorText(e,'Account create')+'')}
  finally{busy('signupBtn',false)}
