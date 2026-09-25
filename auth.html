@@ -53,13 +53,13 @@ async function ready(){
   window.addEventListener('trooth-supabase-ready',on,{once:true});
  });
 }
-async function start(){try{sb=await ready();const r=await sb.auth.getUser();if(r.data?.user)location.href='profile.html';}catch(e){msg(e.message)}}
+async function start(){try{sb=await ready();const r=await sb.auth.getUser();if(r.data?.user)location.href='index.html';}catch(e){msg(e.message)}}
 async function login(){
  if(!sb){try{sb=await ready()}catch(e){msg(e.message);return}}
  const raw=$('identifier').value.trim(),pass=$('password').value,cred=identifier(raw);
  if(!cred||!pass){msg('براہِ کرم درست ای میل/موبائل نمبر اور پاس ورڈ درج کریں۔');return}
  busy('loginBtn',true);msg('Login ہو رہا ہے…');
- try{const r=await sb.auth.signInWithPassword({...cred,password:pass});if(r.error)throw r.error;msg('Login کامیاب ✓');location.href='profile.html';}
+ try{const r=await sb.auth.signInWithPassword({...cred,password:pass});if(r.error)throw r.error;msg('Login کامیاب ✓');location.href='index.html';}
  catch(e){msg(authErrorText(e,'Login')+' اگر confirmation باقی ہے تو نیچے Resend confirmation email دبائیں۔')}
  finally{busy('loginBtn',false)}
 }
