@@ -145,4 +145,4 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
-# Force a fresh Android build with versionCode 11 so Android cannot retain the previous APK build.
+# Force a fresh Android build for the current v1.5 source; versionCode 12.
