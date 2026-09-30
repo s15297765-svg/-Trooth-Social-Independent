@@ -80,7 +80,7 @@
 /* Trooth Facebook-style three-line header — final white-page layout */
 body{background:#fff!important;color:#18231d}
 .top.trooth-topbar{height:58px!important;min-height:58px!important;background:#18a957!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.28)!important;box-shadow:0 2px 10px rgba(0,0,0,.14)!important;color:#fff!important;padding:0 10px!important;gap:8px!important;position:sticky!important;top:0!important;z-index:50!important}
-.trooth-topbar .trooth-icon-btn{width:40px!important;height:40px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:transparent!important;color:#fff!important;border:0!important;font-size:24px!important;border-radius:9px!important;flex:none!important}
+.trooth-logo-mini{width:28px;height:28px;border-radius:8px;background:#fff;color:#18a957;display:grid;place-items:center;font-size:16px;font-weight:950;flex:none}.trooth-create-menu{position:fixed;top:66px;left:72px;z-index:90;background:#fff;border:1px solid #dce9e0;border-radius:14px;box-shadow:0 10px 30px rgba(20,70,40,.18);padding:6px;display:grid;gap:3px;min-width:170px}.trooth-create-menu[hidden]{display:none}.trooth-create-menu a{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:9px;color:#24563b;text-decoration:none;font-size:13px;font-weight:800}.trooth-create-menu a:hover{background:#eaf8ef;color:#15803d}.trooth-topbar .trooth-icon-btn{width:40px!important;height:40px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:transparent!important;color:#fff!important;border:0!important;font-size:24px!important;border-radius:9px!important;flex:none!important}
 .trooth-topbar .trooth-icon-btn:hover{background:rgba(255,255,255,.16)!important;color:#fff!important}
 .trooth-top-logo{display:flex!important;align-items:center!important;text-decoration:none!important;color:#fff!important;margin:0 auto 0 0!important;min-width:0!important}
 .trooth-top-logo strong{font-size:25px!important;font-weight:950!important;letter-spacing:-1px!important;color:#fff!important}
@@ -122,8 +122,16 @@ body{background:#fff!important;color:#18231d}
 @media(max-width:700px){.trooth-topbar{height:56px!important;padding:0 7px!important;gap:3px!important}.trooth-top-logo{min-width:76px!important}.trooth-top-logo strong{font-size:21px!important}.trooth-topbar .trooth-icon-btn{width:34px!important;height:34px!important;font-size:21px!important}.trooth-three-line-nav{top:56px!important}.trooth-three-line-nav .nav-row{overflow-x:auto!important;justify-content:flex-start!important}.trooth-three-line-nav .nav-row a{flex:0 0 auto!important;min-width:max-content!important;padding:6px 8px!important}}
 </style></style></head><body><header class="top trooth-topbar" aria-label="Trooth top bar">
  <button class="trooth-icon-btn" type="button" aria-label="Menu" onclick="document.querySelector('.left')?.classList.toggle('trooth-mobile-open')">☰</button>
- <a class="trooth-top-logo" href="index.html" aria-label="Trooth Home"><strong>Trooth</strong></a>
- <a class="trooth-icon-btn trooth-plus-btn" href="index.html#postInput" aria-label="Create">＋</a>
+ <a class="trooth-top-logo" href="index.html" aria-label="Trooth Home"><span class="trooth-logo-mini">T</span><strong>Trooth</strong></a>
+ <button id="troothCreateBtn" class="trooth-icon-btn trooth-plus-btn" type="button" aria-label="Create">＋</button>
+ <div id="troothCreateMenu" class="trooth-create-menu" hidden>
+  <a href="index.html#postInput" data-create="post">📝 <span>Post</span></a>
+  <a href="index.html#storyInput" data-create="story">⭕ <span>Story</span></a>
+  <a href="index.html#postInput" data-create="reel">🎞️ <span>Reel</span></a>
+  <a href="index.html#postInput" data-create="live">🔴 <span>Live</span></a>
+  <a href="index.html#videoInput" data-create="video">🎥 <span>Video</span></a>
+  <a href="index.html#postInput" data-create="note">📓 <span>Note</span></a>
+ </div>
  <button id="troothSearchBtn" class="trooth-icon-btn" type="button" aria-label="Search">⌕</button>
  <a class="trooth-icon-btn" href="notifications-messages.html" aria-label="Messenger">💬</a>
  <input id="search" class="search trooth-hidden-search" placeholder="Search people, posts & ideas..." oninput="filterPosts()" aria-label="Search">
@@ -131,6 +139,7 @@ body{background:#fff!important;color:#18231d}
  <div class="nav-row trooth-line-2" aria-label="Trooth services">
   <a href="news.html" aria-label="News">📰 <span>News</span></a>
   <a href="sports.html" aria-label="Sports">🏆 <span>Sports</span></a>
+  <a href="international.html" aria-label="International">🌐 <span>International</span></a>
   <a href="stores.html" aria-label="International Stores">🛍️ <span>Stores</span></a>
   <a href="film-fashion.html" aria-label="Film and Fashion">🎬 <span>Film/Fashion</span></a>
   <a href="property.html" aria-label="Property">🏠 <span>Property</span></a>
