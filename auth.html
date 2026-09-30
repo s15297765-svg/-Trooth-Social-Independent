@@ -55,7 +55,7 @@ async function ready(){
 }
 async function start(){try{sb=await ready();const r=await sb.auth.getUser();if(r.data?.user)location.href='index.html';}catch(e){msg(e.message)}}
 async function login(){
- if(!sb){try{sb=await ready()}catch(e){msg(e.message);return}}
+ if(!sb){try{sb=await ready()}catch(e){msg('Trooth service ابھی تیار نہیں۔ براہِ کرم دوبارہ کوشش کریں۔');return}}
  const raw=$('identifier').value.trim(),pass=$('password').value,cred=identifier(raw);
  if(!cred||!pass){msg('براہِ کرم درست ای میل/موبائل نمبر اور پاس ورڈ درج کریں۔');return}
  busy('loginBtn',true);msg('Login ہو رہا ہے…');
