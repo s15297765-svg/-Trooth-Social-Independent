@@ -5,9 +5,9 @@
   function nav(){
     if(document.querySelector('.trooth-unified-nav'))return;
     var oldHeader=document.querySelector('body>header');
-    var oldNav=document.querySelector('main>nav');
+    var oldNavs=document.querySelectorAll('.reference-nav,.trooth-three-line-nav,main>nav');
     if(oldHeader)oldHeader.remove();
-    if(oldNav)oldNav.remove();
+    oldNavs.forEach(function(el){el.remove()});
 
     var wrap=document.createElement('div');
     wrap.className='trooth-unified-nav';
@@ -16,19 +16,19 @@
         <div class="trooth-toprow">
           <button class="trooth-menu" type="button" aria-label="Menu" aria-expanded="false">☰</button>
           <a class="trooth-top-logo" href="index.html" aria-label="Trooth Social Independent">
-            <img class="trooth-logo-3d" src="assets/trooth-logo-3d.svg?v=20260924-3" alt="Trooth Social Independent" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
-            <strong>Trooth</strong>
+            <span class="trooth-logo-word" aria-hidden="true"><span class="trooth-logo-text">Tr</span><span class="trooth-logo-orb orb-a"></span><span class="trooth-logo-orb orb-b"></span><span class="trooth-logo-text">th</span></span>
           </a>
           <button class="trooth-icon trooth-plus" type="button" aria-label="Create" aria-expanded="false">＋</button>
           <button class="trooth-icon trooth-search-trigger" type="button" aria-label="Search">⌕</button>
           <a class="trooth-icon trooth-messenger" href="chat.html" aria-label="Messenger">💬</a>
+          <input id="search" class="trooth-nav-search" type="search" placeholder="Search Trooth…" aria-label="Search Trooth" oninput="filterPosts()">
         </div>
       </header>
       <nav class="trooth-nav-row trooth-nav-secondary" aria-label="Trooth sections">
         <a href="news.html">News</a><a href="sports.html">Sports</a><a href="stores.html">International Stores</a><a href="film-fashion.html">Film/Fashion</a><a href="property.html">Property</a>
       </nav>
       <nav class="trooth-nav-row trooth-nav-tertiary" aria-label="Trooth social navigation">
-        <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="reels.html">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications-messages.html">Notifications</a><a href="profile.html">Profile</a>
+        <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="index.html#feed">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications-messages.html">Notifications</a><a href="profile.html">Profile</a>
       </nav>`;
     document.body.insertBefore(wrap,document.body.firstChild);
 
@@ -45,7 +45,7 @@
         fallback=document.createElement('div');
         fallback.className='trooth-mobile-menu';
         fallback.innerHTML='<div class="trooth-create-title">Trooth Menu</div>'+
-          '<a href="index.html">🏠 Home</a><a href="friends.html">👥 Friends</a><a href="reels.html">🎞️ Videos</a>'+
+          '<a href="index.html">🏠 Home</a><a href="friends.html">👥 Friends</a><a href="index.html#feed">🎞️ Videos</a>'+
           '<a href="dashboard.html">📊 Dashboard</a><a href="notifications-messages.html">🔔 Notifications</a><a href="profile.html">👤 Profile</a>'+
           '<a href="news.html">📰 News</a><a href="sports.html">🏏 Sports</a><a href="stores.html">🛍️ International Stores</a>'+
           '<a href="film-fashion.html">🎬 Film/Fashion</a><a href="property.html">🏠 Property</a>';
@@ -59,7 +59,7 @@
     if(plusBtn){
       var createMenu=document.createElement('div');
       createMenu.className='trooth-create-menu';
-      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="index.html#postInput" data-create="post">📝 Post</a><a href="index.html#story" data-create="story">⭕ Story</a><a href="reels.html" data-create="reel">🎞️ Reel</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="index.html#note" data-create="note">📒 Note</a>';
+      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="index.html#postInput" data-create="post">📝 Post</a><a href="index.html#storyInput" data-create="story">⭕ Story</a><a href="index.html#videoInput" data-create="reel">🎞️ Video / Reel</a><a href="index.html#videoInput" data-create="video">🎥 Video Post</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="index.html#note" data-create="note">📒 Note</a>';
       wrap.querySelector('.trooth-toprow').appendChild(createMenu);
       plusBtn.addEventListener('click',function(){
         var open=createMenu.classList.toggle('open');
@@ -69,7 +69,7 @@
         var a=e.target.closest('a[data-create]');
         if(!a)return;
         var type=a.getAttribute('data-create');
-        if(type==='post' || type==='story' || type==='live' || type==='note'){
+        if(type==='post' || type==='story' || type==='reel' || type==='video' || type==='live' || type==='note'){
           var isIndex=/index\\.html$/i.test(location.pathname)||location.pathname==='/'||location.pathname.endsWith('/');
           if(!isIndex)return;
           e.preventDefault();
@@ -81,6 +81,9 @@
           }else if(type==='story'){
             var s=document.getElementById('storyInput');
             if(s){s.click();}else{location.hash='story';}
+          }else if(type==='reel' || type==='video'){
+            var v=document.getElementById('videoInput');
+            if(v){v.click();}else{location.hash='feed';}
           }else if(type==='note'){
             var n=prompt('اپنا Note لکھیں:');
             if(!n||!n.trim())return;
@@ -109,10 +112,10 @@
     if(searchBtn)searchBtn.addEventListener('click',function(){
       var input=document.getElementById('search');
       if(input){
-        input.classList.toggle('trooth-search-open');
-        if(input.classList.contains('trooth-search-open'))input.focus();
+        input.classList.toggle('open');
+        if(input.classList.contains('open'))input.focus();
       }else{
-        location.href='index.html#search';
+        location.href='index.html#feed';
       }
     });
 
@@ -135,9 +138,13 @@
       .trooth-create-menu a:hover{background:#e5f7eb}
       .trooth-messenger{font-size:23px!important}
       .trooth-search-trigger{font-size:28px!important}
-      .trooth-top-logo{display:flex;align-items:center;gap:6px;min-width:0;flex:1;color:#fff!important;text-decoration:none!important}
-      .trooth-top-logo .trooth-logo-3d{width:205px;max-width:100%;height:auto;filter:grayscale(1) brightness(0) invert(1)}
-      .trooth-top-logo strong{display:none;color:#fff;font-size:25px;font-weight:950;letter-spacing:-1px}
+      .trooth-nav-search{display:none;position:absolute;left:54px;right:54px;top:67px;height:42px;border:1px solid #cfe8d8;border-radius:22px;background:#fff;color:#173b29;padding:0 15px;font-size:14px;box-shadow:0 8px 24px rgba(20,82,56,.16);z-index:1200;outline:none}
+      .trooth-nav-search.open{display:block}
+      .trooth-top-logo{display:flex;align-items:center;min-width:0;flex:1;color:#fff!important;text-decoration:none!important}
+      .trooth-logo-word{display:inline-flex;align-items:center;gap:2px;height:42px;white-space:nowrap}
+      .trooth-logo-text{font-size:25px;font-weight:950;letter-spacing:-1px;color:#fff;line-height:1}
+      .trooth-logo-orb{width:28px;height:28px;border-radius:50%;display:inline-block;background:radial-gradient(circle at 32% 27%,#fff 0 18%,#eafff2 19% 48%,#b9f5d0 49% 72%,#7de0a4 73% 100%);box-shadow:inset -3px -4px 6px rgba(0,100,45,.18),inset 2px 2px 4px rgba(255,255,255,.85),0 1px 2px rgba(0,0,0,.12)}
+      .trooth-logo-orb.orb-b{margin-left:-1px}
       .trooth-nav-row{display:flex;gap:4px;align-items:center;justify-content:center;overflow-x:auto;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7}
       .trooth-nav-row a{color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
       .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}
@@ -145,8 +152,9 @@
         .trooth-toprow{min-height:56px;padding:5px 6px;gap:3px}
         .trooth-menu,.trooth-icon{width:38px;height:38px;font-size:23px}
         .trooth-plus{font-size:29px!important}.trooth-search-trigger{font-size:25px!important}.trooth-messenger{font-size:21px!important}
-        .trooth-top-logo .trooth-logo-3d{width:150px}
-        .trooth-top-logo strong{font-size:22px}
+        .trooth-logo-text{font-size:22px}
+        .trooth-logo-orb{width:25px;height:25px}
+        .trooth-nav-search{left:48px;right:48px;top:59px;height:40px}
         .trooth-nav-row{justify-content:flex-start;padding:6px 5px}
         .trooth-nav-row a{font-size:12px;padding:7px 8px}
       }
