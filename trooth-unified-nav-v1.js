@@ -21,7 +21,7 @@
           <button class="trooth-icon trooth-plus" type="button" aria-label="Create" aria-expanded="false">＋</button>
           <button class="trooth-icon trooth-search-trigger" type="button" aria-label="Search">⌕</button>
           <a class="trooth-icon trooth-messenger" href="chat.html" aria-label="Messenger">💬</a>
-          <input id="search" class="trooth-nav-search" type="search" placeholder="Search Trooth…" aria-label="Search Trooth" oninput="filterPosts()">
+          <input id="troothNavSearch" class="trooth-nav-search" type="search" placeholder="Search Trooth…" aria-label="Search Trooth">
         </div>
       </header>
       <nav class="trooth-nav-row trooth-nav-secondary" aria-label="Trooth sections">
@@ -110,7 +110,7 @@
 
     var searchBtn=wrap.querySelector('.trooth-search-trigger');
     if(searchBtn)searchBtn.addEventListener('click',function(){
-      var input=document.getElementById('search');
+      var input=document.getElementById('troothNavSearch');
       if(input){
         input.classList.toggle('open');
         if(input.classList.contains('open'))input.focus();
@@ -140,11 +140,11 @@
       .trooth-search-trigger{font-size:28px!important}
       .trooth-nav-search{display:none;position:absolute;left:54px;right:54px;top:67px;height:42px;border:1px solid #cfe8d8;border-radius:22px;background:#fff;color:#173b29;padding:0 15px;font-size:14px;box-shadow:0 8px 24px rgba(20,82,56,.16);z-index:1200;outline:none}
       .trooth-nav-search.open{display:block}
-      .trooth-top-logo{display:flex;align-items:center;min-width:0;flex:1;color:#fff!important;text-decoration:none!important}
-      .trooth-logo-word{display:inline-flex;align-items:center;gap:2px;height:42px;white-space:nowrap}
+      .trooth-top-logo{display:flex;align-items:center;min-width:0;flex:1;color:#fff!important;text-decoration:none!important;justify-content:flex-start}
+      .trooth-logo-word{display:inline-flex;align-items:center;gap:0;height:42px;white-space:nowrap;padding:0 3px}
       .trooth-logo-text{font-size:25px;font-weight:950;letter-spacing:-1px;color:#fff;line-height:1}
-      .trooth-logo-orb{width:28px;height:28px;border-radius:50%;display:inline-block;background:radial-gradient(circle at 32% 27%,#fff 0 18%,#eafff2 19% 48%,#b9f5d0 49% 72%,#7de0a4 73% 100%);box-shadow:inset -3px -4px 6px rgba(0,100,45,.18),inset 2px 2px 4px rgba(255,255,255,.85),0 1px 2px rgba(0,0,0,.12)}
-      .trooth-logo-orb.orb-b{margin-left:-1px}
+      .trooth-logo-orb{width:27px;height:27px;flex:none;border-radius:50%;display:inline-block;background:radial-gradient(circle at 32% 27%,#fff 0 18%,#eafff2 19% 48%,#b9f5d0 49% 72%,#7de0a4 73% 100%);box-shadow:inset -3px -4px 6px rgba(0,100,45,.18),inset 2px 2px 4px rgba(255,255,255,.85),0 1px 2px rgba(0,0,0,.12)}
+      .trooth-logo-orb.orb-b{margin-left:-2px}
       .trooth-nav-row{display:flex;gap:4px;align-items:center;justify-content:center;overflow-x:auto;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7}
       .trooth-nav-row a{color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
       .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}
