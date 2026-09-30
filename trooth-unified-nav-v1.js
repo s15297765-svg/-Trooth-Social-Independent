@@ -99,7 +99,7 @@
               if(feed)feed.scrollIntoView({behavior:'smooth',block:'start'});
             }).catch(function(err){alert('Note save failed: '+(err.message||'Please try again.'))});
           }else if(type==='live'){
-            alert('🔴 Live Video setup: camera/microphone access will be connected here. The current project does not yet have a live-stream backend, so I am not pretending this is already live.');
+            if(window.TroothLive)window.TroothLive.open();else alert('Trooth Live is still loading. Please try again.');
           }
         }
       });
