@@ -25,7 +25,7 @@
         </div>
       </header>
       <nav class="trooth-nav-row trooth-nav-secondary" aria-label="Trooth sections">
-        <a href="news.html">News</a><a href="sports.html">Sports</a><a href="stores.html">International Stores</a><a href="film-fashion.html">Film/Fashion</a><a href="property.html">Property</a>
+        <a href="news.html">News</a><a href="sports.html">Sports</a><a href="stores.html">International</a><a href="stores.html">Stores</a><a href="film-fashion.html">Film/Fashion</a><a href="property.html">Property</a>
       </nav>
       <nav class="trooth-nav-row trooth-nav-tertiary" aria-label="Trooth social navigation">
         <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="index.html#feed">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications-messages.html">Notifications</a><a href="profile.html">Profile</a>
@@ -47,7 +47,7 @@
         fallback.innerHTML='<div class="trooth-create-title">Trooth Menu</div>'+
           '<a href="index.html">🏠 Home</a><a href="friends.html">👥 Friends</a><a href="index.html#feed">🎞️ Videos</a>'+
           '<a href="dashboard.html">📊 Dashboard</a><a href="notifications-messages.html">🔔 Notifications</a><a href="profile.html">👤 Profile</a>'+
-          '<a href="news.html">📰 News</a><a href="sports.html">🏏 Sports</a><a href="stores.html">🛍️ International Stores</a>'+
+          '<a href="news.html">📰 News</a><a href="sports.html">🏏 Sports</a><a href="stores.html">🛍️ International</a><a href="stores.html">Stores</a>'+
           '<a href="film-fashion.html">🎬 Film/Fashion</a><a href="property.html">🏠 Property</a>';
         wrap.appendChild(fallback);
       }
@@ -59,7 +59,7 @@
     if(plusBtn){
       var createMenu=document.createElement('div');
       createMenu.className='trooth-create-menu';
-      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="index.html#postInput" data-create="post">📝 Post</a><a href="index.html#storyInput" data-create="story">⭕ Story</a><a href="index.html#videoInput" data-create="reel">🎞️ Video / Reel</a><a href="index.html#videoInput" data-create="video">🎥 Video Post</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="index.html#note" data-create="note">📒 Note</a>';
+      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="index.html#postInput" data-create="post">📝 Post</a><a href="index.html#storyInput" data-create="story">⭕ Story</a><a href="index.html#videoInput" data-create="reel">🎞️ Reel</a><a href="index.html#videoInput" data-create="video">🎥 Video</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="index.html#note" data-create="note">📒 Note</a>';
       wrap.querySelector('.trooth-toprow').appendChild(createMenu);
       plusBtn.addEventListener('click',function(){
         var open=createMenu.classList.toggle('open');
@@ -117,6 +117,11 @@
       }else{
         location.href='index.html#feed';
       }
+    });
+
+    var searchInput=wrap.querySelector('#troothNavSearch');
+    if(searchInput)searchInput.addEventListener('input',function(){
+      if(typeof window.filterPosts==='function')window.filterPosts(searchInput.value);
     });
 
     var style=document.createElement('style');
