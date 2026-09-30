@@ -16,7 +16,7 @@
         <div class="trooth-toprow">
           <button class="trooth-menu" type="button" aria-label="Menu" aria-expanded="false">☰</button>
           <a class="trooth-top-logo" href="index.html" aria-label="Trooth Social Independent">
-            <span class="trooth-logo-word" aria-hidden="true"><span class="trooth-logo-text">Tr</span><span class="trooth-logo-orb orb-a"></span><span class="trooth-logo-orb orb-b"></span><span class="trooth-logo-text">th</span></span>
+            <img class="trooth-logo-3d" src="assets/trooth-logo-3d.svg?v=20260930-1" alt="Trooth">
           </a>
           <button class="trooth-icon trooth-plus" type="button" aria-label="Create" aria-expanded="false">＋</button>
           <button class="trooth-icon trooth-search-trigger" type="button" aria-label="Search">⌕</button>
@@ -145,11 +145,9 @@
       .trooth-search-trigger{font-size:28px!important}
       .trooth-nav-search{display:none;position:absolute;left:54px;right:54px;top:67px;height:42px;border:1px solid #cfe8d8;border-radius:22px;background:#fff;color:#173b29;padding:0 15px;font-size:14px;box-shadow:0 8px 24px rgba(20,82,56,.16);z-index:1200;outline:none}
       .trooth-nav-search.open{display:block}
-      .trooth-top-logo{display:flex;align-items:center;min-width:0;flex:1;color:#fff!important;text-decoration:none!important;justify-content:flex-start}
-      .trooth-logo-word{display:inline-flex;align-items:center;gap:0;height:42px;white-space:nowrap;padding:0 3px}
-      .trooth-logo-text{font-size:25px;font-weight:950;letter-spacing:-1px;color:#fff;line-height:1}
-      .trooth-logo-orb{width:27px;height:27px;flex:none;border-radius:50%;display:inline-block;background:radial-gradient(circle at 32% 27%,#fff 0 18%,#eafff2 19% 48%,#b9f5d0 49% 72%,#7de0a4 73% 100%);box-shadow:inset -3px -4px 6px rgba(0,100,45,.18),inset 2px 2px 4px rgba(255,255,255,.85),0 1px 2px rgba(0,0,0,.12)}
-      .trooth-logo-orb.orb-b{margin-left:-2px}
+      .trooth-top-logo{display:flex;align-items:center;min-width:0;flex:1;color:#fff!important;text-decoration:none!important;justify-content:flex-start;overflow:hidden}
+      .trooth-top-logo .trooth-logo-3d{display:block;width:190px;height:44px;max-width:100%;object-fit:contain;object-position:left center;filter:grayscale(1) brightness(0) invert(1)}
+
       /* Unified one-page shell: remove legacy duplicate side navigation */
       .trooth-unified-nav~.layout{display:block;max-width:900px}
       .trooth-unified-nav~.layout>.left,.trooth-unified-nav~.layout>.right{display:none!important}
@@ -160,8 +158,7 @@
         .trooth-toprow{min-height:56px;padding:5px 6px;gap:3px}
         .trooth-menu,.trooth-icon{width:38px;height:38px;font-size:23px}
         .trooth-plus{font-size:29px!important}.trooth-search-trigger{font-size:25px!important}.trooth-messenger{font-size:21px!important}
-        .trooth-logo-text{font-size:22px}
-        .trooth-logo-orb{width:25px;height:25px}
+        .trooth-top-logo .trooth-logo-3d{width:175px;height:40px}
         .trooth-nav-search{left:48px;right:48px;top:59px;height:40px}
         .trooth-nav-row{justify-content:flex-start;padding:6px 5px}
         .trooth-nav-row a{font-size:12px;padding:7px 8px}
