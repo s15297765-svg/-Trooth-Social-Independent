@@ -145,6 +145,9 @@
       .trooth-logo-text{font-size:25px;font-weight:950;letter-spacing:-1px;color:#fff;line-height:1}
       .trooth-logo-orb{width:27px;height:27px;flex:none;border-radius:50%;display:inline-block;background:radial-gradient(circle at 32% 27%,#fff 0 18%,#eafff2 19% 48%,#b9f5d0 49% 72%,#7de0a4 73% 100%);box-shadow:inset -3px -4px 6px rgba(0,100,45,.18),inset 2px 2px 4px rgba(255,255,255,.85),0 1px 2px rgba(0,0,0,.12)}
       .trooth-logo-orb.orb-b{margin-left:-2px}
+      /* Unified one-page shell: remove legacy duplicate side navigation */
+      .trooth-unified-nav~.layout{display:block;max-width:900px}
+      .trooth-unified-nav~.layout>.left,.trooth-unified-nav~.layout>.right{display:none!important}
       .trooth-nav-row{display:flex;gap:4px;align-items:center;justify-content:center;overflow-x:auto;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7}
       .trooth-nav-row a{color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
       .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}
