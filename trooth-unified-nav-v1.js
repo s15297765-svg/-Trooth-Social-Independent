@@ -2,6 +2,10 @@
 (function(){
   if(window.__troothUnifiedNavV2)return;
   window.__troothUnifiedNavV2=true;
+  function cleanLegacyShell(){
+    document.querySelectorAll('.reference-nav,.trooth-three-line-nav,main>nav,.bottom,#trooth-demo-banner,#trooth-demo-hub').forEach(function(el){el.remove();});
+    document.body.style.paddingBottom='0';
+  }
   function nav(){
     if(document.querySelector('.trooth-unified-nav'))return;
     var oldHeader=document.querySelector('body>header');
@@ -124,8 +128,12 @@
       if(typeof window.filterPosts==='function')window.filterPosts(searchInput.value);
     });
 
+    cleanLegacyShell();
+    var observer=new MutationObserver(function(){cleanLegacyShell();});
+    observer.observe(document.body,{childList:true,subtree:true});
+
     var style=document.createElement('style');
-    style.id='trooth-unified-nav-css-v3';
+    style.id='trooth-unified-nav-css-v4';
     style.textContent=`
       .trooth-unified-nav{position:sticky;top:0;z-index:1000;background:#fff;box-shadow:0 2px 12px rgba(20,82,56,.12)}
       .trooth-topbar{background:#18a957!important;color:#fff!important;padding:0!important;margin:0!important;position:relative!important;border:0!important}
@@ -154,6 +162,12 @@
       .trooth-nav-row{display:flex;gap:4px;align-items:center;justify-content:center;overflow-x:auto;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7}
       .trooth-nav-row a{color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
       .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}
+      /* One-page mobile shell: the unified header owns all navigation. */
+      .bottom{display:none!important}
+      body{padding-bottom:0!important}
+      #trooth-demo-banner,#trooth-demo-hub{display:none!important}
+      .trooth-composer-card .postbox{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
       @media(max-width:600px){
         .trooth-toprow{min-height:56px;padding:5px 6px;gap:3px}
         .trooth-menu,.trooth-icon{width:38px;height:38px;font-size:23px}
