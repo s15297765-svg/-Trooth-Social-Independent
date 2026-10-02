@@ -29,7 +29,7 @@
         </div>
       </header>
       <nav class="trooth-nav-row trooth-nav-secondary" aria-label="Trooth sections">
-        <a href="news.html">News</a><a href="sports.html">Sports</a><a href="stores.html">Stores</a><a href="film-fashion.html">Film/Fashion</a><a href="property.html">Property</a>
+        <a href="news.html">News</a><a href="sports.html">Sports</a><a href="international.html">International</a><a href="stores.html">Stores</a><a href="film-fashion.html">Film/Fashion</a><a href="property.html">Property</a>
       </nav>
       <nav class="trooth-nav-row trooth-nav-tertiary" aria-label="Trooth social navigation">
         <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="index.html#feed">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications-messages.html">Notifications</a><a href="profile.html">Profile</a>
@@ -104,7 +104,7 @@
     var style=document.createElement('style');
     style.id='trooth-unified-nav-css-v4';
     style.textContent=`
-      .trooth-unified-nav{position:sticky!important;top:0!important;z-index:10000!important;display:block!important;background:#fff!important;box-shadow:0 2px 12px rgba(20,82,56,.12)!important;isolation:isolate}
+      .trooth-unified-nav{position:sticky!important;top:0!important;z-index:10000!important;display:block!important;width:100%!important;background:#fff!important;box-shadow:0 2px 12px rgba(20,82,56,.12)!important;isolation:isolate;contain:layout paint!important}.trooth-unified-nav>*{box-sizing:border-box!important;flex:none!important}.trooth-nav-row{position:relative!important;z-index:2!important;min-height:42px!important;visibility:visible!important;opacity:1!important}
       .trooth-topbar{display:block!important;width:100%!important;height:auto!important;min-height:62px!important;background:#18a957!important;color:#fff!important;padding:0!important;margin:0!important;position:relative!important;border:0!important;opacity:1!important;visibility:visible!important}
       .trooth-toprow{width:100%;min-height:62px;display:flex;align-items:center;gap:8px;padding:7px 10px}
       .trooth-menu,.trooth-icon{width:42px;height:42px;display:flex!important;align-items:center;justify-content:center;font-size:27px;font-weight:900;border:0;background:transparent;color:#fff!important;text-decoration:none!important;cursor:pointer;flex:none}
@@ -120,7 +120,7 @@
       .trooth-create-menu a:hover{background:#e5f7eb}
       .trooth-messenger{font-size:23px!important}
       .trooth-search-trigger{font-size:28px!important}
-      .trooth-nav-search{display:none;position:absolute;left:54px;right:54px;top:67px;height:42px;border:1px solid #cfe8d8;border-radius:22px;background:#fff;color:#173b29;padding:0 15px;font-size:14px;box-shadow:0 8px 24px rgba(20,82,56,.16);z-index:1200;outline:none}
+      .trooth-nav-search{display:none;position:absolute;left:54px;right:54px;top:64px;height:42px;border:1px solid #cfe8d8;border-radius:22px;background:#fff;color:#173b29;padding:0 15px;font-size:14px;box-shadow:0 8px 24px rgba(20,82,56,.16);z-index:1200;outline:none}
       .trooth-nav-search.open{display:block}
       .trooth-top-logo{display:flex;align-items:center;min-width:0;flex:1;color:#fff!important;text-decoration:none!important;justify-content:flex-start;overflow:hidden}
       .trooth-top-logo .trooth-logo-3d{display:block;width:190px;height:44px;max-width:100%;object-fit:contain;object-position:left center;filter:grayscale(1) brightness(0) invert(1)}
@@ -128,8 +128,8 @@
       /* Unified one-page shell: remove legacy duplicate side navigation */
       .trooth-unified-nav~.layout{display:block;max-width:900px}
       .trooth-unified-nav~.layout>.left,.trooth-unified-nav~.layout>.right{display:none!important}
-      .trooth-nav-row{width:100%;display:flex;gap:4px;align-items:center;justify-content:center;overflow-x:auto;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7}
-      .trooth-nav-row a{color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
+      .trooth-nav-row{width:100%;display:flex!important;gap:4px;align-items:center;justify-content:center;overflow-x:auto;overflow-y:hidden;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7;scrollbar-width:none!important}.trooth-nav-row::-webkit-scrollbar{display:none!important}
+      .trooth-nav-row a{flex:0 0 auto!important;color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
       .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}
       /* One-page mobile shell: the unified header owns all navigation. */
       .bottom{display:none!important}
@@ -143,7 +143,7 @@
         .trooth-menu,.trooth-icon{width:38px;height:38px;font-size:23px}
         .trooth-plus{font-size:29px!important}.trooth-search-trigger{font-size:25px!important}.trooth-messenger{font-size:21px!important}
         .trooth-top-logo .trooth-logo-3d{width:175px;height:40px}
-        .trooth-nav-search{left:48px;right:48px;top:59px;height:40px}
+        .trooth-nav-search{left:48px;right:48px;top:58px;height:40px}
         .trooth-nav-row{justify-content:flex-start;padding:6px 5px}
         .trooth-nav-row a{font-size:12px;padding:7px 8px}
       }
