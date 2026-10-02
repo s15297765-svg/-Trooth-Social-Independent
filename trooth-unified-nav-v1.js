@@ -63,7 +63,7 @@
     if(plusBtn){
       var createMenu=document.createElement('div');
       createMenu.className='trooth-create-menu';
-      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="index.html#postInput" data-create="post">📝 Post</a><a href="index.html#storyInput" data-create="story">⭕ Story</a><a href="index.html#videoInput" data-create="reel">🎞️ Reel</a><a href="index.html#videoInput" data-create="video">🎥 Video</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="index.html#note" data-create="note">📒 Note</a>';
+      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="post.html" data-create="post">📝 Post</a><a href="story.html" data-create="story">⭕ Story</a><a href="index.html#videoInput" data-create="reel">🎞️ Reel</a><a href="index.html#videoInput" data-create="video">🎥 Video</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="index.html#note" data-create="note">📒 Note</a>';
       wrap.querySelector('.trooth-toprow').appendChild(createMenu);
       plusBtn.addEventListener('click',function(){
         var open=createMenu.classList.toggle('open');
@@ -73,39 +73,11 @@
         var a=e.target.closest('a[data-create]');
         if(!a)return;
         var type=a.getAttribute('data-create');
-        if(type==='post' || type==='story' || type==='reel' || type==='video' || type==='live' || type==='note'){
-          var isIndex=/index\\.html$/i.test(location.pathname)||location.pathname==='/'||location.pathname.endsWith('/');
-          if(!isIndex)return;
-          e.preventDefault();
-          createMenu.classList.remove('open');
-          plusBtn.setAttribute('aria-expanded','false');
-          if(type==='post'){
-            var p=document.getElementById('postInput');
-            if(p){p.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){p.focus()},250);}
-          }else if(type==='story'){
-            var s=document.getElementById('storyInput');
-            if(s){s.click();}else{location.hash='story';}
-          }else if(type==='reel' || type==='video'){
-            var v=document.getElementById('videoInput');
-            if(v){v.click();}else{location.hash='feed';}
-          }else if(type==='note'){
-            var n=prompt('اپنا Note لکھیں:');
-            if(!n||!n.trim())return;
-            var sb=window.troothSupabase;
-            if(!sb){alert('Trooth connection is not ready.');return;}
-            sb.auth.getUser().then(function(r){
-              var u=r.data&&r.data.user;
-              if(!u){location.href='auth.html';return;}
-              return sb.from('posts').insert({user_id:u.id,body:'📒 Note\\n\\n'+n.trim(),media_url:null,media_type:null});
-            }).then(function(r){
-              if(r&&r.error)throw r.error;
-              var feed=document.getElementById('feed');
-              if(feed)feed.scrollIntoView({behavior:'smooth',block:'start'});
-            }).catch(function(err){alert('Note save failed: '+(err.message||'Please try again.'))});
-          }else if(type==='live'){
-            if(window.TroothLive)window.TroothLive.open();else alert('Trooth Live is still loading. Please try again.');
-          }
-        }
+        if(type==='post'){ location.href='post.html'; return; }
+        if(type==='story'){ location.href='story.html'; return; }
+        if(type==='reel' || type==='video'){ location.href='post.html?mode=video'; return; }
+        if(type==='live'){ if(window.TroothLive)window.TroothLive.open(); else alert('Trooth Live is still loading. Please try again.'); return; }
+        if(type==='note'){ location.href='post.html?mode=note'; return; }
       });
       document.addEventListener('click',function(e){
         if(!wrap.contains(e.target)){createMenu.classList.remove('open');plusBtn.setAttribute('aria-expanded','false');}
