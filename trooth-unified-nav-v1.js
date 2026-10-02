@@ -63,7 +63,7 @@
     if(plusBtn){
       var createMenu=document.createElement('div');
       createMenu.className='trooth-create-menu';
-      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="post.html" data-create="post">📝 Post</a><a href="story.html" data-create="story">⭕ Story</a><a href="index.html#videoInput" data-create="reel">🎞️ Reel</a><a href="index.html#videoInput" data-create="video">🎥 Video</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="index.html#note" data-create="note">📒 Note</a>';
+      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="post.html" data-create="post">📝 Post</a><a href="story.html" data-create="story">⭕ Story</a><a href="post.html?mode=video" data-create="reel">🎞️ Reel</a><a href="post.html?mode=video" data-create="video">🎥 Video</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="post.html?mode=note" data-create="note">📒 Note</a>';
       wrap.querySelector('.trooth-toprow').appendChild(createMenu);
       plusBtn.addEventListener('click',function(){
         var open=createMenu.classList.toggle('open');
