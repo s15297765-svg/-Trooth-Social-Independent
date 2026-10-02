@@ -104,9 +104,9 @@
     var style=document.createElement('style');
     style.id='trooth-unified-nav-css-v4';
     style.textContent=`
-      .trooth-unified-nav{position:sticky!important;top:0!important;z-index:10000!important;display:block!important;width:100%!important;background:#fff!important;box-shadow:0 2px 12px rgba(20,82,56,.12)!important;isolation:isolate;contain:layout paint!important}.trooth-unified-nav>*{box-sizing:border-box!important;flex:none!important}.trooth-nav-row{position:relative!important;z-index:2!important;min-height:42px!important;visibility:visible!important;opacity:1!important}
-      .trooth-topbar{display:block!important;width:100%!important;height:auto!important;min-height:62px!important;background:#18a957!important;color:#fff!important;padding:0!important;margin:0!important;position:relative!important;border:0!important;opacity:1!important;visibility:visible!important}
-      .trooth-toprow{width:100%;min-height:62px;display:flex;align-items:center;gap:8px;padding:7px 10px}
+      .trooth-unified-nav{position:sticky!important;top:0!important;z-index:99999!important;display:block!important;width:100%!important;min-height:148px!important;background:#fff!important;box-shadow:0 2px 12px rgba(20,82,56,.12)!important;isolation:isolate;overflow:visible!important;contain:layout!important;backface-visibility:hidden!important}.trooth-unified-nav>*{box-sizing:border-box!important;flex:none!important;visibility:visible!important}.trooth-topbar,.trooth-nav-row{flex:none!important}.trooth-nav-row{position:relative!important;z-index:2!important;min-height:42px!important;visibility:visible!important;opacity:1!important}
+      .trooth-topbar{display:block!important;width:100%!important;height:62px!important;min-height:62px!important;max-height:62px!important;background:#18a957!important;color:#fff!important;padding:0!important;margin:0!important;position:relative!important;border:0!important;opacity:1!important;visibility:visible!important;overflow:visible!important}
+      .trooth-toprow{width:100%;height:62px;min-height:62px;display:flex;align-items:center;gap:8px;padding:7px 10px;overflow:visible}
       .trooth-menu,.trooth-icon{width:42px;height:42px;display:flex!important;align-items:center;justify-content:center;font-size:27px;font-weight:900;border:0;background:transparent;color:#fff!important;text-decoration:none!important;cursor:pointer;flex:none}
       .trooth-plus{font-size:31px!important;position:relative}
       .trooth-create-menu{display:none;position:absolute;top:58px;right:74px;width:190px;background:#fff;border:1px solid #dcebe2;border-radius:14px;box-shadow:0 10px 28px rgba(20,82,56,.18);padding:7px;z-index:1100}
@@ -128,7 +128,7 @@
       /* Unified one-page shell: remove legacy duplicate side navigation */
       .trooth-unified-nav~.layout{display:block;max-width:900px}
       .trooth-unified-nav~.layout>.left,.trooth-unified-nav~.layout>.right{display:none!important}
-      .trooth-nav-row{width:100%;display:flex!important;gap:4px;align-items:center;justify-content:center;overflow-x:auto;overflow-y:hidden;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7;scrollbar-width:none!important}.trooth-nav-row::-webkit-scrollbar{display:none!important}
+      .trooth-nav-row{width:100%;height:43px!important;min-height:43px!important;display:flex!important;gap:4px;align-items:center;justify-content:center;overflow-x:auto;overflow-y:hidden;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7;scrollbar-width:none!important}.trooth-nav-row::-webkit-scrollbar{display:none!important}
       .trooth-nav-row a{flex:0 0 auto!important;color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
       .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}
       /* One-page mobile shell: the unified header owns all navigation. */
@@ -144,7 +144,7 @@
         .trooth-plus{font-size:29px!important}.trooth-search-trigger{font-size:25px!important}.trooth-messenger{font-size:21px!important}
         .trooth-top-logo .trooth-logo-3d{width:175px;height:40px}
         .trooth-nav-search{left:48px;right:48px;top:58px;height:40px}
-        .trooth-nav-row{justify-content:flex-start;padding:6px 5px}
+        .trooth-topbar{height:56px!important;min-height:56px!important;max-height:56px!important}.trooth-toprow{height:56px;min-height:56px}.trooth-nav-row{height:42px!important;min-height:42px!important;justify-content:flex-start;padding:6px 5px}
         .trooth-nav-row a{font-size:12px;padding:7px 8px}
       }
     `;
