@@ -21,9 +21,17 @@ try{
   const url=baseUrl+'?v='+Date.now();
   const field=kind==='avatar'?'avatar_url':'cover_url';
   const r=await sb.from('profiles').update({[field]:url,updated_at:new Date().toISOString()}).eq('id',currentUser.id).select('id,display_name,bio,is_public,avatar_url,cover_url,updated_at').maybeSingle();
-  if(r.error)throw r.error;
-  if(!r.data)throw new Error('Profile record was not saved. Please save your profile first.');
+  if(r.error){
+    try{await sb.storage.from('profile-media').remove([path])}catch(cleanErr){console.warn('Profile media cleanup skipped:',cleanErr?.message||cleanErr)}
+    throw r.error;
+  }
+  if(!r.data){
+    try{await sb.storage.from('profile-media').remove([path])}catch(cleanErr){console.warn('Profile media cleanup skipped:',cleanErr?.message||cleanErr)}
+    throw new Error('Profile record was not saved. Please save your profile first.');
+  }
   profile=r.data;window.profile=profile;
+  const inputId=kind==='avatar'?'avatarFile':'coverFile';
+  if($(inputId))$(inputId).value='';
   status.textContent=(kind==='avatar'?'Profile photo':'Cover photo')+' updated ✓';
   window.dispatchEvent(new CustomEvent('trooth-profile-updated',{detail:{profile:profile}}));
   renderProfile();
