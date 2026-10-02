@@ -16,7 +16,7 @@
     var wrap=document.createElement('div');
     wrap.className='trooth-unified-nav';
     wrap.innerHTML=`
-      <header class="top trooth-topbar" aria-label="Trooth top bar">
+      <header class="trooth-topbar" aria-label="Trooth top bar">
         <div class="trooth-toprow">
           <button class="trooth-menu" type="button" aria-label="Menu" aria-expanded="false">☰</button>
           <a class="trooth-top-logo" href="index.html" aria-label="Trooth Social Independent">
@@ -129,15 +129,12 @@
     });
 
     cleanLegacyShell();
-    var observer=new MutationObserver(function(){cleanLegacyShell();});
-    observer.observe(document.body,{childList:true,subtree:true});
-
     var style=document.createElement('style');
     style.id='trooth-unified-nav-css-v4';
     style.textContent=`
-      .trooth-unified-nav{position:sticky;top:0;z-index:1000;background:#fff;box-shadow:0 2px 12px rgba(20,82,56,.12)}
-      .trooth-topbar{background:#18a957!important;color:#fff!important;padding:0!important;margin:0!important;position:relative!important;border:0!important}
-      .trooth-toprow{min-height:62px;display:flex;align-items:center;gap:8px;padding:7px 10px}
+      .trooth-unified-nav{position:sticky!important;top:0!important;z-index:10000!important;display:block!important;background:#fff!important;box-shadow:0 2px 12px rgba(20,82,56,.12)!important;isolation:isolate}
+      .trooth-topbar{display:block!important;width:100%!important;height:auto!important;min-height:62px!important;background:#18a957!important;color:#fff!important;padding:0!important;margin:0!important;position:relative!important;border:0!important;opacity:1!important;visibility:visible!important}
+      .trooth-toprow{width:100%;min-height:62px;display:flex;align-items:center;gap:8px;padding:7px 10px}
       .trooth-menu,.trooth-icon{width:42px;height:42px;display:flex!important;align-items:center;justify-content:center;font-size:27px;font-weight:900;border:0;background:transparent;color:#fff!important;text-decoration:none!important;cursor:pointer;flex:none}
       .trooth-plus{font-size:31px!important;position:relative}
       .trooth-create-menu{display:none;position:absolute;top:58px;right:74px;width:190px;background:#fff;border:1px solid #dcebe2;border-radius:14px;box-shadow:0 10px 28px rgba(20,82,56,.18);padding:7px;z-index:1100}
@@ -159,7 +156,7 @@
       /* Unified one-page shell: remove legacy duplicate side navigation */
       .trooth-unified-nav~.layout{display:block;max-width:900px}
       .trooth-unified-nav~.layout>.left,.trooth-unified-nav~.layout>.right{display:none!important}
-      .trooth-nav-row{display:flex;gap:4px;align-items:center;justify-content:center;overflow-x:auto;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7}
+      .trooth-nav-row{width:100%;display:flex;gap:4px;align-items:center;justify-content:center;overflow-x:auto;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7}
       .trooth-nav-row a{color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
       .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}
       /* One-page mobile shell: the unified header owns all navigation. */
@@ -169,6 +166,7 @@
       .trooth-composer-card .postbox{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
       @media(max-width:600px){
+        .trooth-topbar{min-height:56px!important}
         .trooth-toprow{min-height:56px;padding:5px 6px;gap:3px}
         .trooth-menu,.trooth-icon{width:38px;height:38px;font-size:23px}
         .trooth-plus{font-size:29px!important}.trooth-search-trigger{font-size:25px!important}.trooth-messenger{font-size:21px!important}
