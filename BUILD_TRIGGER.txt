@@ -2,3 +2,4 @@ Trooth SI v1.5 APK build trigger — final verified source
 Build requested: 2026-10-03
 Source commit: df70b150da44daa78f6926173338ff343f746613
 Final verification: auth redirect + Home feed persistence + post/media hardening + four actions + final navigation
+APK trigger: fresh build after final verification
