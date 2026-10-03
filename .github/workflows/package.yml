@@ -51,8 +51,8 @@ jobs:
               applicationId 'com.trooth.si'
               minSdk 23
               targetSdk 35
-              versionCode 13
-              versionName '1.6-dream'
+              versionCode 14
+              versionName '1.7-dream'
             }
           }
           EOF
@@ -104,7 +104,7 @@ jobs:
                   }
                 }
               });
-              webView.loadUrl("https://s15297765-svg.github.io/-Trooth-Social-Independent/?app=trooth-v1.5");
+              webView.loadUrl("https://s15297765-svg.github.io/-Trooth-Social-Independent/?app=trooth-v1.7-dream");
               setContentView(webView);
             }
 
@@ -141,8 +141,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Trooth-Social-Independent-APK-v1.5
+          name: Trooth-Social-Independent-APK-v1.7-dream
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-
-# Force a fresh Android build for the current v1.5 source; versionCode 12.
