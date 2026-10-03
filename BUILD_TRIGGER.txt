@@ -1,4 +1,4 @@
-Trooth SI v1.5 APK build trigger — profile metadata sync
-Build requested: 2026-09-20
-Source commit: 9fb119f2a84f3f1fe2d8f575e1e3dd668b484093
-Profile/photo cache-bust: v29
+Trooth SI v1.5 APK build trigger — final verified source
+Build requested: 2026-10-03
+Source commit: df70b150da44daa78f6926173338ff343f746613
+Final verification: auth redirect + Home feed persistence + post/media hardening + four actions + final navigation
