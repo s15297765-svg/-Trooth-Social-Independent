@@ -59,16 +59,16 @@
       /* Final locked three-line header: compact, stable, no horizontal overflow */
       .trooth-unified-nav{width:100%!important;overflow:visible!important}
       .trooth-topbar,.trooth-toprow{width:100%!important;box-sizing:border-box!important}
-.trooth-topbar{background:#fff!important;color:#14532d!important;border-bottom:1px solid #e0e8e3!important}
+.trooth-topbar{background:#18a957!important;color:#fff!important;border-bottom:0!important}
       .trooth-toprow{gap:5px!important;padding:5px 7px!important;overflow:hidden!important}
-      .trooth-menu,.trooth-icon{width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important;padding:0!important;display:grid!important;place-items:center!important;flex:none!important;background:transparent!important;color:#14532d!important}
+      .trooth-menu,.trooth-icon{width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important;padding:0!important;display:grid!important;place-items:center!important;flex:none!important;background:transparent!important;color:#fff!important}
       .trooth-nav-svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
       .trooth-menu .trooth-nav-svg{width:24px;height:24px}
       .trooth-plus .trooth-nav-svg{width:25px;height:25px}
       .trooth-search-trigger .trooth-nav-svg{width:24px;height:24px}
       .trooth-messenger .trooth-nav-svg{width:23px;height:23px}
-      .trooth-top-logo{flex:1 1 auto!important;min-width:0!important;margin:0!important;overflow:hidden!important;color:#18a957!important}
-.trooth-top-logo .trooth-logo-3d{filter:none!important}
+      .trooth-top-logo{flex:1 1 auto!important;min-width:0!important;margin:0!important;overflow:hidden!important;color:#fff!important}
+.trooth-top-logo .trooth-logo-3d{filter:grayscale(1) brightness(0) invert(1)!important}
       .trooth-top-logo .trooth-logo-3d{width:min(158px,100%)!important;height:46px!important;max-width:100%!important;object-fit:contain!important;object-position:left center!important}
       .trooth-nav-row{width:100%!important;box-sizing:border-box!important;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:3px!important;height:42px!important;min-height:42px!important;max-height:42px!important;padding:4px 6px!important;overflow:hidden!important;white-space:normal!important}
       .trooth-nav-row a{width:auto!important;min-width:0!important;max-width:none!important;height:34px!important;padding:0!important;margin:0!important;border:0!important;border-radius:9px!important;background:transparent!important;display:grid!important;place-items:center!important;flex:none!important;color:#14532d!important;overflow:hidden!important}
