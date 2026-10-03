@@ -9,7 +9,7 @@
 .card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 8px 30px #16653418}
 h2{margin:0 0 8px}.muted{color:#718276}input{width:100%;padding:13px;border:1px solid #cfe8d5;border-radius:10px;font:inherit;margin-top:10px}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.btn{border:0;border-radius:10px;padding:12px;font-weight:800;cursor:pointer;background:#15803d;color:#fff}.btn.alt{background:#dcfce7;color:#166534}.btn:disabled{opacity:.6;cursor:not-allowed}
-.status{margin-top:13px;padding:11px;border-radius:10px;background:#f1f7f3;line-height:1.45;min-height:20px}.home{display:block;text-align:center;margin-top:14px;color:#166534;text-decoration:none;font-weight:bold}
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:14px 0 4px;padding:4px;background:#f1f7f3;border-radius:12px}.mode{border:0;border-radius:9px;padding:9px;background:transparent;color:#537064;font-weight:800;cursor:pointer}.mode.active{background:#fff;color:#15803d;box-shadow:0 2px 7px #16653412}.status{margin-top:13px;padding:11px;border-radius:10px;background:#f1f7f3;line-height:1.45;min-height:20px}.home{display:block;text-align:center;margin-top:14px;color:#166534;text-decoration:none;font-weight:bold}
 @media(max-width:430px){.actions{grid-template-columns:1fr}.brand h1{font-size:32px}}
 </style>
 </head>
@@ -17,14 +17,15 @@ h2{margin:0 0 8px}.muted{color:#718276}input{width:100%;padding:13px;border:1px 
 <main class="wrap">
 <div class="brand"><h1>Trooth</h1><p>Social Independent • Connect • Build • Grow</p></div>
 <section class="card">
-<h2>Welcome to Trooth 👋</h2>
-<p class="muted">اپنا نام، ای میل یا موبائل نمبر اور پاس ورڈ استعمال کریں۔</p>
-<input id="displayName" placeholder="Your name (for new account)" autocomplete="name">
+<h2 id="authTitle">Log in to Trooth</h2>
+<p class="muted" id="authHint">اپنا ای میل/موبائل نمبر اور پاس ورڈ استعمال کریں۔</p>
+<input id="displayName" placeholder="Your name" autocomplete="name" hidden>
 <input id="identifier" type="text" inputmode="email" autocomplete="username" placeholder="Email or mobile number">
 <input id="password" type="password" autocomplete="current-password" placeholder="Password (6+ characters)">
+<div class="mode-tabs"><button type="button" id="loginTab" class="mode active" onclick="setMode(false)">Login</button><button type="button" id="signupTab" class="mode" onclick="setMode(true)">Create Account</button></div>
 <div class="actions">
 <button class="btn" id="loginBtn" onclick="login()">Login</button>
-<button class="btn alt" id="signupBtn" onclick="signup()">Create Account</button>
+<button class="btn alt" id="signupBtn" onclick="signup()" hidden>Create Account</button>
 </div>
 <button class="btn alt" id="resendBtn" onclick="resendConfirmation()" style="width:100%;margin-top:9px">Resend confirmation email</button>
 <div id="authMsg" class="status"></div>
@@ -36,6 +37,8 @@ h2{margin:0 0 8px}.muted{color:#718276}input{width:100%;padding:13px;border:1px 
 let sb=null;
 const $=id=>document.getElementById(id);
 function msg(t){$('authMsg').textContent=t||''}
+function setMode(signup){$('displayName').hidden=!signup;$('loginBtn').hidden=signup;$('signupBtn').hidden=!signup;$('loginTab').classList.toggle('active',!signup);$('signupTab').classList.toggle('active',signup);$('authTitle').textContent=signup?'Create your Trooth account':'Log in to Trooth';$('authHint').textContent=signup?'نام، ای میل/موبائل نمبر اور پاس ورڈ سے نیا اکاؤنٹ بنائیں۔':'اپنا ای میل/موبائل نمبر اور پاس ورڈ استعمال کریں۔';msg('')}
+
 function authErrorText(e,action){const code=e?.code||'',status=e?.status||'';if(code==='invalid_credentials')return 'ای میل/موبائل یا پاس ورڈ درست نہیں۔';if(code==='email_not_confirmed')return 'ای میل ابھی confirm نہیں ہوئی۔ نیچے Resend confirmation email دبائیں۔';if(status===401||/invalid api key|invalid api/i.test(e?.message||''))return 'Supabase API رابطہ مستحکم نہیں۔ تازہ Trooth build استعمال کریں؛ API configuration دوبارہ چیک کی گئی ہے۔';return e?.message||(' '+action+' نہیں ہو سکا۔')}
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
 function isEmail(v){return validEmail(v)}
@@ -86,7 +89,7 @@ async function resendConfirmation(){
  catch(e){msg(authErrorText(e,'Confirmation email'))}
  finally{busy('resendBtn',false)}
 }
-window.addEventListener('load',start);
+window.addEventListener('load',()=>{setMode(false);start()});
 if(location.hash.includes('error_code=')){try{const p=new URLSearchParams(location.hash.slice(1));msg('Email confirmation response: '+(p.get('error_description')||'Please request a fresh confirmation email.'))}catch(e){}}
 </script>
 </body></html>
