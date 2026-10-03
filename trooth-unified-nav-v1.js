@@ -29,10 +29,10 @@
         </div>
       </header>
       <nav class="trooth-nav-row trooth-nav-secondary" aria-label="Trooth sections">
-        <a href="news.html">News</a><a href="sports.html">Sports</a><a href="news.html#international">International</a><a href="stores.html">Stores</a><a href="film-fashion.html">Film/Fashion</a><a href="property.html">Property</a>
+        <a href="news.html" aria-label="News" title="News">📰</a><a href="sports.html" aria-label="Sports" title="Sports">🏏</a><a href="news.html#international" aria-label="International" title="International">🌐</a><a href="stores.html" aria-label="Stores" title="Stores">🛍️</a><a href="film-fashion.html" aria-label="Film/Fashion" title="Film/Fashion">🎬</a><a href="property.html" aria-label="Property" title="Property">🏠</a>
       </nav>
       <nav class="trooth-nav-row trooth-nav-tertiary" aria-label="Trooth social navigation">
-        <a href="index.html">Home</a><a href="friends.html">Friends</a><a href="index.html#feed">Videos</a><a href="dashboard.html">Dashboard</a><a href="notifications-messages.html">Notifications</a><a href="profile.html">Profile</a>
+        <a href="index.html" aria-label="Home" title="Home">⌂</a><a href="friends.html" aria-label="Friends" title="Friends">👥</a><a href="index.html#feed" aria-label="Videos" title="Videos">▶</a><a href="dashboard.html" aria-label="Dashboard" title="Dashboard">▦</a><a href="notifications-messages.html" aria-label="Notifications" title="Notifications">🔔</a><a href="profile.html" aria-label="Profile" title="Profile">👤</a>
       </nav>`;
     document.body.insertBefore(wrap,document.body.firstChild);
 
@@ -129,8 +129,8 @@
       .trooth-unified-nav~.layout{display:block;max-width:900px}
       .trooth-unified-nav~.layout>.left,.trooth-unified-nav~.layout>.right{display:none!important}
       .trooth-nav-row{width:100%;height:43px!important;min-height:43px!important;display:flex!important;gap:4px;align-items:center;justify-content:center;overflow-x:auto;overflow-y:hidden;white-space:nowrap;background:#fff;padding:7px 8px;border-bottom:1px solid #e3eee7;scrollbar-width:none!important}.trooth-nav-row::-webkit-scrollbar{display:none!important}
-      .trooth-nav-row a{flex:0 0 auto!important;color:#14532d!important;text-decoration:none!important;font-weight:800;padding:8px 10px;border-radius:9px}
-      .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}
+      .trooth-nav-row a{flex:0 0 44px!important;width:44px!important;height:36px!important;display:flex!important;align-items:center!important;justify-content:center!important;color:#14532d!important;text-decoration:none!important;font-weight:800;padding:4px!important;border-radius:9px;font-size:20px!important;line-height:1}
+      .trooth-nav-row a:hover,.trooth-nav-row a:focus{background:#e5f7eb}.trooth-nav-row a:active{transform:scale(.94)}
       /* One-page mobile shell: the unified header owns all navigation. */
       .bottom{display:none!important}
       body{padding-bottom:0!important}
@@ -145,7 +145,7 @@
         .trooth-top-logo .trooth-logo-3d{width:175px;height:40px}
         .trooth-nav-search{left:48px;right:48px;top:58px;height:40px}
         .trooth-topbar{height:56px!important;min-height:56px!important;max-height:56px!important}.trooth-toprow{height:56px;min-height:56px}.trooth-nav-row{height:42px!important;min-height:42px!important;justify-content:flex-start;padding:6px 5px}
-        .trooth-nav-row a{font-size:12px;padding:7px 8px}
+        .trooth-nav-row a{font-size:20px!important;padding:4px!important;width:42px!important;flex-basis:42px!important}
       }
     `;
     document.head.appendChild(style);
