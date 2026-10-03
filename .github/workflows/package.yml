@@ -1,4 +1,4 @@
-name: Trooth SI Android APK
+name: Trooth SI Android APK — Dream Target
 
 on:
   workflow_dispatch:
@@ -51,8 +51,8 @@ jobs:
               applicationId 'com.trooth.si'
               minSdk 23
               targetSdk 35
-              versionCode 12
-              versionName '1.5'
+              versionCode 13
+              versionName '1.6-dream'
             }
           }
           EOF
