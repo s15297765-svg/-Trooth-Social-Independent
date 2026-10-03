@@ -53,8 +53,12 @@
       items.forEach((item,i)=>setIcon(links[i],item[0],item[1]));
     });
 
-    const style=document.createElement('style');
-    style.id='trooth-final-icon-nav-css-v1';
+    let style=document.getElementById('trooth-final-icon-nav-css-v1');
+    if(!style){
+      style=document.createElement('style');
+      style.id='trooth-final-icon-nav-css-v1';
+      document.head.appendChild(style);
+    }
     style.textContent=String.raw`
       /* Final locked three-line header: compact, stable, no horizontal overflow */
       .trooth-unified-nav{width:100%!important;overflow:visible!important}
@@ -85,10 +89,19 @@
         .trooth-nav-row .trooth-nav-svg{width:20px;height:20px}
       }
     `;
-    document.head.appendChild(style);
     return true;
   }
 
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(apply,0)},{once:true});
-  else setTimeout(apply,0);
+  function start(){
+    apply();
+    if(window.__troothFinalIconNavObserver)return;
+    const observer=new MutationObserver(function(){
+      if(document.querySelector('.trooth-unified-nav'))apply();
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+    window.__troothFinalIconNavObserver=observer;
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
 })();
