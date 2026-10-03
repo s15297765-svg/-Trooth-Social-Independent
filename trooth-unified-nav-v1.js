@@ -63,7 +63,7 @@
     if(plusBtn){
       var createMenu=document.createElement('div');
       createMenu.className='trooth-create-menu';
-      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="post.html" data-create="post">📝 Post</a><a href="story.html" data-create="story">⭕ Story</a><a href="post.html?mode=video" data-create="reel">🎞️ Reel</a><a href="post.html?mode=video" data-create="video">🎥 Video</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="post.html?mode=note" data-create="note">📒 Note</a>';
+      createMenu.innerHTML='<div class="trooth-create-title">Create</div><a href="post.html" data-create="post">📝 Post</a><a href="story.html" data-create="story">⭕ Story</a><a href="reels.html" data-create="reel">🎞️ Reel</a><a href="post.html?mode=video" data-create="video">🎥 Video</a><a href="index.html#live" data-create="live">🔴 Live Video</a><a href="post.html?mode=note" data-create="note">📒 Note</a>';
       wrap.querySelector('.trooth-toprow').appendChild(createMenu);
       plusBtn.addEventListener('click',function(){
         var open=createMenu.classList.toggle('open');
@@ -75,7 +75,7 @@
         var type=a.getAttribute('data-create');
         if(type==='post'){ location.href='post.html'; return; }
         if(type==='story'){ location.href='story.html'; return; }
-        if(type==='reel' || type==='video'){ location.href='post.html?mode=video'; return; }
+        if(type==='reel'){ location.href='reels.html'; return; } if(type==='video'){ location.href='post.html?mode=video'; return; }
         if(type==='live'){ if(window.TroothLive)window.TroothLive.open(); else alert('Trooth Live is still loading. Please try again.'); return; }
         if(type==='note'){ location.href='post.html?mode=note'; return; }
       });
