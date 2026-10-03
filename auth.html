@@ -92,4 +92,10 @@ async function resendConfirmation(){
 window.addEventListener('load',()=>{setMode(false);start()});
 if(location.hash.includes('error_code=')){try{const p=new URLSearchParams(location.hash.slice(1));msg('Email confirmation response: '+(p.get('error_description')||'Please request a fresh confirmation email.'))}catch(e){}}
 </script>
+<script>
+/* Trooth dream login/session polish */
+(function(){
+ var st=document.createElement('style');st.textContent='.brand h1{font-size:42px;font-weight:950;letter-spacing:-2px}.brand h1:after{content:"";display:block;width:110px;height:4px;background:#18a957;border-radius:5px;margin:5px auto}.card{border:1px solid #dfeee4;box-shadow:0 8px 28px rgba(20,70,40,.09)}.btn{background:#18a957}.btn.alt{background:#eaf8ef;color:#166534}';document.head.appendChild(st);
+})();
+</script>
 </body></html>
