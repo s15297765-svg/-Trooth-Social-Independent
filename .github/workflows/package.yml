@@ -87,6 +87,7 @@ jobs:
               s.setDatabaseEnabled(true);
               s.setAllowFileAccess(true);
               s.setAllowContentAccess(true);
+              s.setCacheMode(WebSettings.LOAD_NO_CACHE);
               s.setMediaPlaybackRequiresUserGesture(false);
               webView.setWebViewClient(new WebViewClient());
               webView.setWebChromeClient(new WebChromeClient() {
@@ -104,7 +105,7 @@ jobs:
                   }
                 }
               });
-              webView.loadUrl("file:///android_asset/site/index.html");
+              webView.loadUrl("https://s15297765-svg.github.io/-Trooth-Social-Independent/?app=trooth-live");
               setContentView(webView);
             }
 
