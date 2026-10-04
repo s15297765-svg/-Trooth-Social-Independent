@@ -104,7 +104,7 @@ jobs:
                   }
                 }
               });
-              webView.loadUrl("https://s15297765-svg.github.io/-Trooth-Social-Independent/?app=trooth-v1.7-dream");
+              webView.loadUrl("file:///android_asset/site/index.html");
               setContentView(webView);
             }
 
