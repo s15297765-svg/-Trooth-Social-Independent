@@ -37,7 +37,7 @@
         var p=r.data;
         if(!p){
           var display=(u.user_metadata&&u.user_metadata.display_name)||((u.email||'Trooth User').split('@')[0]);
-          return sb.from('profiles').insert({id:u.id,display_name:display,bio:''}).select('*').single();
+          return sb.from('profiles').insert({id:u.id,display_name:display,bio:'',is_public:true}).select('*').single();
         }
         return {data:p};
       }).then(function(r){
