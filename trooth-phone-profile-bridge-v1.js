@@ -14,7 +14,7 @@
       if(p.error)return;
       if(!p.data){
         var name=sessionStorage.getItem('trooth_pending_name')||user.user_metadata?.display_name||user.phone||'Trooth User';
-        await sb.from('profiles').insert({id:user.id,display_name:name,bio:''});
+        await sb.from('profiles').insert({id:user.id,display_name:name,bio:'',is_public:true});
       }
       sessionStorage.removeItem('trooth_verified');
       sessionStorage.removeItem('trooth_pending_name');
