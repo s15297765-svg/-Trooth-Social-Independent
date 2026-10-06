@@ -13,12 +13,14 @@
 - Pages workflow applies cache-busted social/profile bridges during deployment.
 
 ## APK
-- Target release: v1.5
-- Android versionCode: 12
-- Android versionName: 1.5
-- APK artifact name: `Trooth-Social-Independent-APK-v1.5`
+- Current target release: **v1.7**
+- Android versionCode: **17**
+- Android versionName: **1.7**
+- APK artifact name: `Trooth-Social-Independent-APK-v1.7`
 - Build workflow: `.github/workflows/package.yml`
 - APK is generated from the current `main` branch web app source and packaged as an Android WebView application.
+- Stability rule: the APK loads the bundled `index.html` from Android assets instead of depending on the live GitHub Pages URL at runtime. Supabase/network features may still use the internet normally.
+- Navigation target: compact three-line mobile navigation; the second row shows News, Sports, International, Stores, Film / Fashion and Property with visible labels.
 
 ## Verification rule
 - Do not provide an APK download as current until the corresponding GitHub Actions build has completed successfully and the artifact has been checked.
