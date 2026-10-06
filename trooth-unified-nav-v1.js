@@ -3,13 +3,13 @@
   if(window.__troothUnifiedNavV2)return;
   window.__troothUnifiedNavV2=true;
   function cleanLegacyShell(){
-    document.querySelectorAll('.reference-nav,.trooth-three-line-nav,main>nav,.bottom,#trooth-demo-banner,#trooth-demo-hub').forEach(function(el){el.remove();});
+    document.querySelectorAll('.reference-nav,.trooth-three-line-nav,main>nav,.bottom,.top,#trooth-demo-banner,#trooth-demo-hub').forEach(function(el){el.remove();});
     document.body.style.paddingBottom='0';
   }
   function nav(){
     if(document.querySelector('.trooth-unified-nav'))return;
     var oldHeader=document.querySelector('body>header');
-    var oldNavs=document.querySelectorAll('.reference-nav,.trooth-three-line-nav,main>nav');
+    var oldNavs=document.querySelectorAll('.reference-nav,.trooth-three-line-nav,main>nav,.top');
     if(oldHeader)oldHeader.remove();
     oldNavs.forEach(function(el){el.remove()});
 
