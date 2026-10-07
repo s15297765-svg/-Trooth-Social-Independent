@@ -33,20 +33,20 @@ jobs:
           import re
           page = Path('index.html')
           html = page.read_text(encoding='utf-8')
-          html = re.sub(r'<script[^>]+trooth-live-final-v1\\.js[^>]*></script>', '', html, flags=re.I)
-          html = re.sub(r'<script[^>]+trooth-live-final-v2\\.js[^>]*></script>', '', html, flags=re.I)
+          html = re.sub(r'<script[^>]+trooth-live-final-v1\.js[^>]*></script>', '', html, flags=re.I)
+          html = re.sub(r'<script[^>]+trooth-live-final-v2\.js[^>]*></script>', '', html, flags=re.I)
           html = re.sub(r'<div id="trooth-build-marker"[^>]*>.*?</div>', '', html, flags=re.I|re.S)
           bridge = '<script src="trooth-home-search-fix-v1.js?v=${{ github.sha }}"></script>'
           if 'trooth-home-search-fix-v1.js' not in html:
               html = html.replace('</body>', bridge + '</body>', 1)
           social = '<script src="trooth-social-actions-v1.js?v=${{ github.sha }}"></script>'
-          html = re.sub(r'<script[^>]+trooth-social-actions-v1\\.js[^>]*></script>', '', html, flags=re.I)
+          html = re.sub(r'<script[^>]+trooth-social-actions-v1\.js[^>]*></script>', '', html, flags=re.I)
           html = html.replace('</body>', social + '</body>', 1)
           page.write_text(html, encoding='utf-8')
 
           for p in Path('.').glob('*.html'):
               h = p.read_text(encoding='utf-8')
-              h = re.sub(r'<script[^>]+trooth-brand-v1\\.js[^>]*></script>', '', h, flags=re.I)
+              h = re.sub(r'<script[^>]+trooth-brand-v1\.js[^>]*></script>', '', h, flags=re.I)
               h = h.replace('</body>', '<script src="trooth-brand-v1.js?v=${{ github.sha }}"></script></body>', 1)
               p.write_text(h, encoding='utf-8')
 
@@ -55,12 +55,12 @@ jobs:
               if not p.exists():
                   continue
               h = p.read_text(encoding='utf-8')
-              h = re.sub(r'<script[^>]+trooth-profile-bridge-v[12]\\.js[^>]*></script>', '', h, flags=re.I)
+              h = re.sub(r'<script[^>]+trooth-profile-bridge-v[12]\.js[^>]*></script>', '', h, flags=re.I)
               tag = '<script src="trooth-profile-bridge-v2.js?v=${{ github.sha }}"></script>'
               h = h.replace('</body>', tag + '</body>', 1)
               if name == 'auth.html':
                   email_tag = '<script src="trooth-email-auth-v1.js?v=${{ github.sha }}"></script>'
-                  h = re.sub(r'<script[^>]+trooth-email-auth-v1\\.js[^>]*></script>', '', h, flags=re.I)
+                  h = re.sub(r'<script[^>]+trooth-email-auth-v1\.js[^>]*></script>', '', h, flags=re.I)
                   h = h.replace('</body>', email_tag + '</body>', 1)
               p.write_text(h, encoding='utf-8')
           PY
