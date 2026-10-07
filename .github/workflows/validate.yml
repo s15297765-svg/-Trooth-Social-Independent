@@ -50,8 +50,11 @@ jobs:
         run: |
           set -euo pipefail
           test -f supabase-client.js
-          grep -q "trooth-business-owner-v1.js" supabase-client.js
-          grep -q "trooth-business-analytics-v1.js" supabase-client.js
+          grep -q "tmshuyvtmbumtrlbhdjq.supabase.co" supabase-client.js
+          grep -q "supabase.createClient" supabase-client.js
+          grep -q "persistSession:true" supabase-client.js
+          test -f trooth-business-owner-v1.js
+          test -f trooth-business-analytics-v1.js
 
   android-apk:
     runs-on: ubuntu-latest
