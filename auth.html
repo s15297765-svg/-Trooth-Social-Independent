@@ -50,10 +50,12 @@ async function ready(){
  if(window.troothSupabase)return window.troothSupabase;
  return await new Promise((resolve,reject)=>{
   let done=false;
-  const finish=(v,e)=>{if(done)return;done=true;clearTimeout(timer);window.removeEventListener('trooth-supabase-ready',on);e?reject(e):resolve(v)};
+  const finish=(v,e)=>{if(done)return;done=true;clearTimeout(timer);window.removeEventListener('trooth-supabase-ready',on);window.removeEventListener('trooth-supabase-error',onError);e?reject(e):resolve(v)};
   const on=()=>window.troothSupabase?finish(window.troothSupabase):finish(null,new Error('Trooth services are unavailable. Please refresh.'));
-  const timer=setTimeout(()=>finish(null,new Error('Trooth services took too long to start. Please refresh.')),10000);
+  const onError=e=>finish(null,e?.detail?.error||new Error('Trooth services could not start. Please refresh.'));
+  const timer=setTimeout(()=>finish(null,new Error('Trooth services took too long to start. Please refresh.')),12000);
   window.addEventListener('trooth-supabase-ready',on,{once:true});
+  window.addEventListener('trooth-supabase-error',onError,{once:true});
  });
 }
 async function start(){try{sb=await ready();const r=await sb.auth.getUser();if(r.data?.user){msg('Session موجود ہے ✓');location.href='index.html';return}sb.auth.onAuthStateChange((event,session)=>{if(session?.user&&(event==='SIGNED_IN'||event==='INITIAL_SESSION')){location.href='index.html'}})}catch(e){msg(e.message)}}
