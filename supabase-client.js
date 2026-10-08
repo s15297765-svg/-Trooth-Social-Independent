@@ -5,12 +5,12 @@
 
   var SUPABASE_URL='https://tmshuyvtmbumtrlbhdjq.supabase.co';
   var SUPABASE_KEY='sb_publishable_AU3U8fFpSCi9ifFwQpAkVA_GTSnhpkz';
-  var RELEASE='20261006-v36';
+  var RELEASE='20261008-v37';
   var scripts=[
-    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
-    'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js'
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js',
+    'https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js'
   ];
-  var i=0,readySent=false;
+  var i=0,readySent=false,startedAt=Date.now();
 
   window.troothLoadedModules=window.troothLoadedModules||[];
 
@@ -27,11 +27,11 @@
   }
   function loadNext(){
     if(i>=scripts.length){
-      fail('all','Supabase client could not be loaded from the available CDNs.');
+      fail('all','Supabase client could not be loaded. Network/CDN access is unavailable.');
       return;
     }
     var src=scripts[i++],s=document.createElement('script');
-    s.src=src+'?v='+RELEASE;
+    s.src=src+'?trooth='+RELEASE;
     s.async=false;
     s.dataset.troothRelease=RELEASE;
     s.onload=function(){
